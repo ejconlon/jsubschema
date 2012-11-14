@@ -72,7 +72,7 @@ public class Thing implements Visitable {
     public static Thing makeArray() { return makeArray(new ArrayList<Thing>()); }
     public void setArray(List<Thing> v) { setValue(v); }
 
-    /*public boolean isString() {
+    public boolean isString() {
         return isA(Type.of("string"));
     }
     public String getString() {
@@ -118,7 +118,20 @@ public class Thing implements Visitable {
         return new Thing(Type.of("double"), s);
     }
     public static Thing makeDouble() { return makeDouble(null); }
-    public void setDouble(Double v) { setValue(v); }*/
+    public void setDouble(Double v) { setValue(v); }
+
+    public boolean isScalar() {
+        return TypeInfo.getScalars().contains(type);
+    }
+    public static Thing makeScalar(Object v) {
+        if (v instanceof String) return new Thing(Type.of("string"), v);
+        if (v instanceof Boolean) return new Thing(Type.of("boolean"), v);
+        if (v instanceof Long) return new Thing(Type.of("long"), v);
+        if (v instanceof Integer) return new Thing(Type.of("long"), v);
+        if (v instanceof Double) return new Thing(Type.of("double"), v);
+        if (v instanceof Float) return new Thing(Type.of("double"), v);
+        else throw new IllegalArgumentException("Invalid scalar: "+v.getClass()+" "+v);
+    }
 
     // --- boilerplate
 

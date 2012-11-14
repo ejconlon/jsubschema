@@ -1,5 +1,10 @@
 package net.exathunk.jsubschema.base;
 
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
+
 import java.util.*;
 
 /**
@@ -46,5 +51,32 @@ public class Util {
             if (part != null && !part.isEmpty()) list.add(part);
         }
         return list;
+    }
+
+    public static Thing parse(String s) {
+        JSON json = (new JSONSerializer()).toJSON(s);
+        return parseInner(json);
+    }
+
+    private static Thing parseInner(Object json) {
+        if (json instanceof JSONArray) {
+            JSONArray a = (JSONArray)json;
+            List<Thing> list = new ArrayList<Thing>(a.size());
+            for (Object o : a) {
+                list.add(parseInner(o));
+            }
+            return Thing.makeArray(list);
+        } else if (json instanceof JSONObject) {
+            JSONObject o = (JSONObject)json;
+            Map<String, Thing> map = new TreeMap<String, Thing>();
+            for (Object entries : o.entrySet()) {
+                String key = ((Map.Entry<String, Thing>)entries).getKey();
+                Object value = ((Map.Entry<String, Object>)entries).getValue();
+                map.put(key, parseInner(value));
+            }
+            return Thing.makeObject(map);
+        } else {
+            return Thing.makeScalar(json);
+        }
     }
 }

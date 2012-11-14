@@ -2,9 +2,8 @@ package net.exathunk.jsubschema.base;
 
 import org.junit.Test;
 
-import java.util.Map;
+import java.io.IOException;
 import java.util.Set;
-import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
 
@@ -13,21 +12,36 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestNodes {
 
-    final String[][] strings = new String[][] {
-            {"object", "type,properties"},
-            {"array", "type,items"},
-            {"string", "type"},
-            {"boolean", "type"},
-            {"long", "type"},
-            {"double", "type"},
+    final String[][] properties = new String[][] {
+            {"{\"foo\":1,\"bar\":false}", "foo,bar"},
+            {"{}", ""},
+            {"[1,2,3]", ""}
     };
 
     @Test
-    public void testNodes() {
-        for (String[] ss : strings) {
-            Set<String> as = Nodes.propsForType(Type.of(ss[0]));
+    public void testProperties() {
+        for (String[] ss : properties) {
+            Thing thing = Util.parse(ss[0]);
+            Set<String> as = TypeInfo.propsForThing(thing);
             Set<String> bs = Util.asSet(Util.split(ss[1], ","));
-            Util.assertTrue("propsForType", as, bs, Util.setEquals(as, bs));
+            assertEquals(as, bs);
         }
     }
+
+    public void runTestSchema(String name) throws IOException, TypeException {
+        Thing thing = Loader.loadSchemaThing(name);
+        System.out.println(thing);
+
+        SchemaBuilder builder = new SchemaBuilder(thing);
+        Schema schema = builder.build();
+        System.out.println(schema);
+    }
+
+    @Test
+    public void testSchema() throws IOException, TypeException {
+        for (String name : Util.split("schema,address,event,geo,link,card", ",")) {
+            runTestSchema(name);
+        }
+    }
+
 }
