@@ -1,0 +1,108 @@
+<project
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>net.exathunk</groupId>
+    <artifactId>jsubschema</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>JSubSchema</name>
+    <url>http://exathunk.net</url>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.11</version>
+                <configuration>
+                    <systemProperties>
+                        <property>
+                            <name>java.util.logging.config.file</name>
+                            <value>logging.properties</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!--<profiles>
+        <profile>
+            <id>profile-genschemas</id>
+            <activation>
+                <file><exists>/bin/bash</exists></file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate-test-sources</id>
+                                <phase>generate-test-sources</phase>
+                                <configuration>
+                                    <tasks>
+                                        <property name="classpath" refid="maven.compile.classpath"/>
+                                        <mkdir dir="target/generated-sources" />
+                                        <exec executable="java">
+                                            <arg value="-cp"/>
+                                            <arg value="${classpath}"/>
+                                            <arg value="net.exathunk.jereal.base.gen.RunGen"/>
+                                            <arg value="src/main/resources/schemas"/>
+                                            <arg value="target/generated-sources/gen-javabean/net/exathunk/jereal/genschema"/>
+                                            <arg value="net.exathunk.jereal.genschema"/>
+                                        </exec>
+                                        <delete>
+                                            <fileset dir="src/main/java/net/exathunk/jereal/genschema" includes="**/*"/>
+                                        </delete>
+                                        <copy todir="src/main/java/net/exathunk/jereal/genschema">
+                                            <fileset dir="target/generated-sources/gen-javabean/net/exathunk/jereal/genschema"/>
+                                        </copy>
+                                        <delete>
+                                            <fileset dir="target/generated-sources/gen-javabean/net/exathunk/jereal/genschema" includes="**/*"/>
+                                        </delete>
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>-->
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>3.0.4</version>
+        </dependency>
+    </dependencies>
+
+</project>
