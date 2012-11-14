@@ -1,5 +1,6 @@
 package net.exathunk.jsubschema.base;
 
+import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -19,20 +20,20 @@ public class TestNodes {
     };
 
     @Test
-    public void testProperties() {
+    public void testProperties() throws IOException {
         for (String[] ss : properties) {
-            Thing thing = Util.parse(ss[0]);
-            Set<String> as = TypeInfo.propsForThing(thing);
+            JsonNode node = Util.parse(ss[0]);
+            Set<String> as = TypeInfo.propsForNode(node);
             Set<String> bs = Util.asSet(Util.split(ss[1], ","));
             assertEquals(as, bs);
         }
     }
 
     public void runTestSchema(String name) throws IOException, TypeException {
-        Thing thing = Loader.loadSchemaThing(name);
-        System.out.println(thing);
+        JsonNode node = Loader.loadSchemaNode(name);
+        System.out.println(node);
 
-        SchemaBuilder builder = new SchemaBuilder(thing);
+        SchemaBuilder builder = new SchemaBuilder(node);
         Schema schema = builder.build();
         System.out.println(schema);
     }
@@ -40,6 +41,7 @@ public class TestNodes {
     @Test
     public void testSchema() throws IOException, TypeException {
         for (String name : Util.split("schema,address,event,geo,link,card", ",")) {
+        //for (String name : Util.split("schema", ",")) {
             runTestSchema(name);
         }
     }

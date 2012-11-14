@@ -1,10 +1,9 @@
 package net.exathunk.jsubschema.base;
 
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -12,16 +11,21 @@ import java.util.*;
  */
 public class Util {
 
-    public static <X> Set<X> asSet(Iterable<X> xs) {
-        Set<X> s = new HashSet<X>();
-        for (X x : xs) {
-            s.add(x);
+    public static <X> Set<X> asSet(Iterator<X> xs) {
+        final Set<X> s = new HashSet<X>();
+        while (xs.hasNext()) {
+            final X next = xs.next();
+            s.add(next);
         }
         return s;
     }
 
+    public static <X> Set<X> asSet(Iterable<X> xs) {
+        return asSet(xs.iterator());
+    }
+
     public static <X> Set<X> asSet(X... xs) {
-        Set<X> s = new HashSet<X>();
+        final Set<X> s = new HashSet<X>();
         for (X x : xs) {
             s.add(x);
         }
@@ -53,30 +57,8 @@ public class Util {
         return list;
     }
 
-    public static Thing parse(String s) {
-        JSON json = (new JSONSerializer()).toJSON(s);
-        return parseInner(json);
+    public static JsonNode parse(String s) throws IOException {
+        return (new ObjectMapper()).readTree(s);
     }
 
-    private static Thing parseInner(Object json) {
-        if (json instanceof JSONArray) {
-            JSONArray a = (JSONArray)json;
-            List<Thing> list = new ArrayList<Thing>(a.size());
-            for (Object o : a) {
-                list.add(parseInner(o));
-            }
-            return Thing.makeArray(list);
-        } else if (json instanceof JSONObject) {
-            JSONObject o = (JSONObject)json;
-            Map<String, Thing> map = new TreeMap<String, Thing>();
-            for (Object entries : o.entrySet()) {
-                String key = ((Map.Entry<String, Thing>)entries).getKey();
-                Object value = ((Map.Entry<String, Object>)entries).getValue();
-                map.put(key, parseInner(value));
-            }
-            return Thing.makeObject(map);
-        } else {
-            return Thing.makeScalar(json);
-        }
-    }
 }

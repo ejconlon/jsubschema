@@ -1,16 +1,20 @@
 package net.exathunk.jsubschema.base;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
+
 import java.util.*;
 
 /**
  * charolastra 11/13/12 10:22 PM
  */
 public class SchemaBuilder {
-    private final Thing thing;
+    private final JsonNode node;
 
-    public SchemaBuilder(Thing thing) {
-        this.thing = thing;
-        assert thing != null;
+    public SchemaBuilder(JsonNode node) {
+        this.node = node;
+        assert node != null;
     }
 
     private static final Set<String> REQUIRED_PROPS = Util.asSet(Arrays.asList("type"));
@@ -25,63 +29,68 @@ public class SchemaBuilder {
     }
 
     public Schema build() throws TypeException {
-        final Set<String> props = TypeInfo.propsForThing(thing);
+        final Set<String> props = TypeInfo.propsForNode(node);
         if (!props.containsAll(REQUIRED_PROPS)) {
-            throw new TypeException("Missing props: "+thing);
+            throw new TypeException("Missing props: "+node);
         } else if (!ALL_PROPS.containsAll(props)) {
             for (String prop : props) {
                 if (!ALL_PROPS.contains(prop)) {
                     throw new TypeException("THIS ONE: "+prop);
                 }
             }
-            throw new TypeException("Extra props: "+thing);
+            throw new TypeException("Extra props: "+node);
         }
         final Schema s = new Schema();
-        final Map<String, Thing> rootMap = thing.getObject();
-        for (Map.Entry<String, Thing> entry : rootMap.entrySet()) {
+        final Iterator<Map.Entry<String, JsonNode>> rootMapIt = ((ObjectNode)node).getFields();
+        while (rootMapIt.hasNext()) {
+            Map.Entry<String, JsonNode> entry = rootMapIt.next();
             final String key = entry.getKey();
-            final Thing thing = entry.getValue();
+            final JsonNode child = entry.getValue();
             if (key.equals("type")) {
-                TypeException.assertThat(thing.isString(), "type must be string");
-                s.type = thing.getString();
+                TypeException.assertThat(child.isTextual(), "type must be string");
+                s.type = child.asText();
             } else if (key.equals("required")) {
-                TypeException.assertThat(thing.isBoolean(), "required must be boolean");
-                s.required = thing.getBoolean();
+                TypeException.assertThat(child.isBoolean(), "required must be boolean");
+                s.required = child.asBoolean();
             } else if (key.equals("id")) {
-                TypeException.assertThat(thing.isString(), "id must be string");
-                s.id = thing.getString();
+                TypeException.assertThat(child.isTextual(), "id must be string");
+                s.id = child.asText();
             } else if (key.equals("ref")) {
-                TypeException.assertThat(thing.isString(), "ref must be string");
-                s.ref = thing.getString();
+                TypeException.assertThat(child.isTextual(), "ref must be string");
+                s.ref = child.asText();
             } else if (key.equals("format")) {
-                TypeException.assertThat(thing.isString(), "format must be string");
-                s.format = thing.getString();
+                TypeException.assertThat(child.isTextual(), "format must be string");
+                s.format = child.asText();
             } else if (key.equals("description")) {
-                TypeException.assertThat(thing.isString(), "description must be string");
-                s.description = thing.getString();
+                TypeException.assertThat(child.isTextual(), "description must be string");
+                s.description = child.asText();
             } else if (key.equals("forbids")) {
-                TypeException.assertThat(thing.isArray(), "forbids must be array");
+                TypeException.assertThat(child.isArray(), "forbids must be array");
                 List<String> list = new ArrayList<String>();
-                for (Thing child : thing.getArray()) {
-                    TypeException.assertThat(child.isString(), "forbids item must be string");
-                    list.add(child.getString());
+                for (JsonNode grandChild : (ArrayNode)child) {
+                    TypeException.assertThat(grandChild.isTextual(), "forbids item must be string");
+                    list.add(grandChild.asText());
                 }
                 s.forbids = list;
             } else if (key.equals("requires")) {
-                TypeException.assertThat(thing.isArray(), "requires must be array");
+                TypeException.assertThat(child.isArray(), "requires must be array");
                 List<String> list = new ArrayList<String>();
-                for (Thing child : thing.getArray()) {
-                    TypeException.assertThat(child.isString(), "requires item must be string");
-                    list.add(child.getString());
+                for (JsonNode grandChild : (ArrayNode)child) {
+                    TypeException.assertThat(grandChild.isTextual(), "requires item must be string");
+                    list.add(grandChild.asText());
                 }
                 s.requires = list;
             } else if (key.equals("properties")) {
-                TypeException.assertThat(thing.isObject(), "properties must be object");
+                TypeException.assertThat(child.isObject(), "properties must be object");
                 Map<String, Schema> map = new TreeMap<String, Schema>();
-                for (Map.Entry<String, Thing> child : thing.getObject().entrySet()) {
-                    SchemaBuilder builder = new SchemaBuilder(child.getValue());
+                final Iterator<Map.Entry<String, JsonNode>> childMapIt = ((ObjectNode)child).getFields();
+                while (childMapIt.hasNext()) {
+                    Map.Entry<String, JsonNode> grandChild = childMapIt.next();
+                    final String gcKey = grandChild.getKey();
+                    final JsonNode gcNode = grandChild.getValue();
+                    SchemaBuilder builder = new SchemaBuilder(gcNode);
                     Schema s2 = builder.build();
-                    map.put(child.getKey(), s2);
+                    map.put(gcKey, s2);
                 }
                 s.properties = map;
             }

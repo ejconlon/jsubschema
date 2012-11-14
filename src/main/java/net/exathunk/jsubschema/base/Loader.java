@@ -1,17 +1,17 @@
 package net.exathunk.jsubschema.base;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.codehaus.jackson.JsonNode;
+
+import java.io.*;
+import java.util.Set;
 
 /**
  * charolastra 10/24/12 7:53 PM
  */
 public class Loader {
 
-    public static String loadSchemaString(String name) throws IOException {
-        InputStream is = Loader.class.getResourceAsStream("/schemas/"+name);
+    public static String loadString(String path) throws IOException {
+        InputStream is = Loader.class.getResourceAsStream(path);
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
         String line = reader.readLine();
@@ -23,8 +23,28 @@ public class Loader {
         return sb.toString();
     }
 
-    public static Thing loadSchemaThing(String name) throws IOException {
-        final String loaded = loadSchemaString(name);
+    public static JsonNode loadNode(String path) throws IOException {
+        final String loaded = loadString(path);
         return Util.parse(loaded);
+    }
+
+    public static Set<String> listFiles(String path) throws IOException {
+        File file = new File(path);
+        if (!file.exists() || !file.isDirectory()) {
+            throw new IOException("Not a directory: "+file);
+        }
+        return Util.asSet(file.list());
+    }
+
+    public static String loadSchemaString(String name) throws IOException {
+        return loadString("/schemas/"+name);
+    }
+
+    public static JsonNode loadSchemaNode(String name) throws IOException {
+        return loadNode("/schemas/"+name);
+    }
+
+    public static Set<String> listSchemas() throws IOException {
+        return listFiles("/schemas");
     }
 }

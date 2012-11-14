@@ -8,54 +8,54 @@
 
     "type" : {
       "type" : "string",
-      "required" : true,
+      "required" : true
     },
 
     "description" : {
-      "type" : "string",
+      "type" : "string"
     },
 
     "format" : {
-      "type" : "string",
+      "type" : "string"
     },
 
     "properties" : {
       "type" : "object",
       "items" : {
         "type" : "object",
-        "getRef" : "#",
-      },
+        "getRef" : "#"
+      }
     },
 
     "id" : {
       "type" : "string",
-      "forbids" : ["ref"],
+      "forbids" : ["ref"]
     },
 
     "ref" : {
       "type" : "string",
-      "forbids" : ["id"],
+      "forbids" : ["id"]
     },
 
     "items" : {
       "type" : "object",
-      "ref" : "#",
+      "ref" : "#"
     },
 
     "required" : {
-      "type" : "boolean",
+      "type" : "boolean"
     },
 
     "requires" : {
       "type" : "array",
-      "items" : "string",
+      "items" : "string"
     },
 
     "forbids" : {
       "type" : "array",
-      "items" : "string",
-    },
+      "items" : "string"
+    }
 
-  },
+  }
 
 }

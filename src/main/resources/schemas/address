@@ -10,5 +10,5 @@
 		"region": { "type": "string", "required": true },
 		"postal-code": { "type": "string" },
 		"country-name": { "type": "string", "required": true}
-	},
+	}
 }

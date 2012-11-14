@@ -1,6 +1,11 @@
 package net.exathunk.jsubschema.base;
 
-import java.util.*;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.node.ObjectNode;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * charolastra 11/13/12 7:26 PM
@@ -29,9 +34,9 @@ public class TypeInfo {
         return SCALARS;
     }
 
-    public static Set<String> propsForThing(Thing thing) {
-        if (thing.isObject()) {
-            return thing.getObject().keySet();
+    public static Set<String> propsForNode(JsonNode node) {
+        if (node.isObject()) {
+            return Util.asSet(((ObjectNode)node).getFieldNames());
         }
         return new TreeSet<String>();
     }
