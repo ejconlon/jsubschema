@@ -7,22 +7,32 @@ import java.util.*;
  */
 public class Nodes {
 
-    private static final List<Type> TYPES;
+    private static final Set<Type> TYPES;
 
     static {
-        TYPES = Arrays.asList(
+        TYPES = Util.asSet(Arrays.asList(
             Type.of("object"), Type.of("array"),
             Type.of("string"), Type.of("boolean"),
-            Type.of("integer"), Type.of("number"));
+            Type.of("long"), Type.of("double")));
         Type.seal();
     }
 
-    public List<Type> getTypes() {
+    public Set<Type> getTypes() {
         return TYPES;
     }
 
     public static Set<String> propsForType(Type type) {
         Set<String> s = new TreeSet<String>();
+        if (TYPES.contains(type)) {
+            s.add("type");
+        } else {
+            throw new IllegalArgumentException("Bad type: "+type);
+        }
+        if (type.equals(Type.of("object"))) {
+            s.add("properties");
+        } else if (type.equals(Type.of("array"))) {
+            s.add("items");
+        }
         return s;
     }
 }

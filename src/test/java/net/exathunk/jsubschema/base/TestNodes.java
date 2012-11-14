@@ -14,12 +14,12 @@ import static org.junit.Assert.assertEquals;
 public class TestNodes {
 
     final String[][] strings = new String[][] {
-            {"object", ""},
-            {"array", ""},
-            {"string", ""},
-            {"boolean", ""},
-            {"integer", ""},
-            {"number", ""},
+            {"object", "type,properties"},
+            {"array", "type,items"},
+            {"string", "type"},
+            {"boolean", "type"},
+            {"long", "type"},
+            {"double", "type"},
     };
 
     @Test
