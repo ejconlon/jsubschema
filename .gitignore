@@ -1,4 +1,12 @@
 *.class
+*.iml
+.idea/*
+*~
+*.swo
+*.swp
+*.bak
+*.log
+*.tmp
 
 # Package Files #
 *.jar

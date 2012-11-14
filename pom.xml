@@ -59,19 +59,19 @@
                                         <exec executable="java">
                                             <arg value="-cp"/>
                                             <arg value="${classpath}"/>
-                                            <arg value="net.exathunk.jereal.base.gen.RunGen"/>
+                                            <arg value="net.exathunk.jsubschema.base.gen.RunGen"/>
                                             <arg value="src/main/resources/schemas"/>
-                                            <arg value="target/generated-sources/gen-javabean/net/exathunk/jereal/genschema"/>
-                                            <arg value="net.exathunk.jereal.genschema"/>
+                                            <arg value="target/generated-sources/gen-javabean/net/exathunk/jsubschema/genschema"/>
+                                            <arg value="net.exathunk.jsubschema.genschema"/>
                                         </exec>
                                         <delete>
-                                            <fileset dir="src/main/java/net/exathunk/jereal/genschema" includes="**/*"/>
+                                            <fileset dir="src/main/java/net/exathunk/jsubschema/genschema" includes="**/*"/>
                                         </delete>
-                                        <copy todir="src/main/java/net/exathunk/jereal/genschema">
-                                            <fileset dir="target/generated-sources/gen-javabean/net/exathunk/jereal/genschema"/>
+                                        <copy todir="src/main/java/net/exathunk/jsubschema/genschema">
+                                            <fileset dir="target/generated-sources/gen-javabean/net/exathunk/jsubschema/genschema"/>
                                         </copy>
                                         <delete>
-                                            <fileset dir="target/generated-sources/gen-javabean/net/exathunk/jereal/genschema" includes="**/*"/>
+                                            <fileset dir="target/generated-sources/gen-javabean/net/exathunk/jsubschema/genschema" includes="**/*"/>
                                         </delete>
                                     </tasks>
                                 </configuration>
