@@ -13,5 +13,10 @@ public class Geo {
     public Double longitude;
 
 
+    public String toString() { 
+        StringBuilder sb = new StringBuilder("Geo{ ");
+        if (latitude != null) sb.append("latitude='").append(latitude).append("', ");
+        if (longitude != null) sb.append("longitude='").append(longitude).append("', ");
+        return sb.append("}").toString();  }
 
 }

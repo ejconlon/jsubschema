@@ -19,5 +19,12 @@ public class Link {
     public String enctype;
 
 
+    public String toString() { 
+        StringBuilder sb = new StringBuilder("Link{ ");
+        if (href != null) sb.append("href='").append(href).append("', ");
+        if (rel != null) sb.append("rel='").append(rel).append("', ");
+        if (method != null) sb.append("method='").append(method).append("', ");
+        if (enctype != null) sb.append("enctype='").append(enctype).append("', ");
+        return sb.append("}").toString();  }
 
 }

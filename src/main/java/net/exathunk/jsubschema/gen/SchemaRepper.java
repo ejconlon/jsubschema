@@ -3,6 +3,7 @@ package net.exathunk.jsubschema.gen;
 import net.exathunk.jsubschema.base.Util;
 import net.exathunk.jsubschema.genschema.Schema;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,7 +22,29 @@ public class SchemaRepper {
         c.imports.add("org.codehaus.jackson.annotate.JsonProperty");
         c.imports.add("java.util.List");
         c.imports.add("java.util.Map");
+        c.methods.add(makeToString(c.className, c.fields));
         return c;
+    }
+
+    private static MethodRep makeToString(String className, List<FieldRep> fields) {
+        final MethodRep method = new MethodRep();
+        method.overrides = true;
+        method.name = "toString";
+        method.returns = "String";
+
+        Stringer stringer = new Stringer();
+        stringer.end();
+        Stringer sb2 = stringer.indent().indent();
+
+        sb2.append("StringBuilder sb = new StringBuilder(\"").append(className).append("{ \");\n");
+        for (FieldRep field : fields) {
+            sb2.append("if (").append(field.name).append(" != null) sb.append(\"");
+            sb2.cont().append(field.name).append("='\")").append(".append(").append(field.name).append(").append(\"', \");\n");
+        }
+        sb2.append("return sb.append(\"}\").toString(); ");
+
+        method.body = stringer.toString();
+        return method;
     }
 
     public static ClassRep makeFactory(Schema schema, String basePackageName) {

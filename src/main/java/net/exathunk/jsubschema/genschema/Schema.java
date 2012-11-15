@@ -37,5 +37,18 @@ public class Schema {
     public List<String> forbids;
 
 
+    public String toString() { 
+        StringBuilder sb = new StringBuilder("Schema{ ");
+        if (type != null) sb.append("type='").append(type).append("', ");
+        if (description != null) sb.append("description='").append(description).append("', ");
+        if (format != null) sb.append("format='").append(format).append("', ");
+        if (properties != null) sb.append("properties='").append(properties).append("', ");
+        if (id != null) sb.append("id='").append(id).append("', ");
+        if (__dollar__ref != null) sb.append("__dollar__ref='").append(__dollar__ref).append("', ");
+        if (items != null) sb.append("items='").append(items).append("', ");
+        if (required != null) sb.append("required='").append(required).append("', ");
+        if (requires != null) sb.append("requires='").append(requires).append("', ");
+        if (forbids != null) sb.append("forbids='").append(forbids).append("', ");
+        return sb.append("}").toString();  }
 
 }
