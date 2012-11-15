@@ -33,8 +33,8 @@ public class TestNodes {
         JsonNode node = Loader.loadSchemaNode(name);
         System.out.println(node);
 
-        SchemaBuilder builder = new SchemaBuilder(node);
-        Schema schema = builder.build();
+        ManualSchemaBinder binder = new ManualSchemaBinder();
+        Schema schema = binder.bind(node);
         System.out.println(schema);
     }
 
@@ -44,6 +44,12 @@ public class TestNodes {
         //for (String name : Util.split("schema", ",")) {
             runTestSchema(name);
         }
+    }
+
+    @Test
+    public void testloadSession() throws IOException, TypeException {
+        Session session = new SchemaSessionFactory().makeSession();
+        System.out.println(session);
     }
 
 }

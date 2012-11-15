@@ -23,23 +23,23 @@
       "type" : "object",
       "items" : {
         "type" : "object",
-        "getRef" : "#"
+        "$ref" : "#"
       }
     },
 
     "id" : {
       "type" : "string",
-      "forbids" : ["ref"]
+      "forbids" : ["$ref"]
     },
 
-    "ref" : {
+    "$ref" : {
       "type" : "string",
       "forbids" : ["id"]
     },
 
     "items" : {
       "type" : "object",
-      "ref" : "#"
+      "$ref" : "#"
     },
 
     "required" : {
@@ -48,12 +48,16 @@
 
     "requires" : {
       "type" : "array",
-      "items" : "string"
+      "items" : {
+          "type": "string"
+      }
     },
 
     "forbids" : {
       "type" : "array",
-      "items" : "string"
+      "items" : {
+          "type": "string"
+      }
     }
 
   }

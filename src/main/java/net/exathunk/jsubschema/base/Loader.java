@@ -3,6 +3,7 @@ package net.exathunk.jsubschema.base;
 import org.codehaus.jackson.JsonNode;
 
 import java.io.*;
+import java.net.URL;
 import java.util.Set;
 
 /**
@@ -29,7 +30,8 @@ public class Loader {
     }
 
     public static Set<String> listFiles(String path) throws IOException {
-        File file = new File(path);
+        final URL url = Loader.class.getResource(path);
+        File file = new File(url.getFile());
         if (!file.exists() || !file.isDirectory()) {
             throw new IOException("Not a directory: "+file);
         }

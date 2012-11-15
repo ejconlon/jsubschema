@@ -8,6 +8,14 @@ public class TypeException extends Exception {
         super(message);
     }
 
+    public TypeException(Exception cause) {
+        super(cause);
+    }
+
+    public TypeException(String message, Exception cause) {
+        super(message, cause);
+    }
+
     public static void assertThat(boolean condition, String message) throws TypeException {
         if (!condition) {
             throw new TypeException(message);

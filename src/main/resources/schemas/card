@@ -28,8 +28,8 @@
                 "value": { "type": "string", "format": "phone" }
             }
         },
-        "adr": { "type": "object", "ref": "http://exathunk.net/schemas/address" },
-        "geo": { "type": "object", "ref": "http://exathunk.net/schemas/geo" },
+        "adr": { "type": "object", "$ref": "http://exathunk.net/schemas/address" },
+        "geo": { "type": "object", "$ref": "http://exathunk.net/schemas/geo" },
         "tz": { "type": "string" },
         "photo": { "type": "string" },
         "logo": { "type": "string" },

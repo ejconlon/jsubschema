@@ -9,17 +9,10 @@ import java.util.*;
 /**
  * charolastra 11/13/12 10:22 PM
  */
-public class SchemaBuilder {
-    private final JsonNode node;
-
-    public SchemaBuilder(JsonNode node) {
-        this.node = node;
-        assert node != null;
-    }
-
+public class ManualSchemaBinder implements Binder<Schema> {
     private static final Set<String> REQUIRED_PROPS = Util.asSet(Arrays.asList("type"));
     private static final Set<String> OPTIONAL_PROPS = Util.asSet(Arrays.asList(
-            "properties", "items", "required", "format", "id", "ref", "requires", "forbids", "description"));
+            "properties", "items", "required", "format", "id", "$ref", "requires", "forbids", "description"));
     private static final Set<String> ALL_PROPS;
 
     static {
@@ -28,7 +21,7 @@ public class SchemaBuilder {
         ALL_PROPS.addAll(OPTIONAL_PROPS);
     }
 
-    public Schema build() throws TypeException {
+    public Schema bind(final JsonNode node) throws TypeException {
         final Set<String> props = TypeInfo.propsForNode(node);
         if (!props.containsAll(REQUIRED_PROPS)) {
             throw new TypeException("Missing props: "+node);
@@ -55,9 +48,9 @@ public class SchemaBuilder {
             } else if (key.equals("id")) {
                 TypeException.assertThat(child.isTextual(), "id must be string");
                 s.id = child.asText();
-            } else if (key.equals("ref")) {
+            } else if (key.equals("$ref")) {
                 TypeException.assertThat(child.isTextual(), "ref must be string");
-                s.ref = child.asText();
+                s.__dollar__ref = child.asText();
             } else if (key.equals("format")) {
                 TypeException.assertThat(child.isTextual(), "format must be string");
                 s.format = child.asText();
@@ -88,13 +81,17 @@ public class SchemaBuilder {
                     Map.Entry<String, JsonNode> grandChild = childMapIt.next();
                     final String gcKey = grandChild.getKey();
                     final JsonNode gcNode = grandChild.getValue();
-                    SchemaBuilder builder = new SchemaBuilder(gcNode);
-                    Schema s2 = builder.build();
+                    Schema s2 = bind(gcNode);
                     map.put(gcKey, s2);
                 }
                 s.properties = map;
             }
         }
         return s;
+    }
+
+    @Override
+    public JsonNode unbind(Schema domain) throws TypeException {
+        throw new TypeException("NOT IMPLEMENTED");
     }
 }
