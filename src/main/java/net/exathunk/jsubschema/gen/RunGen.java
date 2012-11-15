@@ -3,7 +3,7 @@ package net.exathunk.jsubschema.gen;
 import net.exathunk.jsubschema.base.Session;
 import net.exathunk.jsubschema.base.TypeException;
 import net.exathunk.jsubschema.base.Util;
-import net.exathunk.jsubschema.schema.schema.Schema;
+import net.exathunk.jsubschema.genschema.Schema;
 import org.codehaus.jackson.JsonNode;
 
 import java.io.*;

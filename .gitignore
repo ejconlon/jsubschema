@@ -8,6 +8,9 @@
 *.log
 *.tmp
 
+target/*
+out/*
+
 # Package Files #
 *.jar
 *.war

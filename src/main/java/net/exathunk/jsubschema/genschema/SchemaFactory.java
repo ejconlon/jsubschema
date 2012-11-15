@@ -2,10 +2,10 @@ package net.exathunk.jsubschema.genschema;
 
 import net.exathunk.jsubschema.base.DomainFactory;
 
-public class SchemaFactory implements DomainFactory<SchemaFactory> {
+public class SchemaFactory implements DomainFactory<Schema> {
 
 
-    public Class<SchemaFactory> getDomainClass() { return SchemaFactory.class; }
-    public SchemaFactory makeDomain() { return new SchemaFactory(); }
+    public Class<Schema> getDomainClass() { return Schema.class; }
+    public Schema makeDomain() { return new Schema(); }
 
 }

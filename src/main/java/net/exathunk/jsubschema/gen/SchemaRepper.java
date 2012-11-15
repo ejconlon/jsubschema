@@ -1,7 +1,7 @@
 package net.exathunk.jsubschema.gen;
 
 import net.exathunk.jsubschema.base.Util;
-import net.exathunk.jsubschema.schema.schema.Schema;
+import net.exathunk.jsubschema.genschema.Schema;
 
 import java.util.Map;
 
@@ -26,12 +26,13 @@ public class SchemaRepper {
 
     public static ClassRep makeFactory(Schema schema, String basePackageName) {
         final ClassRep c = new ClassRep();
-        c.className = parseClassName(schema.id)+"Factory";
+        String baseName = parseClassName(schema.id);
+        c.className = baseName+"Factory";
         c.packageName = basePackageName;
         c.imports.add("net.exathunk.jsubschema.base.DomainFactory");
-        c.methods.add(makeDomainClassMethod(c.className));
-        c.methods.add(makeMakeDomainMethod(c.className));
-        c.implemented.add("DomainFactory<"+c.className+">");
+        c.methods.add(makeDomainClassMethod(baseName));
+        c.methods.add(makeMakeDomainMethod(baseName));
+        c.implemented.add("DomainFactory<"+baseName+">");
         return c;
     }
 
