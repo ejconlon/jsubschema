@@ -31,7 +31,23 @@ public class Pather {
         }
     }
 
-    public static JsonNode pathNode(Schema schema, Path path) throws PathException {
-        throw new PathException("NOT IMPLEMENTED");
+    public static JsonNode pathNode(JsonNode node, Path path) throws PathException {
+        if (path.isEmpty()) return node;
+        else {
+            Part part = path.getHead();
+            if (part.hasKey()) {
+                if (!node.isObject() || !node.has(part.getKey())) {
+                    throw new PathException("Expected object: "+path+" "+node);
+                } else {
+                    return pathNode(node.get(part.getKey()), path.getTail());
+                }
+            } else {
+                if (!node.isArray() || !node.has(part.getIndex())) {
+                    throw new PathException("Expected array: "+path+" "+node);
+                } else {
+                    return pathNode(node.get(part.getIndex()), path.getTail());
+                }
+            }
+        }
     }
 }

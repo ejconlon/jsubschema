@@ -1,6 +1,8 @@
 package net.exathunk.jsubschema.base;
 
+import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.genschema.Schema;
+import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -29,9 +31,9 @@ public class TestPaths {
         Schema schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
-        Schema reqSchema = Pather.pathSchema(schema, new Path().cons(Part.asKey("required")));
+        Schema reqSchema = Pather.pathSchema(schema, new Path().cons(Part.asKey("type")));
         assertNotNull(reqSchema);
-        assertEquals("boolean", reqSchema.type);
+        assertEquals("string", reqSchema.type);
 
         Schema idForbidSchema = Pather.pathSchema(schema, new Path().cons(Part.asKey("id")).cons(Part.asKey("forbids")).reversed());
         assertNotNull(idForbidSchema);
@@ -40,5 +42,22 @@ public class TestPaths {
         Schema idForbid0Schema = Pather.pathSchema(schema, new Path().cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)).reversed());
         assertNotNull(idForbid0Schema);
         assertEquals("string", idForbid0Schema.type);
+    }
+
+    @Test
+    public void testPathNode() throws IOException, TypeException, PathException {
+        JsonNode node = Loader.loadSchemaNode("schema");
+
+        JsonNode reqNode = Pather.pathNode(node, new Path().cons(Part.asKey("type")));
+        assertNotNull(reqNode);
+        assertEquals("object", reqNode.asText());
+
+        JsonNode idForbidNode = Pather.pathNode(node, new Path().cons(Part.asKey("properties")).cons(Part.asKey("id")).cons(Part.asKey("forbids")).reversed());
+        assertNotNull(idForbidNode);
+        assertEquals(1, idForbidNode.size());
+
+        JsonNode idForbid0Node = Pather.pathNode(node, new Path().cons(Part.asKey("properties")).cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)).reversed());
+        assertNotNull(idForbid0Node);
+        assertEquals("$ref", idForbid0Node.asText());
     }
 }
