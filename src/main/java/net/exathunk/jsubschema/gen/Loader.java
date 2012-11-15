@@ -1,4 +1,4 @@
-package net.exathunk.jsubschema.schema;
+package net.exathunk.jsubschema.gen;
 
 import net.exathunk.jsubschema.base.Util;
 import org.codehaus.jackson.JsonNode;

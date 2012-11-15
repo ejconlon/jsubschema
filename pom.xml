@@ -38,7 +38,7 @@
         </plugins>
     </build>
 
-    <!--<profiles>
+    <profiles>
         <profile>
             <id>profile-genschemas</id>
             <activation>
@@ -59,7 +59,7 @@
                                         <exec executable="java">
                                             <arg value="-cp"/>
                                             <arg value="${classpath}"/>
-                                            <arg value="net.exathunk.jsubschema.base.gen.RunGen"/>
+                                            <arg value="net.exathunk.jsubschema.gen.RunGen"/>
                                             <arg value="src/main/resources/schemas"/>
                                             <arg value="target/generated-sources/gen-javabean/net/exathunk/jsubschema/genschema"/>
                                             <arg value="net.exathunk.jsubschema.genschema"/>
@@ -84,7 +84,7 @@
                 </plugins>
             </build>
         </profile>
-    </profiles>-->
+    </profiles>
 
     <dependencies>
         <dependency>

@@ -26,7 +26,7 @@ public class SchemaRepper {
 
     public static ClassRep makeFactory(Schema schema, String basePackageName) {
         final ClassRep c = new ClassRep();
-        c.className = parseClassName(schema.id);
+        c.className = parseClassName(schema.id)+"Factory";
         c.packageName = basePackageName;
         c.imports.add("net.exathunk.jsubschema.base.DomainFactory");
         c.methods.add(makeDomainClassMethod(c.className));
@@ -63,7 +63,6 @@ public class SchemaRepper {
 
     private static String typeOf(Schema schema, String rootClassName) {
         if (schema.type.equals("object")) {
-            final String sub;
             if (schema.__dollar__ref != null) {
                 if (schema.__dollar__ref.equals("#")) return rootClassName;
                 else return parseClassName(schema.__dollar__ref);

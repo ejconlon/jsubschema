@@ -3,7 +3,7 @@ package net.exathunk.jsubschema.base;
 import net.exathunk.jsubschema.gen.Assembler;
 import net.exathunk.jsubschema.gen.ClassRep;
 import net.exathunk.jsubschema.gen.SchemaRepper;
-import net.exathunk.jsubschema.schema.Loader;
+import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.schema.schema.Schema;
 import net.exathunk.jsubschema.schema.schema.SchemaFactory;
 import org.codehaus.jackson.JsonNode;
@@ -48,7 +48,7 @@ public class TestNodes {
 
     @Test
     public void testSchema() throws IOException, TypeException {
-        for (String name : Util.split("schema,address,event,geo,link,card", ",")) {
+        for (String name : Util.split("schema,address,event,geo,link", ",")) {
         //for (String name : Util.split("schema", ",")) {
             runTestSchema(name);
         }

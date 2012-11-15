@@ -101,6 +101,7 @@ public class Util {
     static {
         SUBS = new TreeMap<String, String>();
         SUBS.put("\\$", "__dollar__");
+        SUBS.put("-", "__dash__");
     }
 
     public static String convert(String name) {
