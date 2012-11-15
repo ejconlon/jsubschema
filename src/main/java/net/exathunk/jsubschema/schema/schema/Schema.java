@@ -1,4 +1,4 @@
-package net.exathunk.jsubschema.base;
+package net.exathunk.jsubschema.schema.schema;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 

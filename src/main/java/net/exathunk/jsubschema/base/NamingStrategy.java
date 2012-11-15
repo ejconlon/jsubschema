@@ -11,7 +11,7 @@ import java.util.TreeMap;
 /**
  * charolastra 11/14/12 3:54 PM
  */
-public class NamingStrategy extends PropertyNamingStrategy {
+public class NamingStrategy extends PropertyNamingStrategy implements Translator {
 
     /*public static String capitalize(String s) {
         final String[] parts = s.split("\\W+");
@@ -34,6 +34,7 @@ public class NamingStrategy extends PropertyNamingStrategy {
         SUBS.put("$", "__dollar__");
     }
 
+    @Override
     public String convert(String name) {
         for (Map.Entry<String, String> e : SUBS.entrySet()) {
             name = name.replaceAll(e.getKey(), e.getValue());
@@ -41,6 +42,7 @@ public class NamingStrategy extends PropertyNamingStrategy {
         return name;
     }
 
+    @Override
     public String unconvert(String name) {
         for (Map.Entry<String, String> e : SUBS.entrySet()) {
             name = name.replaceAll(e.getValue(), e.getKey());

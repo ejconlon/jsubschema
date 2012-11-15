@@ -1,6 +1,10 @@
 package net.exathunk.jsubschema.base;
 
+import net.exathunk.jsubschema.schema.Loader;
+import net.exathunk.jsubschema.schema.schema.Schema;
+import net.exathunk.jsubschema.schema.schema.SchemaFactory;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -23,7 +27,7 @@ public class TestNodes {
     public void testProperties() throws IOException {
         for (String[] ss : properties) {
             JsonNode node = Util.parse(ss[0]);
-            Set<String> as = TypeInfo.propsForNode(node);
+            Set<String> as = Util.propsForNode(node);
             Set<String> bs = Util.asSet(Util.split(ss[1], ","));
             assertEquals(as, bs);
         }
@@ -33,7 +37,7 @@ public class TestNodes {
         JsonNode node = Loader.loadSchemaNode(name);
         System.out.println(node);
 
-        ManualSchemaBinder binder = new ManualSchemaBinder();
+        Binder<Schema> binder = new JacksonBinder<Schema>(new ObjectMapper(), new SchemaFactory());
         Schema schema = binder.bind(node);
         System.out.println(schema);
     }
@@ -48,7 +52,7 @@ public class TestNodes {
 
     @Test
     public void testloadSession() throws IOException, TypeException {
-        Session session = new SchemaSessionFactory().makeSession();
+        Session session = Session.loadDefaultSession();
         System.out.println(session);
     }
 

@@ -1,5 +1,6 @@
 package net.exathunk.jsubschema.base;
 
+import net.exathunk.jsubschema.schema.schema.Schema;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
@@ -22,7 +23,7 @@ public class ManualSchemaBinder implements Binder<Schema> {
     }
 
     public Schema bind(final JsonNode node) throws TypeException {
-        final Set<String> props = TypeInfo.propsForNode(node);
+        final Set<String> props = Util.propsForNode(node);
         if (!props.containsAll(REQUIRED_PROPS)) {
             throw new TypeException("Missing props: "+node);
         } else if (!ALL_PROPS.containsAll(props)) {

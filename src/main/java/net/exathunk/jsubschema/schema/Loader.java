@@ -1,5 +1,6 @@
-package net.exathunk.jsubschema.base;
+package net.exathunk.jsubschema.schema;
 
+import net.exathunk.jsubschema.base.Util;
 import org.codehaus.jackson.JsonNode;
 
 import java.io.*;

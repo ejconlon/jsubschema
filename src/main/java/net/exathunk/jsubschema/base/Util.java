@@ -2,6 +2,7 @@ package net.exathunk.jsubschema.base;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
 
 import java.io.IOException;
 import java.util.*;
@@ -59,6 +60,13 @@ public class Util {
 
     public static JsonNode parse(String s) throws IOException {
         return (new ObjectMapper()).readTree(s);
+    }
+
+    public static Set<String> propsForNode(JsonNode node) {
+        if (node.isObject()) {
+            return Util.asSet(((ObjectNode)node).getFieldNames());
+        }
+        return new TreeSet<String>();
     }
 
 }
