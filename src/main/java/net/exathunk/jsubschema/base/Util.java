@@ -69,4 +69,51 @@ public class Util {
         return new TreeSet<String>();
     }
 
+    public static <X> X last(List<X> split) {
+        return split.get(split.size()-1);
+    }
+
+    public static String capitalize(String s) {
+        final String[] parts = s.split("\\W+");
+        final StringBuilder sb = new StringBuilder();
+        for (String part : parts) {
+            sb.append(upperFirst(part));
+        }
+        return sb.toString();
+    }
+
+    public static String camelize(String key) {
+        String s = capitalize(key);
+        return lowerFirst(s);
+    }
+
+    public static String lowerFirst(String s) {
+        return s.substring(0, 1).toLowerCase()+s.substring(1);
+    }
+
+    public static String upperFirst(String s) {
+        return s.substring(0, 1).toUpperCase()+s.substring(1);
+    }
+
+
+    private static final Map<String, String> SUBS;
+
+    static {
+        SUBS = new TreeMap<String, String>();
+        SUBS.put("\\$", "__dollar__");
+    }
+
+    public static String convert(String name) {
+        for (Map.Entry<String, String> e : SUBS.entrySet()) {
+            name = name.replaceAll(e.getKey(), e.getValue());
+        }
+        return name;
+    }
+
+    public static String unconvert(String name) {
+        for (Map.Entry<String, String> e : SUBS.entrySet()) {
+            name = name.replaceAll(e.getValue(), e.getKey());
+        }
+        return name;
+    }
 }

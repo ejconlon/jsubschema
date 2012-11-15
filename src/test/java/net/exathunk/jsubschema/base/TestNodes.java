@@ -1,5 +1,8 @@
 package net.exathunk.jsubschema.base;
 
+import net.exathunk.jsubschema.gen.Assembler;
+import net.exathunk.jsubschema.gen.ClassRep;
+import net.exathunk.jsubschema.gen.SchemaRepper;
 import net.exathunk.jsubschema.schema.Loader;
 import net.exathunk.jsubschema.schema.schema.Schema;
 import net.exathunk.jsubschema.schema.schema.SchemaFactory;
@@ -11,6 +14,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * charolastra 11/13/12 7:18 PM
@@ -54,6 +58,19 @@ public class TestNodes {
     public void testloadSession() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
         System.out.println(session);
+    }
+
+    @Test
+    public void testGenSchema() throws IOException, TypeException {
+        final Session session = Session.loadDefaultSession();
+        final Schema schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        assertNotNull(schema);
+        final ClassRep classRep = SchemaRepper.makeClass(schema, "net.exathunk.jsubschema.genschema");
+        final String classString = Assembler.writeClass(classRep);
+        System.out.println(classString);
+        final ClassRep factoryRep = SchemaRepper.makeFactory(schema, "net.exathunk.jsubschema.genschema");
+        final String factoryString = Assembler.writeClass(factoryRep);
+        System.out.println(factoryString);
     }
 
 }

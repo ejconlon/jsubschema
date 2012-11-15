@@ -16,7 +16,6 @@ import java.util.TreeMap;
  */
 public class Session {
     public final ObjectMapper mapper = new ObjectMapper();
-    public final Translator translator;
     public final Map<String, Schema> schemas = new TreeMap<String, Schema>();
     public final Map<Class, Binder> binders = new HashMap<Class, Binder>();
 
@@ -29,13 +28,6 @@ public class Session {
             session.addSchema(schema);
         }
         return session;
-    }
-
-    public Session() {
-        NamingStrategy ns = new NamingStrategy();
-        translator = ns;
-        // Don't need this if manually annotate:
-        //mapper.setPropertyNamingStrategy(ns);
     }
 
     public void addSchema(Schema schema) {
