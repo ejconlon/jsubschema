@@ -1,8 +1,11 @@
 package net.exathunk.jsubschema.genschema;
+
 import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.List;
 import java.util.Map;
+
 public class Schema implements Cloneable {
+
     @JsonProperty("type")
     public String type;
 
@@ -37,7 +40,8 @@ public class Schema implements Cloneable {
     public List<String> forbids;
 
     @Override
-    public String toString() {        StringBuilder sb = new StringBuilder("Schema{ ");
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Schema{ ");
         if (type != null) sb.append("type='").append(type).append("', ");
         if (description != null) sb.append("description='").append(description).append("', ");
         if (format != null) sb.append("format='").append(format).append("', ");
@@ -50,40 +54,44 @@ public class Schema implements Cloneable {
         if (requires != null) sb.append("requires='").append(requires).append("', ");
         if (forbids != null) sb.append("forbids='").append(forbids).append("', ");
         return sb.append("}").toString();
-}
+    }
+
     @Override
-    public boolean equals(Object o) {        if (this == o) return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
         if (o instanceof Schema) {
             Schema other = (Schema) o;
-        if (type == null) { if (other.type != null) return false; }
-        else if (!type.equals(other.type)) { return false; }
-        if (description == null) { if (other.description != null) return false; }
-        else if (!description.equals(other.description)) { return false; }
-        if (format == null) { if (other.format != null) return false; }
-        else if (!format.equals(other.format)) { return false; }
-        if (properties == null) { if (other.properties != null) return false; }
-        else if (!properties.equals(other.properties)) { return false; }
-        if (declarations == null) { if (other.declarations != null) return false; }
-        else if (!declarations.equals(other.declarations)) { return false; }
-        if (id == null) { if (other.id != null) return false; }
-        else if (!id.equals(other.id)) { return false; }
-        if (__dollar__ref == null) { if (other.__dollar__ref != null) return false; }
-        else if (!__dollar__ref.equals(other.__dollar__ref)) { return false; }
-        if (items == null) { if (other.items != null) return false; }
-        else if (!items.equals(other.items)) { return false; }
-        if (required == null) { if (other.required != null) return false; }
-        else if (!required.equals(other.required)) { return false; }
-        if (requires == null) { if (other.requires != null) return false; }
-        else if (!requires.equals(other.requires)) { return false; }
-        if (forbids == null) { if (other.forbids != null) return false; }
-        else if (!forbids.equals(other.forbids)) { return false; }
+            if (type == null) { if (other.type != null) return false; }
+            else if (!type.equals(other.type)) { return false; }
+            if (description == null) { if (other.description != null) return false; }
+            else if (!description.equals(other.description)) { return false; }
+            if (format == null) { if (other.format != null) return false; }
+            else if (!format.equals(other.format)) { return false; }
+            if (properties == null) { if (other.properties != null) return false; }
+            else if (!properties.equals(other.properties)) { return false; }
+            if (declarations == null) { if (other.declarations != null) return false; }
+            else if (!declarations.equals(other.declarations)) { return false; }
+            if (id == null) { if (other.id != null) return false; }
+            else if (!id.equals(other.id)) { return false; }
+            if (__dollar__ref == null) { if (other.__dollar__ref != null) return false; }
+            else if (!__dollar__ref.equals(other.__dollar__ref)) { return false; }
+            if (items == null) { if (other.items != null) return false; }
+            else if (!items.equals(other.items)) { return false; }
+            if (required == null) { if (other.required != null) return false; }
+            else if (!required.equals(other.required)) { return false; }
+            if (requires == null) { if (other.requires != null) return false; }
+            else if (!requires.equals(other.requires)) { return false; }
+            if (forbids == null) { if (other.forbids != null) return false; }
+            else if (!forbids.equals(other.forbids)) { return false; }
             return true;
         } else {
             return false;
         }
-}
+    }
+
     @Override
-    public int hashCode() {        int result = 0;
+    public int hashCode() {
+        int result = 0;
         result = 31 * result + (type == null ? 0 : type.hashCode());
         result = 31 * result + (description == null ? 0 : description.hashCode());
         result = 31 * result + (format == null ? 0 : format.hashCode());
@@ -96,5 +104,6 @@ public class Schema implements Cloneable {
         result = 31 * result + (requires == null ? 0 : requires.hashCode());
         result = 31 * result + (forbids == null ? 0 : forbids.hashCode());
         return result;
-}
+    }
+
 }

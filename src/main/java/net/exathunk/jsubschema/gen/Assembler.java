@@ -33,10 +33,12 @@ public class Assembler {
             s.append("import "+i+";");
             s.end();
         }
+        if (!c.imports.isEmpty()) s.end();
     }
 
     private static void writePackageName(ClassRep classRep, Stringer s) {
         s.append("package "+classRep.packageName+";");
+        s.end();
         s.end();
     }
 
@@ -52,6 +54,7 @@ public class Assembler {
         }
         s.cont().append(" {");
         s.end();
+        s.end();
     }
 
     private static void writeOpenInterface(ClassRep classRep, Stringer s) {
@@ -62,12 +65,13 @@ public class Assembler {
         }
         s.cont().append(" {");
         s.end();
+        s.end();
     }
 
     private static void writeList(List<String> list, Stringer s) {
         final int len = list.size();
         for (int i = 0; i < len; ++i) {
-            s.cont().append(list.get(0));
+            s.cont().append(list.get(i));
             if (i < len - 1) {
                 s.cont().append(", ");
             }

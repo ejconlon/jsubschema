@@ -37,8 +37,10 @@ public class MethodRep {
         sb.cont().append(returns.toString()).append(" ").append(name).append("(");
         writeList(parameters, sb);
         sb.cont().append(") {");
+        sb.end();
         body.makeString(sb.indent());
-        sb.cont().append("}");
+        sb.append("}");
+        sb.end();
     }
 
     public void makeInterfaceString(Stringer sb) {

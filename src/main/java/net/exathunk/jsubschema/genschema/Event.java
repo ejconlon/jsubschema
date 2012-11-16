@@ -1,8 +1,11 @@
 package net.exathunk.jsubschema.genschema;
+
 import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.List;
 import java.util.Map;
+
 public class Event implements Cloneable {
+
     @JsonProperty("dtstart")
     public String dtstart;
 
@@ -37,7 +40,8 @@ public class Event implements Cloneable {
     public Geo geo;
 
     @Override
-    public String toString() {        StringBuilder sb = new StringBuilder("Event{ ");
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Event{ ");
         if (dtstart != null) sb.append("dtstart='").append(dtstart).append("', ");
         if (dtend != null) sb.append("dtend='").append(dtend).append("', ");
         if (summary != null) sb.append("summary='").append(summary).append("', ");
@@ -50,40 +54,44 @@ public class Event implements Cloneable {
         if (description != null) sb.append("description='").append(description).append("', ");
         if (geo != null) sb.append("geo='").append(geo).append("', ");
         return sb.append("}").toString();
-}
+    }
+
     @Override
-    public boolean equals(Object o) {        if (this == o) return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
         if (o instanceof Event) {
             Event other = (Event) o;
-        if (dtstart == null) { if (other.dtstart != null) return false; }
-        else if (!dtstart.equals(other.dtstart)) { return false; }
-        if (dtend == null) { if (other.dtend != null) return false; }
-        else if (!dtend.equals(other.dtend)) { return false; }
-        if (summary == null) { if (other.summary != null) return false; }
-        else if (!summary.equals(other.summary)) { return false; }
-        if (location == null) { if (other.location != null) return false; }
-        else if (!location.equals(other.location)) { return false; }
-        if (url == null) { if (other.url != null) return false; }
-        else if (!url.equals(other.url)) { return false; }
-        if (duration == null) { if (other.duration != null) return false; }
-        else if (!duration.equals(other.duration)) { return false; }
-        if (rdate == null) { if (other.rdate != null) return false; }
-        else if (!rdate.equals(other.rdate)) { return false; }
-        if (rrule == null) { if (other.rrule != null) return false; }
-        else if (!rrule.equals(other.rrule)) { return false; }
-        if (category == null) { if (other.category != null) return false; }
-        else if (!category.equals(other.category)) { return false; }
-        if (description == null) { if (other.description != null) return false; }
-        else if (!description.equals(other.description)) { return false; }
-        if (geo == null) { if (other.geo != null) return false; }
-        else if (!geo.equals(other.geo)) { return false; }
+            if (dtstart == null) { if (other.dtstart != null) return false; }
+            else if (!dtstart.equals(other.dtstart)) { return false; }
+            if (dtend == null) { if (other.dtend != null) return false; }
+            else if (!dtend.equals(other.dtend)) { return false; }
+            if (summary == null) { if (other.summary != null) return false; }
+            else if (!summary.equals(other.summary)) { return false; }
+            if (location == null) { if (other.location != null) return false; }
+            else if (!location.equals(other.location)) { return false; }
+            if (url == null) { if (other.url != null) return false; }
+            else if (!url.equals(other.url)) { return false; }
+            if (duration == null) { if (other.duration != null) return false; }
+            else if (!duration.equals(other.duration)) { return false; }
+            if (rdate == null) { if (other.rdate != null) return false; }
+            else if (!rdate.equals(other.rdate)) { return false; }
+            if (rrule == null) { if (other.rrule != null) return false; }
+            else if (!rrule.equals(other.rrule)) { return false; }
+            if (category == null) { if (other.category != null) return false; }
+            else if (!category.equals(other.category)) { return false; }
+            if (description == null) { if (other.description != null) return false; }
+            else if (!description.equals(other.description)) { return false; }
+            if (geo == null) { if (other.geo != null) return false; }
+            else if (!geo.equals(other.geo)) { return false; }
             return true;
         } else {
             return false;
         }
-}
+    }
+
     @Override
-    public int hashCode() {        int result = 0;
+    public int hashCode() {
+        int result = 0;
         result = 31 * result + (dtstart == null ? 0 : dtstart.hashCode());
         result = 31 * result + (dtend == null ? 0 : dtend.hashCode());
         result = 31 * result + (summary == null ? 0 : summary.hashCode());
@@ -96,5 +104,6 @@ public class Event implements Cloneable {
         result = 31 * result + (description == null ? 0 : description.hashCode());
         result = 31 * result + (geo == null ? 0 : geo.hashCode());
         return result;
-}
+    }
+
 }
