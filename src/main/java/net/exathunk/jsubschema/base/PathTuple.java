@@ -14,20 +14,23 @@ public class PathTuple implements Iterable<PathTuple> {
     public final Schema rootSchema;
     public final JsonNode node;
     public final Path path;
+    public final RefResolver resolver;
 
-    public PathTuple(Schema schema, JsonNode node) {
-        this(Either.<Schema, String>makeFirst(schema), schema, node, new Path());
+    public PathTuple(Schema schema, JsonNode node, RefResolver resolver) {
+        this(Either.<Schema, String>makeFirst(schema), schema, node, new Path(), resolver);
     }
 
-    private PathTuple(Either<Schema, String> eitherSchema, Schema rootSchema, JsonNode node, Path path) {
+    private PathTuple(Either<Schema, String> eitherSchema, Schema rootSchema, JsonNode node, Path path, RefResolver resolver) {
         this.eitherSchema = eitherSchema;
         this.rootSchema = rootSchema;
         this.node = node;
         this.path = path;
+        this.resolver = resolver;
         assert eitherSchema != null;
         assert rootSchema != null;
         assert node != null;
         assert path != null;
+        assert resolver != null;
     }
 
     @Override
@@ -76,22 +79,22 @@ public class PathTuple implements Iterable<PathTuple> {
                     final Path path = root.path.cons(Part.asKey(nextField));
                     final Either<Schema, String> eitherSchema;
                     if (root.eitherSchema.isFirst()) {
-                        eitherSchema = Pather.pathSchema(root.rootSchema, path.reversed());
+                        eitherSchema = Pather.pathSchema(root.rootSchema, path.reversed(), root.resolver);
                     } else {
                         eitherSchema = Either.makeSecond("[recursive failure]");
                     }
-                    return new PathTuple(eitherSchema, root.rootSchema, node, path);
+                    return new PathTuple(eitherSchema, root.rootSchema, node, path, root.resolver);
                 } else if (size >= 0) {
                     final JsonNode node = root.node.get(pos);
                     final Path path = root.path.cons(Part.asIndex(pos));
                     final Either<Schema, String> eitherSchema;
                     if (root.eitherSchema.isFirst()) {
-                        eitherSchema = Pather.pathSchema(root.rootSchema, path.reversed());
+                        eitherSchema = Pather.pathSchema(root.rootSchema, path.reversed(), root.resolver);
                     } else {
                         eitherSchema = Either.makeSecond("[recursive failure]");
                     }
                     ++pos;
-                    return new PathTuple(eitherSchema, root.rootSchema, node, path);
+                    return new PathTuple(eitherSchema, root.rootSchema, node, path, root.resolver);
                 } else {
                     throw new NoSuchElementException();
                 }

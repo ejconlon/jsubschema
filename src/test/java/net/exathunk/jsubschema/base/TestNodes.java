@@ -46,20 +46,21 @@ public class TestNodes {
         System.out.println(schema);
     }
 
-    @Test
+    /*@Test
     public void testSchema() throws IOException, TypeException {
         for (String name : Util.split("schema,address,event,geo,link", ",")) {
         //for (String name : Util.split("schema", ",")) {
             runTestSchema(name);
         }
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void testloadSession() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
         System.out.println(session);
-    }
+    }*/
 
+    // TODO better assertions :-/
     @Test
     public void testGenSchema() throws IOException, TypeException {
         final Session session = Session.loadDefaultSession();
@@ -67,10 +68,12 @@ public class TestNodes {
         assertNotNull(schema);
         final ClassRep classRep = SchemaRepper.makeClass(schema, "net.exathunk.jsubschema.genschema");
         final String classString = Assembler.writeClass(classRep);
-        System.out.println(classString);
+        assertNotNull(classString);
+        //System.out.println(classString);
         final ClassRep factoryRep = SchemaRepper.makeFactory(schema, "net.exathunk.jsubschema.genschema");
         final String factoryString = Assembler.writeClass(factoryRep);
-        System.out.println(factoryString);
+        //System.out.println(factoryString);
+        assertNotNull(factoryString);
     }
 
 }

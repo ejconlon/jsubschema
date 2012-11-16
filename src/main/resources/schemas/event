@@ -33,6 +33,6 @@
 		},
 		"category": { "type": "string" },
 		"description": { "type": "string" },
-		"geo": { "type" : "object", "$ref": "http: //exathunk.net/schemas/geo" }
+		"geo": { "type" : "object", "$ref": "http://exathunk.net/schemas/geo" }
 	}
 }

@@ -7,27 +7,39 @@ import org.codehaus.jackson.JsonNode;
  * charolastra 11/15/12 12:44 PM
  */
 public class Pather {
-    public static Either<Schema, String> pathSchema(Schema schema, Path path) throws PathException {
-        return pathSchemaInner(schema, schema, path, false);
+    public static Either<Schema, String> pathSchema(Schema schema, Path path, RefResolver resolver) throws PathException {
+        return pathSchemaInner(schema, schema, path, false, resolver);
     }
 
-    private static Either<Schema, String> pathSchemaInner(Schema schema, Schema root, Path path, boolean inProperties) throws PathException {
-        if (path.isEmpty()) return Either.makeFirst(schema);
-        else {
+    private static Either<Schema, String> pathSchemaInner(Schema schema, Schema root, Path path, boolean inProperties, RefResolver resolver) throws PathException {
+        if (path.isEmpty()) {
+            if (schema.__dollar__ref != null) {
+                return resolver.resolveRef(schema.__dollar__ref);
+            } else {
+                return Either.makeFirst(schema);
+            }
+        } else {
             Part part = path.getHead();
             if (part.hasKey()) {
-                if (root.properties.containsKey(part.getKey())) {
-                    return pathSchemaInner(root.properties.get(part.getKey()), root, path.getTail(), !inProperties && "properties".equals(part.getKey()));
-                } else if (inProperties) {
-                    return pathSchemaInner(root, root, path.getTail(), false);
-                } else {
+                if (inProperties) {
+                    return pathSchemaInner(root, root, path.getTail(), false, resolver);
+                } else if (root.properties.containsKey(part.getKey())) {
+                    return pathSchemaInner(root.properties.get(part.getKey()), root, path.getTail(), !inProperties && "properties".equals(part.getKey()), resolver);
+                } else if (schema.__dollar__ref != null) {
+                    Either<Schema, String> eitherSchema = resolver.resolveRef(schema.__dollar__ref);
+                    if (eitherSchema.isFirst()) {
+                        return pathSchemaInner(eitherSchema.getFirst(), eitherSchema.getFirst(), path, false, resolver);
+                    } else {
+                        return eitherSchema;
+                    }
+                } else  {
                     return Either.makeSecond("Expected object: "+path+" "+schema);
                 }
             } else {
                 if (!schema.type.equals("array") || schema.items == null) {
                     return Either.makeSecond("Expected array: "+path+" "+schema);
                 } else {
-                    return pathSchemaInner(schema.items, root, path.getTail(), false);
+                    return pathSchemaInner(schema.items, root, path.getTail(), false, resolver);
                 }
             }
         }
