@@ -14,7 +14,7 @@ public class FieldRep {
     public List<AnnotationRep> annotations = new ArrayList<AnnotationRep>();
 
 
-    public void writeDeclarationString(Stringer s) {
+    public void makeDeclarationString(Stringer s) {
         for (AnnotationRep annotationRep : annotations) {
             s.append(annotationRep.toString());
             s.end();
@@ -28,8 +28,7 @@ public class FieldRep {
         s.end();
     }
 
-    public void writeParameterString(Stringer s) {
-        s.append(className).append(" ").append(name);
-        s.end();
+    public void makeParameterString(Stringer s) {
+        s.cont().append(className).append(" ").append(name);
     }
 }

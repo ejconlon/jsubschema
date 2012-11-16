@@ -12,41 +12,38 @@ public class MethodRep {
     public String returns;
     public List<FieldRep> parameters = new ArrayList<FieldRep>();
     public List<AnnotationRep> annotations = new ArrayList<AnnotationRep>();
-    public String body;
+    public Stringable body;
 
     private static void writeList(List<FieldRep> list, Stringer sb) {
         final int len = list.size();
         for (int i = 0; i < len; ++i) {
-            list.get(i).writeParameterString(sb);
+            list.get(i).makeParameterString(sb);
             if (i < len - 1) {
-                sb.append(", ");
+                sb.cont().append(", ");
             }
         }
     }
 
-    public String toClassString() {
-        Stringer sb = new Stringer();
+    public void makeClassString(Stringer sb) {
         for (AnnotationRep annotation : annotations) {
-            sb.append(annotation.toString()).append("\n");
+            sb.append(annotation.toString());
+            sb.end();
         }
         if (!Visibility.PACKAGE.equals(visibility)) {
             sb.append(visibility.toString().toLowerCase()).append(" ");
+        } else {
+            sb.append("");
         }
-        sb.append(returns.toString()).append(" ");
-        sb.append(name).append("(");
+        sb.cont().append(returns.toString()).append(" ").append(name).append("(");
         writeList(parameters, sb);
-        sb.append(") { ");
-        sb.append(body);
-        sb.append(" }");
-        return sb.toString();
+        sb.cont().append(") {");
+        body.makeString(sb.indent());
+        sb.cont().append("}");
     }
 
-    public String toInterfaceString() {
-        Stringer sb = new Stringer();
-        sb.append(returns.toString()).append(" ");
-        sb.append(name).append("(");
+    public void makeInterfaceString(Stringer sb) {
+        sb.append(returns.toString()).append(" ").append(name).append("(");
         writeList(parameters, sb);
-        sb.append(");");
-        return sb.toString();
+        sb.cont().append(");");
     }
 }

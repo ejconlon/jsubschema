@@ -10,15 +10,10 @@ public class Assembler {
     public static String writeClass(ClassRep c) {
         Stringer s = new Stringer();
         writePackageName(c, s);
-        s.end();
         writeImports(c, s);
-        s.end();
         writeOpenClass(c, s);
-        s.end();
         writeFields(c, s.indent());
-        s.end();
         writeClassMethods(c, s.indent());
-        s.end();
         writeClose(s);
         return s.toString();
     }
@@ -26,13 +21,9 @@ public class Assembler {
     public static String writeInterface(ClassRep c) {
         Stringer s = new Stringer();
         writePackageName(c, s);
-        s.end();
         writeImports(c, s);
-        s.end();
         writeOpenInterface(c, s);
-        s.end();
         writeInterfaceMethods(c, s.indent());
-        s.end();
         writeClose(s);
         return s.toString();
     }
@@ -90,21 +81,21 @@ public class Assembler {
 
     private static void writeFields(ClassRep classRep, Stringer s) {
         for (FieldRep fieldRep : classRep.fields) {
-            fieldRep.writeDeclarationString(s);
+            fieldRep.makeDeclarationString(s);
             s.end();
         }
     }
 
     private static void writeClassMethods(ClassRep classRep, Stringer s) {
         for (MethodRep methodRep : classRep.methods) {
-            s.append(methodRep.toClassString());
+            methodRep.makeClassString(s);
             s.end();
         }
     }
 
     private static void writeInterfaceMethods(ClassRep classRep, Stringer s) {
         for (MethodRep methodRep : classRep.methods) {
-            s.append(methodRep.toInterfaceString());
+            methodRep.makeInterfaceString(s);
             s.end();
         }
     }

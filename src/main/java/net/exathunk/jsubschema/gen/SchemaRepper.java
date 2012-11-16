@@ -41,22 +41,34 @@ public class SchemaRepper {
     }
 
     // Like: public Schema makeDomain() { return new Schema(); }
-    private static MethodRep makeMakeDomainMethod(String className) {
+    private static MethodRep makeMakeDomainMethod(final String className) {
         final MethodRep method = new MethodRep();
         method.visibility = Visibility.PUBLIC;
         method.name = "makeDomain";
-        method.body = "return new "+className+"();";
+        method.body = new Stringable() {
+            @Override
+            public void makeString(Stringer s) {
+                s.append("return new "+className+"();");
+                s.end();
+            }
+        };
         method.returns = className;
         method.annotations.add(new AnnotationRep("@Override"));
         return method;
     }
 
     // Like: public Class<Schema> getDomainClass() { return Schema.class; }
-    private static MethodRep makeDomainClassMethod(String className) {
+    private static MethodRep makeDomainClassMethod(final String className) {
         final MethodRep method = new MethodRep();
         method.visibility = Visibility.PUBLIC;
         method.name = "getDomainClass";
-        method.body = "return "+className+".class;";
+        method.body = new Stringable() {
+            @Override
+            public void makeString(Stringer s) {
+                s.append("return "+className+".class;");
+                s.end();
+            }
+        };
         method.returns = "Class<"+className+">";
         method.annotations.add(new AnnotationRep("@Override"));
         return method;

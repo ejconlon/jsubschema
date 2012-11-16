@@ -54,24 +54,26 @@ public class GenUtil {
 
     public static class ToStringClassMangler implements ClassMangler {
         @Override
-        public void mangleClass(ClassRep classRep) {
+        public void mangleClass(final ClassRep classRep) {
             final MethodRep method = new MethodRep();
             method.annotations.add(new AnnotationRep("@Override"));
             method.name = "toString";
             method.returns = "String";
 
-            Stringer stringer = new Stringer();
-            stringer.end();
-            Stringer sb2 = stringer.indent().indent();
-
-            sb2.append("StringBuilder sb = new StringBuilder(\"").append(classRep.name).append("{ \");\n");
-            for (FieldRep field : classRep.fields) {
-                sb2.append("if (").append(field.name).append(" != null) sb.append(\"");
-                sb2.cont().append(field.name).append("='\")").append(".append(").append(field.name).append(").append(\"', \");\n");
-            }
-            sb2.append("return sb.append(\"}\").toString(); ");
-
-            method.body = stringer.toString();
+            method.body = new Stringable() {
+                @Override
+                public void makeString(final Stringer sb) {
+                    sb.append("StringBuilder sb = new StringBuilder(\"").append(classRep.name).append("{ \");");
+                    sb.end();
+                    for (FieldRep field : classRep.fields) {
+                        sb.append("if (").append(field.name).append(" != null) sb.append(\"");
+                        sb.cont().append(field.name).append("='\")").append(".append(").append(field.name).append(").append(\"', \");");
+                        sb.end();
+                    }
+                    sb.append("return sb.append(\"}\").toString();");
+                    sb.end();
+                }
+            };
 
             classRep.methods.add(method);
         }
@@ -79,7 +81,7 @@ public class GenUtil {
 
     public static class EqualsClassMangler implements ClassMangler {
         @Override
-        public void mangleClass(ClassRep classRep) {
+        public void mangleClass(final ClassRep classRep) {
             final MethodRep method = new MethodRep();
             method.annotations.add(new AnnotationRep("@Override"));
             method.name = "equals";
@@ -89,22 +91,31 @@ public class GenUtil {
             otherField.className = "Object";
             method.parameters.add(otherField);
 
-            Stringer sb = new Stringer();
-            sb.append("if (this == o) return true;\n");
-            sb.append("if (o instanceof ").append(classRep.name).append(") {\n");
-            sb.indent().append(classRep.name).append(" other = (").append(classRep.name).append(") o;\n");
-            for (FieldRep field : classRep.fields) {
-                final String capKey = field.name.substring(0, 1).toUpperCase()+field.name.substring(1);
-                final String getCall = "get"+capKey+"Ref()";
-                sb.append("if (" + field.name + " == null) { if (other." + field.name + " != null) return false; }\n");
-                sb.append("else if (!" + field.name + ".equals(other." + field.name + ")) { return false; }\n");
-            }
-            sb.indent().append("return true;\n");
-            sb.append("} else {\n");
-            sb.indent().append("return false;\n");
-            sb.append("}\n");
-
-            method.body = sb.toString();
+            method.body = new Stringable() {
+                @Override
+                public void makeString(final Stringer sb) {
+                    sb.append("if (this == o) return true;");
+                    sb.end();
+                    sb.append("if (o instanceof ").append(classRep.name).append(") {");
+                    sb.end();
+                    sb.indent().append(classRep.name).append(" other = (").append(classRep.name).append(") o;");
+                    sb.end();
+                    for (FieldRep field : classRep.fields) {
+                        sb.append("if (" + field.name + " == null) { if (other." + field.name + " != null) return false; }");
+                        sb.end();
+                        sb.append("else if (!" + field.name + ".equals(other." + field.name + ")) { return false; }");
+                        sb.end();
+                    }
+                    sb.indent().append("return true;");
+                    sb.end();
+                    sb.append("} else {");
+                    sb.end();
+                    sb.indent().append("return false;");
+                    sb.end();
+                    sb.append("}");
+                    sb.end();
+                }
+            };
 
             classRep.methods.add(method);
         }
@@ -112,20 +123,27 @@ public class GenUtil {
 
     public static class HashCodeClassMangler implements ClassMangler {
         @Override
-        public void mangleClass(ClassRep classRep) {
+        public void mangleClass(final ClassRep classRep) {
             final MethodRep method = new MethodRep();
             method.annotations.add(new AnnotationRep("@Override"));
             method.name = "hashCode";
             method.returns = "int";
 
             Stringer sb = new Stringer();
-            sb.append("int result = 0;\n");
-            for (FieldRep field : classRep.fields) {
-                sb.append("result = 31 * result + ("+field.name+" == null ? 0 : ").append(field.name).append(".hashCode());\n");
-            }
-            sb.append("return result;\n");
 
-            method.body = sb.toString();
+            method.body = new Stringable() {
+                @Override
+                public void makeString(final Stringer sb) {
+                    sb.append("int result = 0;");
+                    sb.end();
+                    for (FieldRep field : classRep.fields) {
+                        sb.append("result = 31 * result + ("+field.name+" == null ? 0 : ").append(field.name).append(".hashCode());");
+                        sb.end();
+                    }
+                    sb.append("return result;");
+                    sb.end();
+                }
+            };
 
             classRep.methods.add(method);
         }
