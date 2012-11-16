@@ -1,6 +1,7 @@
 package net.exathunk.jsubschema.base;
 
 import net.exathunk.jsubschema.gen.Loader;
+import net.exathunk.jsubschema.gendeps.DomainFactory;
 import net.exathunk.jsubschema.genschema.Schema;
 import net.exathunk.jsubschema.genschema.SchemaFactory;
 import org.codehaus.jackson.JsonNode;

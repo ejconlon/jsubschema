@@ -1,6 +1,6 @@
 package net.exathunk.jsubschema.genschema;
 
-import net.exathunk.jsubschema.base.DomainFactory;
+import net.exathunk.jsubschema.gendeps.DomainFactory;
 
 public class LinkFactory implements DomainFactory<Link> {
 

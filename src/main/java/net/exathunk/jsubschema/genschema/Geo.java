@@ -3,7 +3,6 @@ package net.exathunk.jsubschema.genschema;
 import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.List;
 import java.util.Map;
-import net.exathunk.jsubschema.gen.GenUtil;
 
 public class Geo implements Cloneable {
 
@@ -16,9 +15,9 @@ public class Geo implements Cloneable {
 
     @Override
 public String toString() { 
-        GenUtil.ToStringContext c = new GenUtil.ToStringContext("Geo");
-        c.add("latitude", latitude);
-        c.add("longitude", longitude);
-        return c.finish();  }
+        StringBuilder sb = new StringBuilder("Geo{ ");
+        if (latitude != null) sb.append("latitude='").append(latitude).append("', ");
+        if (longitude != null) sb.append("longitude='").append(longitude).append("', ");
+        return sb.append("}").toString();  }
 
 }

@@ -53,7 +53,6 @@ public class GenUtil {
     }
 
     public static class ToStringClassMangler implements ClassMangler {
-
         @Override
         public void mangleClass(ClassRep classRep) {
             final MethodRep method = new MethodRep();
@@ -65,11 +64,12 @@ public class GenUtil {
             stringer.end();
             Stringer sb2 = stringer.indent().indent();
 
-            sb2.append("GenUtil.ToStringContext c = new GenUtil.ToStringContext(\"").append(classRep.name).append("\");\n");
+            sb2.append("StringBuilder sb = new StringBuilder(\"").append(classRep.name).append("{ \");\n");
             for (FieldRep field : classRep.fields) {
-                sb2.append("c.add(\"").append(field.name).append("\", ").append(field.name).append(");\n");
+                sb2.append("if (").append(field.name).append(" != null) sb.append(\"");
+                sb2.cont().append(field.name).append("='\")").append(".append(").append(field.name).append(").append(\"', \");\n");
             }
-            sb2.append("return c.finish(); ");
+            sb2.append("return sb.append(\"}\").toString(); ");
 
             method.body = stringer.toString();
 

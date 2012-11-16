@@ -1,4 +1,4 @@
-package net.exathunk.jsubschema.base;
+package net.exathunk.jsubschema.gendeps;
 
 /**
  * charolastra 11/14/12 9:14 PM

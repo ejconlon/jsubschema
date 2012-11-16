@@ -1,5 +1,6 @@
 package net.exathunk.jsubschema.base;
 
+import net.exathunk.jsubschema.gendeps.DomainFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 

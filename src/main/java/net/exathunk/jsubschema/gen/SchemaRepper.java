@@ -21,7 +21,6 @@ public class SchemaRepper {
         c.imports.add("org.codehaus.jackson.annotate.JsonProperty");
         c.imports.add("java.util.List");
         c.imports.add("java.util.Map");
-        c.imports.add("net.exathunk.jsubschema.gen.GenUtil");
         c.implemented.add("Cloneable");
         new GenUtil.ToStringClassMangler().mangleClass(c);
         return c;
@@ -32,7 +31,7 @@ public class SchemaRepper {
         String baseName = parseClassName(schema.id);
         c.name = baseName+"Factory";
         c.packageName = basePackageName;
-        c.imports.add("net.exathunk.jsubschema.base.DomainFactory");
+        c.imports.add("net.exathunk.jsubschema.gendeps.DomainFactory");
         c.methods.add(makeDomainClassMethod(baseName));
         c.methods.add(makeMakeDomainMethod(baseName));
         c.implemented.add("DomainFactory<"+baseName+">");

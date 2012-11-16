@@ -1,6 +1,6 @@
 package net.exathunk.jsubschema.genschema;
 
-import net.exathunk.jsubschema.base.DomainFactory;
+import net.exathunk.jsubschema.gendeps.DomainFactory;
 
 public class EventFactory implements DomainFactory<Event> {
 
