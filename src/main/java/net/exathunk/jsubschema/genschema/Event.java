@@ -4,7 +4,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.List;
 import java.util.Map;
 
-public class Calendar {
+public class Event {
 
     @JsonProperty("dtstart")
     public String dtstart;
@@ -41,7 +41,7 @@ public class Calendar {
 
 
     public String toString() { 
-        StringBuilder sb = new StringBuilder("Calendar{ ");
+        StringBuilder sb = new StringBuilder("Event{ ");
         if (dtstart != null) sb.append("dtstart='").append(dtstart).append("', ");
         if (dtend != null) sb.append("dtend='").append(dtend).append("', ");
         if (summary != null) sb.append("summary='").append(summary).append("', ");
