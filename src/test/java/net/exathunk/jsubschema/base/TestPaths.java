@@ -160,4 +160,31 @@ public class TestPaths {
             assertEquals(1, context.errors.size());
         }
     }
+
+    @Test
+    public void testRequired() throws IOException, TypeException {
+        Session session = Session.loadDefaultSession();
+        Schema schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        assertNotNull(schema);
+
+        Validator validator = new RequiredValidator();
+
+        {
+            JsonNode node = Loader.loadSchemaNode("geo");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(0, context.errors.size());
+        }
+
+        {
+            JsonNode node = Util.parse("{ \"type\": \"string\", \"id\":\"foo\" }");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(0, context.errors.size());
+        }
+
+        {
+            JsonNode node = Util.parse("{ \"id\":\"foo\" }");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(1, context.errors.size());
+        }
+    }
 }
