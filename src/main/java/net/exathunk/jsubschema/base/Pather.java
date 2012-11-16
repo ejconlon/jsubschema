@@ -8,24 +8,26 @@ import org.codehaus.jackson.JsonNode;
  */
 public class Pather {
     public static Either<Schema, String> pathSchema(Schema schema, Path path) throws PathException {
-        return pathSchemaInner(schema, schema, path);
+        return pathSchemaInner(schema, schema, path, false);
     }
 
-    public static Either<Schema, String> pathSchemaInner(Schema schema, Schema root, Path path) throws PathException {
+    private static Either<Schema, String> pathSchemaInner(Schema schema, Schema root, Path path, boolean inProperties) throws PathException {
         if (path.isEmpty()) return Either.makeFirst(schema);
         else {
             Part part = path.getHead();
             if (part.hasKey()) {
                 if (root.properties.containsKey(part.getKey())) {
-                    return pathSchemaInner(root.properties.get(part.getKey()), root, path.getTail());
+                    return pathSchemaInner(root.properties.get(part.getKey()), root, path.getTail(), !inProperties && "properties".equals(part.getKey()));
+                } else if (inProperties) {
+                    return pathSchemaInner(root, root, path.getTail(), false);
                 } else {
-                    return pathSchemaInner(root, root, path.getTail());
+                    return Either.makeSecond("Expected object: "+path+" "+schema);
                 }
             } else {
                 if (!schema.type.equals("array") || schema.items == null) {
                     return Either.makeSecond("Expected array: "+path+" "+schema);
                 } else {
-                    return pathSchemaInner(schema.items, root, path.getTail());
+                    return pathSchemaInner(schema.items, root, path.getTail(), false);
                 }
             }
         }

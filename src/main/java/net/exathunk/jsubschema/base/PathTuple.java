@@ -76,7 +76,7 @@ public class PathTuple implements Iterable<PathTuple> {
                     final Path path = root.path.cons(Part.asKey(nextField));
                     final Either<Schema, String> eitherSchema;
                     if (root.eitherSchema.isFirst()) {
-                        eitherSchema = Pather.pathSchemaInner(root.eitherSchema.getFirst(), root.rootSchema, path.reversed());
+                        eitherSchema = Pather.pathSchema(root.rootSchema, path.reversed());
                     } else {
                         eitherSchema = Either.makeSecond("[recursive failure]");
                     }
@@ -86,7 +86,7 @@ public class PathTuple implements Iterable<PathTuple> {
                     final Path path = root.path.cons(Part.asIndex(pos));
                     final Either<Schema, String> eitherSchema;
                     if (root.eitherSchema.isFirst()) {
-                        eitherSchema = Pather.pathSchemaInner(root.eitherSchema.getFirst(), root.rootSchema, path.reversed());
+                        eitherSchema = Pather.pathSchema(root.rootSchema, path.reversed());
                     } else {
                         eitherSchema = Either.makeSecond("[recursive failure]");
                     }

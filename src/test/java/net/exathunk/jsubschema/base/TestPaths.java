@@ -122,6 +122,12 @@ public class TestPaths {
         }
 
         {
+            JsonNode node = Util.parse("{ \"x\":\"object\" }");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(1, context.errors.size());
+        }
+
+        {
             JsonNode node = Util.parse("[1, 2]");
             VContext context = Util.runValidator(validator, new PathTuple(schema, node));
             assertEquals(3, context.errors.size());
@@ -151,7 +157,7 @@ public class TestPaths {
         {
             JsonNode node = Util.parse("{ \"x\": [1,2,3] }");
             VContext context = Util.runValidator(validator, new PathTuple(schema, node));
-            //assertEquals(1, context.errors.size());
+            assertEquals(1, context.errors.size());
         }
     }
 }

@@ -18,6 +18,9 @@ public class Schema {
     @JsonProperty("properties")
     public Map<String, Schema> properties;
 
+    @JsonProperty("declarations")
+    public Map<String, Schema> declarations;
+
     @JsonProperty("id")
     public String id;
 
@@ -43,6 +46,7 @@ public class Schema {
         if (description != null) sb.append("description='").append(description).append("', ");
         if (format != null) sb.append("format='").append(format).append("', ");
         if (properties != null) sb.append("properties='").append(properties).append("', ");
+        if (declarations != null) sb.append("declarations='").append(declarations).append("', ");
         if (id != null) sb.append("id='").append(id).append("', ");
         if (__dollar__ref != null) sb.append("__dollar__ref='").append(__dollar__ref).append("', ");
         if (items != null) sb.append("items='").append(items).append("', ");

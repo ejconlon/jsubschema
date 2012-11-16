@@ -27,6 +27,14 @@
       }
     },
 
+    "declarations" : {
+      "type" : "object",
+      "items" : {
+        "type" : "object",
+        "$ref" : "#"
+      }
+    },
+
     "id" : {
       "type" : "string",
       "forbids" : ["$ref"]
