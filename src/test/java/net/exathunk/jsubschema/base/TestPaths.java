@@ -1,7 +1,10 @@
 package net.exathunk.jsubschema.base;
 
+import net.exathunk.jsubschema.ForbidsValidator;
+import net.exathunk.jsubschema.RequiresValidator;
 import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.genschema.Schema;
+import net.exathunk.jsubschema.genschema.SchemaFactory;
 import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
@@ -185,6 +188,60 @@ public class TestPaths {
             JsonNode node = Util.parse("{ \"id\":\"foo\" }");
             VContext context = Util.runValidator(validator, new PathTuple(schema, node));
             assertEquals(1, context.errors.size());
+        }
+    }
+
+    @Test
+    public void testForbidden() throws IOException, TypeException {
+        Session session = Session.loadDefaultSession();
+        Schema schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        assertNotNull(schema);
+
+        Validator validator = new ForbidsValidator();
+
+        {
+            JsonNode node = Util.parse("{ \"type\": \"object\", \"id\":\"foo\" }");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(0, context.errors.size());
+        }
+
+        {
+            JsonNode node = Util.parse("{ \"type\": \"object\", \"$ref\":\"bar\" }");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(0, context.errors.size());
+        }
+
+        {
+            JsonNode node = Util.parse("{ \"type\": \"object\", \"id\":\"foo\", \"$ref\":\"bar\" }");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(2, context.errors.size());
+        }
+    }
+
+    @Test
+    public void testRequires() throws IOException, TypeException {
+        JsonNode schemaNode = Util.parse("{\"type\":\"object\", \"properties\": { \"a\": {\"type\":\"integer\", \"requires\":[\"b\"]}, \"b\": {\"type\":\"integer\", \"requires\":[\"b\"]} }}");
+        Schema schema = Util.quickBind(schemaNode, new SchemaFactory());
+        assertNotNull(schema);
+
+        Validator validator = new RequiresValidator();
+
+        {
+            JsonNode node = Util.parse("{ \"a\":\"1\" }");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(1, context.errors.size());
+        }
+
+        {
+            JsonNode node = Util.parse("{ \"b\":\"2\" }");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(0, context.errors.size());
+        }
+
+        {
+            JsonNode node = Util.parse("{ \"a\":\"1\", \"b\":\"2\" }");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(0, context.errors.size());
         }
     }
 }

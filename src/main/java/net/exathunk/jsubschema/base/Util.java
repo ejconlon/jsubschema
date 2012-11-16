@@ -220,4 +220,14 @@ public class Util {
             }
         };
     }
+
+    public static <X> X quickBind(JsonNode node, DomainFactory<X> factory) throws TypeException {
+        JacksonBinder<X> binder = new JacksonBinder<X>(new ObjectMapper(), factory);
+        return binder.bind(node);
+    }
+
+    public static <X> JsonNode quickUnbind(X domain) throws TypeException {
+        JacksonBinder<X> binder = new JacksonBinder<X>(new ObjectMapper(), null);
+        return binder.unbind(domain);
+    }
 }
