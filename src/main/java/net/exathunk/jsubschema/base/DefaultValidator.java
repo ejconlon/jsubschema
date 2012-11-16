@@ -1,8 +1,5 @@
 package net.exathunk.jsubschema.base;
 
-import net.exathunk.jsubschema.ForbidsValidator;
-import net.exathunk.jsubschema.RequiresValidator;
-
 import java.util.Arrays;
 
 /**

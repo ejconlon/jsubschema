@@ -1,4 +1,4 @@
-package net.exathunk.jsubschema;
+package net.exathunk.jsubschema.base;
 
 import net.exathunk.jsubschema.base.PathTuple;
 import net.exathunk.jsubschema.base.VContext;

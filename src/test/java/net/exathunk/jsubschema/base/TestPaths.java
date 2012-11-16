@@ -1,6 +1,5 @@
 package net.exathunk.jsubschema.base;
 
-import net.exathunk.jsubschema.ForbidsValidator;
 import net.exathunk.jsubschema.RequiresValidator;
 import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.genschema.Schema;
