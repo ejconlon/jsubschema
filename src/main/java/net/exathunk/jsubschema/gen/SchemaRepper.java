@@ -23,6 +23,8 @@ public class SchemaRepper {
         c.imports.add("java.util.Map");
         c.implemented.add("Cloneable");
         new GenUtil.ToStringClassMangler().mangleClass(c);
+        new GenUtil.EqualsClassMangler().mangleClass(c);
+        new GenUtil.HashCodeClassMangler().mangleClass(c);
         return c;
     }
 

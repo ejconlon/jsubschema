@@ -76,4 +76,58 @@ public class GenUtil {
             classRep.methods.add(method);
         }
     }
+
+    public static class EqualsClassMangler implements ClassMangler {
+        @Override
+        public void mangleClass(ClassRep classRep) {
+            final MethodRep method = new MethodRep();
+            method.annotations.add(new AnnotationRep("@Override"));
+            method.name = "equals";
+            method.returns = "boolean";
+            FieldRep otherField = new FieldRep();
+            otherField.name = "o";
+            otherField.className = "Object";
+            method.parameters.add(otherField);
+
+            Stringer sb = new Stringer();
+            sb.append("if (this == o) return true;\n");
+            sb.append("if (o instanceof ").append(classRep.name).append(") {\n");
+            sb.indent().append(classRep.name).append(" other = (").append(classRep.name).append(") o;\n");
+            for (FieldRep field : classRep.fields) {
+                final String capKey = field.name.substring(0, 1).toUpperCase()+field.name.substring(1);
+                final String getCall = "get"+capKey+"Ref()";
+                sb.append("if (" + field.name + " == null) { if (other." + field.name + " != null) return false; }\n");
+                sb.append("else if (!" + field.name + ".equals(other." + field.name + ")) { return false; }\n");
+            }
+            sb.indent().append("return true;\n");
+            sb.append("} else {\n");
+            sb.indent().append("return false;\n");
+            sb.append("}\n");
+
+            method.body = sb.toString();
+
+            classRep.methods.add(method);
+        }
+    }
+
+    public static class HashCodeClassMangler implements ClassMangler {
+        @Override
+        public void mangleClass(ClassRep classRep) {
+            final MethodRep method = new MethodRep();
+            method.annotations.add(new AnnotationRep("@Override"));
+            method.name = "hashCode";
+            method.returns = "int";
+
+            Stringer sb = new Stringer();
+            sb.append("int result = 0;\n");
+            for (FieldRep field : classRep.fields) {
+                sb.append("result = 31 * result + ("+field.name+" == null ? 0 : ").append(field.name).append(".hashCode());\n");
+            }
+            sb.append("return result;\n");
+
+            method.body = sb.toString();
+
+            classRep.methods.add(method);
+        }
+    }
 }
