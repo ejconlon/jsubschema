@@ -63,8 +63,8 @@ public class RunGen {
             final Schema schema = (Schema) session.binders.get(Schema.class).bind(node);
             final ClassRep classRep = SchemaRepper.makeClass(schema, basePackage);
             final ClassRep factoryRep = SchemaRepper.makeFactory(schema, basePackage);
-            genned.put(classRep.className, classRep);
-            genned.put(factoryRep.className, factoryRep);
+            genned.put(classRep.name, classRep);
+            genned.put(factoryRep.name, factoryRep);
         }
 
         for (Map.Entry<String, ClassRep> entry : genned.entrySet()) {

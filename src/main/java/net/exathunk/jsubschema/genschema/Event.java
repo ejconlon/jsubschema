@@ -3,8 +3,9 @@ package net.exathunk.jsubschema.genschema;
 import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.List;
 import java.util.Map;
+import net.exathunk.jsubschema.gen.GenUtil;
 
-public class Event {
+public class Event implements Cloneable {
 
     @JsonProperty("dtstart")
     public String dtstart;
@@ -40,19 +41,20 @@ public class Event {
     public Geo geo;
 
 
-    public String toString() { 
-        StringBuilder sb = new StringBuilder("Event{ ");
-        if (dtstart != null) sb.append("dtstart='").append(dtstart).append("', ");
-        if (dtend != null) sb.append("dtend='").append(dtend).append("', ");
-        if (summary != null) sb.append("summary='").append(summary).append("', ");
-        if (location != null) sb.append("location='").append(location).append("', ");
-        if (url != null) sb.append("url='").append(url).append("', ");
-        if (duration != null) sb.append("duration='").append(duration).append("', ");
-        if (rdate != null) sb.append("rdate='").append(rdate).append("', ");
-        if (rrule != null) sb.append("rrule='").append(rrule).append("', ");
-        if (category != null) sb.append("category='").append(category).append("', ");
-        if (description != null) sb.append("description='").append(description).append("', ");
-        if (geo != null) sb.append("geo='").append(geo).append("', ");
-        return sb.append("}").toString();  }
+    @Override
+public String toString() { 
+        GenUtil.ToStringContext c = new GenUtil.ToStringContext("Event");
+        c.add("dtstart", dtstart);
+        c.add("dtend", dtend);
+        c.add("summary", summary);
+        c.add("location", location);
+        c.add("url", url);
+        c.add("duration", duration);
+        c.add("rdate", rdate);
+        c.add("rrule", rrule);
+        c.add("category", category);
+        c.add("description", description);
+        c.add("geo", geo);
+        return c.finish();  }
 
 }

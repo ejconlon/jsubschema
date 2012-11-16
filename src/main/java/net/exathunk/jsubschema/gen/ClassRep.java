@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class ClassRep {
     public String packageName;
-    public String className;
+    public String name;
     public List<String> extended = new ArrayList<String>();
     public List<String> implemented = new ArrayList<String>();
     public List<String> imports = new ArrayList<String>();

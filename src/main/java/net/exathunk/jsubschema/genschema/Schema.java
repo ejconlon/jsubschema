@@ -3,8 +3,9 @@ package net.exathunk.jsubschema.genschema;
 import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.List;
 import java.util.Map;
+import net.exathunk.jsubschema.gen.GenUtil;
 
-public class Schema {
+public class Schema implements Cloneable {
 
     @JsonProperty("type")
     public String type;
@@ -40,19 +41,20 @@ public class Schema {
     public List<String> forbids;
 
 
-    public String toString() { 
-        StringBuilder sb = new StringBuilder("Schema{ ");
-        if (type != null) sb.append("type='").append(type).append("', ");
-        if (description != null) sb.append("description='").append(description).append("', ");
-        if (format != null) sb.append("format='").append(format).append("', ");
-        if (properties != null) sb.append("properties='").append(properties).append("', ");
-        if (declarations != null) sb.append("declarations='").append(declarations).append("', ");
-        if (id != null) sb.append("id='").append(id).append("', ");
-        if (__dollar__ref != null) sb.append("__dollar__ref='").append(__dollar__ref).append("', ");
-        if (items != null) sb.append("items='").append(items).append("', ");
-        if (required != null) sb.append("required='").append(required).append("', ");
-        if (requires != null) sb.append("requires='").append(requires).append("', ");
-        if (forbids != null) sb.append("forbids='").append(forbids).append("', ");
-        return sb.append("}").toString();  }
+    @Override
+public String toString() { 
+        GenUtil.ToStringContext c = new GenUtil.ToStringContext("Schema");
+        c.add("type", type);
+        c.add("description", description);
+        c.add("format", format);
+        c.add("properties", properties);
+        c.add("declarations", declarations);
+        c.add("id", id);
+        c.add("__dollar__ref", __dollar__ref);
+        c.add("items", items);
+        c.add("required", required);
+        c.add("requires", requires);
+        c.add("forbids", forbids);
+        return c.finish();  }
 
 }

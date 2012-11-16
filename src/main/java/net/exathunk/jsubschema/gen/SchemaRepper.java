@@ -3,7 +3,6 @@ package net.exathunk.jsubschema.gen;
 import net.exathunk.jsubschema.base.Util;
 import net.exathunk.jsubschema.genschema.Schema;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,44 +12,25 @@ public class SchemaRepper {
 
     public static ClassRep makeClass(Schema schema, String basePackageName) {
         final ClassRep c = new ClassRep();
-        c.className = parseClassName(schema.id);
+        c.name = parseClassName(schema.id);
         c.packageName = basePackageName;
         for (Map.Entry<String, Schema> entry : schema.properties.entrySet()) {
-            final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.className);
+            final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.name);
             c.fields.add(field);
         }
         c.imports.add("org.codehaus.jackson.annotate.JsonProperty");
         c.imports.add("java.util.List");
         c.imports.add("java.util.Map");
-        c.methods.add(makeToString(c.className, c.fields));
+        c.imports.add("net.exathunk.jsubschema.gen.GenUtil");
+        c.implemented.add("Cloneable");
+        new GenUtil.ToStringClassMangler().mangleClass(c);
         return c;
-    }
-
-    private static MethodRep makeToString(String className, List<FieldRep> fields) {
-        final MethodRep method = new MethodRep();
-        method.overrides = true;
-        method.name = "toString";
-        method.returns = "String";
-
-        Stringer stringer = new Stringer();
-        stringer.end();
-        Stringer sb2 = stringer.indent().indent();
-
-        sb2.append("StringBuilder sb = new StringBuilder(\"").append(className).append("{ \");\n");
-        for (FieldRep field : fields) {
-            sb2.append("if (").append(field.name).append(" != null) sb.append(\"");
-            sb2.cont().append(field.name).append("='\")").append(".append(").append(field.name).append(").append(\"', \");\n");
-        }
-        sb2.append("return sb.append(\"}\").toString(); ");
-
-        method.body = stringer.toString();
-        return method;
     }
 
     public static ClassRep makeFactory(Schema schema, String basePackageName) {
         final ClassRep c = new ClassRep();
         String baseName = parseClassName(schema.id);
-        c.className = baseName+"Factory";
+        c.name = baseName+"Factory";
         c.packageName = basePackageName;
         c.imports.add("net.exathunk.jsubschema.base.DomainFactory");
         c.methods.add(makeDomainClassMethod(baseName));
@@ -66,7 +46,7 @@ public class SchemaRepper {
         method.name = "makeDomain";
         method.body = "return new "+className+"();";
         method.returns = className;
-        method.overrides = true;
+        method.annotations.add(new AnnotationRep("@Override"));
         return method;
     }
 
@@ -77,7 +57,7 @@ public class SchemaRepper {
         method.name = "getDomainClass";
         method.body = "return "+className+".class;";
         method.returns = "Class<"+className+">";
-        method.overrides = true;
+        method.annotations.add(new AnnotationRep("@Override"));
         return method;
     }
 

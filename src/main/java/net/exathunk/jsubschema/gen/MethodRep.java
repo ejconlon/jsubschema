@@ -11,7 +11,6 @@ public class MethodRep {
     public Visibility visibility = Visibility.PUBLIC;
     public String returns;
     public List<FieldRep> parameters = new ArrayList<FieldRep>();
-    public boolean overrides = false;
     public List<AnnotationRep> annotations = new ArrayList<AnnotationRep>();
     public String body;
 
