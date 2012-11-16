@@ -32,17 +32,17 @@ public class TestPaths {
         Schema schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
-        Schema reqSchema = Pather.pathSchema(schema, new Path().cons(Part.asKey("type")));
+        Either<Schema, String> reqSchema = Pather.pathSchema(schema, new Path().cons(Part.asKey("type")));
         assertNotNull(reqSchema);
-        assertEquals("string", reqSchema.type);
+        assertEquals("string", reqSchema.getFirst().type);
 
-        Schema idForbidSchema = Pather.pathSchema(schema, new Path().cons(Part.asKey("id")).cons(Part.asKey("forbids")).reversed());
+        Either<Schema, String> idForbidSchema = Pather.pathSchema(schema, new Path().cons(Part.asKey("id")).cons(Part.asKey("forbids")).reversed());
         assertNotNull(idForbidSchema);
-        assertEquals("array", idForbidSchema.type);
+        assertEquals("array", idForbidSchema.getFirst().type);
 
-        Schema idForbid0Schema = Pather.pathSchema(schema, new Path().cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)).reversed());
+        Either<Schema, String> idForbid0Schema = Pather.pathSchema(schema, new Path().cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)).reversed());
         assertNotNull(idForbid0Schema);
-        assertEquals("string", idForbid0Schema.type);
+        assertEquals("string", idForbid0Schema.getFirst().type);
     }
 
     @Test
@@ -70,34 +70,88 @@ public class TestPaths {
 
         JsonNode node = Loader.loadSchemaNode("geo");
 
-        List<PathTuple> flattened = new PathTuple(schema, node).flattened();
+        List<PathTuple> flattened = Util.asList(Util.withSelfDepthFirst(new PathTuple(schema, node)));
         //System.out.println(flattened);
 
-        assertEquals("object", flattened.get(0).schema.type);
+        assertEquals("object", flattened.get(0).eitherSchema.getFirst().type);
         assertEquals(true, flattened.get(0).path.isEmpty());
 
-        assertEquals("string", flattened.get(1).schema.type);
+        assertEquals("string", flattened.get(1).eitherSchema.getFirst().type);
         assertEquals("id", flattened.get(1).path.getHead().getKey());
 
-        assertEquals("string", flattened.get(2).schema.type);
+        assertEquals("string", flattened.get(2).eitherSchema.getFirst().type);
         assertEquals("description", flattened.get(2).path.getHead().getKey());
 
-        assertEquals("string", flattened.get(3).schema.type);
+        assertEquals("string", flattened.get(3).eitherSchema.getFirst().type);
         assertEquals("type", flattened.get(3).path.getHead().getKey());
 
-        assertEquals("object", flattened.get(4).schema.type);
+        assertEquals("object", flattened.get(4).eitherSchema.getFirst().type);
         assertEquals("properties", flattened.get(4).path.getHead().getKey());
 
-        assertEquals("object", flattened.get(5).schema.type);
+        assertEquals("object", flattened.get(5).eitherSchema.getFirst().type);
         assertEquals("latitude", flattened.get(5).path.getHead().getKey());
 
-        assertEquals("string", flattened.get(6).schema.type);
+        assertEquals("string", flattened.get(6).eitherSchema.getFirst().type);
         assertEquals("type", flattened.get(6).path.getHead().getKey());
 
-        assertEquals("object", flattened.get(7).schema.type);
+        assertEquals("object", flattened.get(7).eitherSchema.getFirst().type);
         assertEquals("longitude", flattened.get(7).path.getHead().getKey());
 
-        assertEquals("string", flattened.get(8).schema.type);
+        assertEquals("string", flattened.get(8).eitherSchema.getFirst().type);
         assertEquals("type", flattened.get(8).path.getHead().getKey());
+    }
+
+    @Test
+    public void testValidTypes() throws IOException, TypeException {
+        Session session = Session.loadDefaultSession();
+        Schema schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        assertNotNull(schema);
+
+        Validator validator = new TypeValidator();
+
+        {
+            JsonNode node = Loader.loadSchemaNode("geo");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(0, context.errors.size());
+        }
+
+        {
+            JsonNode node = Util.parse("{ \"type\":\"object\" }");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(0, context.errors.size());
+        }
+
+        {
+            JsonNode node = Util.parse("[1, 2]");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(3, context.errors.size());
+        }
+    }
+
+    @Test
+    public void testValidTypes2() throws IOException, TypeException {
+        Session session = Session.loadDefaultSession();
+        Schema schema = session.schemas.get("http://exathunk.net/schemas/geo");
+        assertNotNull("schema");
+
+        Validator validator = new TypeValidator();
+
+        {
+            JsonNode node = Util.parse("{ \"latitude\": 3.14, \"longitude\": 5 }");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(0, context.errors.size());
+        }
+
+        {
+            JsonNode node = Util.parse("{ \"latitude\": 3.14, \"longitude\": \"derp\" }");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            assertEquals(1, context.errors.size());
+        }
+
+        {
+            JsonNode node = Util.parse("{ \"x\": [1,2,3] }");
+            VContext context = Util.runValidator(validator, new PathTuple(schema, node));
+            //assertEquals(1, context.errors.size());
+        }
     }
 }

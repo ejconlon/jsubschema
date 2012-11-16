@@ -13,7 +13,6 @@ public class MetaValidator implements Validator {
         this.validators = validators;
     }
 
-
     @Override
     public void validate(PathTuple tuple, VContext context) {
         for (Validator v : validators) {

@@ -33,6 +33,27 @@ public class Util {
         return s;
     }
 
+    public static <X> List<X> asList(Iterator<X> xs) {
+        final List<X> s = new ArrayList<X>();
+        while (xs.hasNext()) {
+            final X next = xs.next();
+            s.add(next);
+        }
+        return s;
+    }
+
+    public static <X> List<X> asList(Iterable<X> xs) {
+        return asList(xs.iterator());
+    }
+
+    public static <X> List<X> asList(X... xs) {
+        final List<X> s = new ArrayList<X>();
+        for (X x : xs) {
+            s.add(x);
+        }
+        return s;
+    }
+
     public static <X> boolean setEquals(Set<X> as, Set<X> bs) {
         if (as == null) return bs == null;
         if (bs == null) return false;
@@ -116,5 +137,87 @@ public class Util {
             name = name.replaceAll(e.getValue(), e.getKey());
         }
         return name;
+    }
+
+    public static void runValidator(Validator validator, PathTuple rootTuple, VContext context) {
+        if (rootTuple.eitherSchema.isSecond()) {
+            context.errors.add(new VError(rootTuple.path, rootTuple.eitherSchema.getSecond()));
+        } else {
+            validator.validate(rootTuple, context);
+            for (PathTuple childTuple : rootTuple) {
+                runValidator(validator, childTuple, context);
+            }
+        }
+    }
+
+    public static VContext runValidator(Validator validator, PathTuple rootTuple) {
+        VContext context = new VContext();
+        runValidator(validator, rootTuple, context);
+        return context;
+    }
+
+    public static boolean matchesType(JsonNode node, String schemaType) {
+        if (schemaType.equals("object")) return node.isObject();
+        else if (schemaType.equals("array")) return node.isArray();
+        else if (schemaType.equals("string")) return node.isTextual();
+        else if (schemaType.equals("boolean")) return node.isBoolean();
+        else if (schemaType.equals("integer")) return node.isIntegralNumber();
+        else if (schemaType.equals("number")) return node.isFloatingPointNumber() || node.isIntegralNumber();
+        else return false;
+    }
+
+    public static void assertNotNull(String name, Object x) {
+        if (x == null) throw new IllegalArgumentException(name+" cannot be null");
+    }
+
+    public static <X extends Iterable<X>> Iterator<X> withSelfDepthFirst(final X x) {
+        return new Iterator<X>() {
+
+            private boolean hasYieldedSelf = false;
+            private Iterator<X> rootIt = x.iterator();
+            private Iterator<X> childIt;
+
+            private void advance() {
+                while ((childIt == null || !childIt.hasNext()) && rootIt.hasNext()) {
+                    childIt = withSelfDepthFirst(rootIt.next());
+                }
+            }
+
+            @Override
+            public boolean hasNext() {
+                if (!hasYieldedSelf) {
+                    return true;
+                } else {
+                    advance();
+                    return (childIt != null) && childIt.hasNext();
+                }
+            }
+
+            @Override
+            public X next() {
+                if (!hasYieldedSelf) {
+                    hasYieldedSelf = true;
+                    return x;
+                } else {
+                    advance();
+                    if (childIt != null) return childIt.next();
+                    else throw new NoSuchElementException();
+                }
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+    public static <X> Iterable<X> onceIterable(final Iterator<X> it) {
+        return new Iterable<X>() {
+            @Override
+            public Iterator<X> iterator() {
+                return it;
+            }
+        };
     }
 }

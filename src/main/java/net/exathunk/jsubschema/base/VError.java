@@ -6,17 +6,17 @@ import java.util.List;
  * charolastra 11/15/12 11:41 AM
  */
 public class VError {
-    public final String fieldName;
+    public final Path path;
     public final String message;
 
-    public VError(String fieldName, String message) {
-        this.fieldName = fieldName;
+    public VError(Path path, String message) {
+        this.path = path;
         this.message = message;
     }
 
     @Override
     public String toString() {
-        return "VError: "+fieldName+" "+message+"\n";
+        return "VError: "+path.toPointer()+" "+message+"\n";
     }
 
     public void throwThis(VError ve) throws TypeException {

@@ -3,29 +3,31 @@ package net.exathunk.jsubschema.base;
 import net.exathunk.jsubschema.genschema.Schema;
 import org.codehaus.jackson.JsonNode;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
  * charolastra 11/15/12 12:48 PM
  */
 public class PathTuple implements Iterable<PathTuple> {
-    public final Schema schema;
+    public final Either<Schema, String> eitherSchema;
     public final Schema rootSchema;
     public final JsonNode node;
     public final Path path;
 
     public PathTuple(Schema schema, JsonNode node) {
-        this(schema, schema, node, new Path());
+        this(Either.<Schema, String>makeFirst(schema), schema, node, new Path());
     }
 
-    public PathTuple(Schema schema, Schema rootSchema, JsonNode node, Path path) {
-        this.schema = schema;
+    private PathTuple(Either<Schema, String> eitherSchema, Schema rootSchema, JsonNode node, Path path) {
+        this.eitherSchema = eitherSchema;
         this.rootSchema = rootSchema;
         this.node = node;
         this.path = path;
+        assert eitherSchema != null;
+        assert rootSchema != null;
+        assert node != null;
+        assert path != null;
     }
 
     @Override
@@ -59,7 +61,7 @@ public class PathTuple implements Iterable<PathTuple> {
             if (nextFields != null) {
                 return nextFields.hasNext();
             } else if (size >= 0) {
-                return pos <= size;
+                return pos < size;
             } else {
                 return false;
             }
@@ -72,14 +74,24 @@ public class PathTuple implements Iterable<PathTuple> {
                     final String nextField = nextFields.next();
                     final JsonNode node = root.node.get(nextField);
                     final Path path = root.path.cons(Part.asKey(nextField));
-                    final Schema schema = Pather.pathSchemaInner(root.schema, root.rootSchema, path.reversed());
-                    return new PathTuple(schema, root.rootSchema, node, path);
+                    final Either<Schema, String> eitherSchema;
+                    if (root.eitherSchema.isFirst()) {
+                        eitherSchema = Pather.pathSchemaInner(root.eitherSchema.getFirst(), root.rootSchema, path.reversed());
+                    } else {
+                        eitherSchema = Either.makeSecond("[recursive failure]");
+                    }
+                    return new PathTuple(eitherSchema, root.rootSchema, node, path);
                 } else if (size >= 0) {
                     final JsonNode node = root.node.get(pos);
                     final Path path = root.path.cons(Part.asIndex(pos));
-                    final Schema schema = Pather.pathSchemaInner(root.schema, root.rootSchema, path.reversed());
+                    final Either<Schema, String> eitherSchema;
+                    if (root.eitherSchema.isFirst()) {
+                        eitherSchema = Pather.pathSchemaInner(root.eitherSchema.getFirst(), root.rootSchema, path.reversed());
+                    } else {
+                        eitherSchema = Either.makeSecond("[recursive failure]");
+                    }
                     ++pos;
-                    return new PathTuple(schema, root.rootSchema, node, path);
+                    return new PathTuple(eitherSchema, root.rootSchema, node, path);
                 } else {
                     throw new NoSuchElementException();
                 }
@@ -92,18 +104,5 @@ public class PathTuple implements Iterable<PathTuple> {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-    }
-
-    private void flattened(List<PathTuple> list) {
-        list.add(this);
-        for (PathTuple child : this) {
-            child.flattened(list);
-        }
-    }
-
-    public List<PathTuple> flattened() {
-        List<PathTuple> list = new ArrayList<PathTuple>();
-        flattened(list);
-        return list;
     }
 }
