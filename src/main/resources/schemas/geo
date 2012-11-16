@@ -1,5 +1,5 @@
 {
-    "id": "http://json-schema.org/geo",
+    "id": "http://exathunk.net/schemas/geo",
 	"description": "A geographical coordinate",
 	"type": "object",
 	"properties": {

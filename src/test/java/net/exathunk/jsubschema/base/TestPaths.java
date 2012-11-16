@@ -6,6 +6,7 @@ import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -59,5 +60,44 @@ public class TestPaths {
         JsonNode idForbid0Node = Pather.pathNode(node, new Path().cons(Part.asKey("properties")).cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)).reversed());
         assertNotNull(idForbid0Node);
         assertEquals("$ref", idForbid0Node.asText());
+    }
+
+    @Test
+    public void testTupling() throws IOException, TypeException, PathException {
+        Session session = Session.loadDefaultSession();
+        Schema schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        assertNotNull(schema);
+
+        JsonNode node = Loader.loadSchemaNode("geo");
+
+        List<PathTuple> flattened = new PathTuple(schema, node).flattened();
+        //System.out.println(flattened);
+
+        assertEquals("object", flattened.get(0).schema.type);
+        assertEquals(true, flattened.get(0).path.isEmpty());
+
+        assertEquals("string", flattened.get(1).schema.type);
+        assertEquals("id", flattened.get(1).path.getHead().getKey());
+
+        assertEquals("string", flattened.get(2).schema.type);
+        assertEquals("description", flattened.get(2).path.getHead().getKey());
+
+        assertEquals("string", flattened.get(3).schema.type);
+        assertEquals("type", flattened.get(3).path.getHead().getKey());
+
+        assertEquals("object", flattened.get(4).schema.type);
+        assertEquals("properties", flattened.get(4).path.getHead().getKey());
+
+        assertEquals("object", flattened.get(5).schema.type);
+        assertEquals("latitude", flattened.get(5).path.getHead().getKey());
+
+        assertEquals("string", flattened.get(6).schema.type);
+        assertEquals("type", flattened.get(6).path.getHead().getKey());
+
+        assertEquals("object", flattened.get(7).schema.type);
+        assertEquals("longitude", flattened.get(7).path.getHead().getKey());
+
+        assertEquals("string", flattened.get(8).schema.type);
+        assertEquals("type", flattened.get(8).path.getHead().getKey());
     }
 }

@@ -11,15 +11,15 @@ public class Pather {
         return pathSchemaInner(schema, schema, path);
     }
 
-    private static Schema pathSchemaInner(Schema schema, Schema root, Path path) throws PathException {
+    public static Schema pathSchemaInner(Schema schema, Schema root, Path path) throws PathException {
         if (path.isEmpty()) return schema;
         else {
             Part part = path.getHead();
             if (part.hasKey()) {
-                if (!root.properties.containsKey(part.getKey())) {
-                    throw new PathException("Expected object: "+path+" "+schema);
-                } else {
+                if (root.properties.containsKey(part.getKey())) {
                     return pathSchemaInner(root.properties.get(part.getKey()), root, path.getTail());
+                } else {
+                    return pathSchemaInner(root, root, path.getTail());
                 }
             } else {
                 if (!schema.type.equals("array") || schema.items == null) {
