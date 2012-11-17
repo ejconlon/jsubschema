@@ -14,7 +14,7 @@ public class Pather {
     private static Either<SchemaLike, String> pathSchemaInner(SchemaLike schema, SchemaLike root, Pointer pointer, boolean inProperties, RefResolver resolver) throws PathException {
         if (pointer.isEmpty()) {
             if (schema.get__dollar__ref() != null) {
-                return resolver.resolveRef(schema.get__dollar__ref());
+                return Resolvers.resolveRefString(schema.get__dollar__ref(), resolver);
             } else {
                 return Either.makeFirst(schema);
             }
@@ -26,7 +26,7 @@ public class Pather {
                 } else if (root.getProperties().containsKey(part.getKey())) {
                     return pathSchemaInner(root.getProperties().get(part.getKey()), root, pointer.getTail(), !inProperties && "properties".equals(part.getKey()), resolver);
                 } else if (schema.get__dollar__ref() != null) {
-                    Either<SchemaLike, String> eitherSchema = resolver.resolveRef(schema.get__dollar__ref());
+                    Either<SchemaLike, String> eitherSchema = Resolvers.resolveRefString(schema.get__dollar__ref(), resolver);
                     if (eitherSchema.isFirst()) {
                         return pathSchemaInner(eitherSchema.getFirst(), eitherSchema.getFirst(), pointer, false, resolver);
                     } else {

@@ -24,7 +24,7 @@ public class TestPaths {
     @Test
     public void testPathSchema() throws IOException, TypeException, PathException {
         Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
         Either<SchemaLike, String> reqSchema = Pather.pathSchema(schema, new Pointer().cons(Part.asKey("type")), new EmptyResolver());
@@ -60,7 +60,7 @@ public class TestPaths {
     @Test
     public void testTupling() throws IOException, TypeException, PathException {
         Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
         JsonNode node = Loader.loadSchemaNode("geo");
@@ -120,7 +120,7 @@ public class TestPaths {
         JsonNode node = Util.quickUnbind(event);
         //System.out.println(node);
 
-        SchemaLike schema = resolver.resolveRef("http://exathunk.net/schemas/event").getFirst();
+        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/event");
 
         List<PathTuple> flattened = Util.asList(Util.withSelfDepthFirst(new PathTuple(schema, node, resolver)));
 

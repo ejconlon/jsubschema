@@ -86,6 +86,11 @@ public class TestPointers {
     }
 
     @Test
+    public void testCorners() {
+        assertEquals(Either.makeSecond("Null pointer"), Pointer.fromPointerString(null));
+    }
+
+    @Test
     public void testReverse() {
         final String goldPointer = "/foo/0/bar";
         final Pointer goldPath = new Pointer().cons(Part.asKey("foo")).cons(Part.asIndex(0)).cons(Part.asKey("bar"));

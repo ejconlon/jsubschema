@@ -17,7 +17,7 @@ public class PathTuple implements Iterable<PathTuple> {
     public final RefResolver resolver;
 
     public PathTuple(SchemaLike schema, JsonNode node, RefResolver resolver) {
-        this(Either.<SchemaLike, String>makeFirst(schema), schema, node, Reference.fromId(schema.getId(), null), resolver);
+        this(Either.<SchemaLike, String>makeFirst(schema), schema, node, Reference.fromId(schema.getId()), resolver);
     }
 
     private PathTuple(Either<SchemaLike, String> eitherSchema, SchemaLike rootSchema, JsonNode node, Reference reference, RefResolver resolver) {

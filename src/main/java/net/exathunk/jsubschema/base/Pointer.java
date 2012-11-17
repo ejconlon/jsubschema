@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * charolastra 11/15/12 11:52 AM
  */
-public class Pointer extends ConsList<Part> {
+public class Pointer extends ConsList<Part> implements Comparable<Pointer> {
 
     // DOWN <==> /foo/0 <==> (cons 0 (cons "foo" nil)) <==> points to 1 in { "foo": [1,2,3] }
     // UP <==> /0/foo <==> (cons "foo" (cons 0 nil)) <==> points to [1,2,3] in [{"foo": [1,2,3]}, ...]
@@ -62,6 +62,7 @@ public class Pointer extends ConsList<Part> {
     }
 
     public static Either<Pointer, String> fromPointerString(String pointer) {
+        if (pointer == null) return Either.makeSecond("Null pointer");
         Pointer path = new Pointer();
         if (pointer.length() > 0) {
             if (pointer.contains("#") || pointer.charAt(0) != '/') {
@@ -115,4 +116,10 @@ public class Pointer extends ConsList<Part> {
         result = 31 * result + direction.hashCode();
         return result;
     }
+
+    @Override
+    public int compareTo(Pointer pointer) {
+        return toPointerString().compareTo(pointer.toPointerString());
+    }
+
 }

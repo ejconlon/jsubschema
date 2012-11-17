@@ -13,12 +13,12 @@ public class SessionResolver implements RefResolver {
     }
 
     @Override
-    public Either<SchemaLike, String> resolveRef(String ref) {
-        final SchemaLike maybeSchema = session.schemas.get(ref);
+    public Either<SchemaLike, String> resolveRef(Reference reference) {
+        final SchemaLike maybeSchema = session.schemas.get(reference);
         if (maybeSchema != null) {
             return Either.makeFirst(maybeSchema);
         } else {
-            return Either.makeSecond("Invalid ref: "+ref);
+            return Either.makeSecond("Invalid reference: "+reference.toReferenceString());
         }
     }
 }

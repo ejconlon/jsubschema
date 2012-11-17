@@ -5,7 +5,6 @@ import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.genschema.Schema;
 import net.exathunk.jsubschema.genschema.SchemaFactory;
 import net.exathunk.jsubschema.genschema.SchemaLike;
-import net.exathunk.jsubschema.validation.*;
 import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
@@ -22,7 +21,7 @@ public class TestValidation {
     @Test
     public void testValidTypes() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
         Validator validator = new TypeValidator();
@@ -55,7 +54,7 @@ public class TestValidation {
     @Test
     public void testValidTypes2() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/geo");
+        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/geo");
         assertNotNull("schema");
 
         Validator validator = new TypeValidator();
@@ -82,7 +81,7 @@ public class TestValidation {
     @Test
     public void testRequired() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
         Validator validator = new RequiredValidator();
@@ -109,7 +108,7 @@ public class TestValidation {
     @Test
     public void testForbidden() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
         Validator validator = new ForbidsValidator();

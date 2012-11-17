@@ -7,7 +7,7 @@ import net.exathunk.jsubschema.genschema.SchemaLike;
  */
 public class EmptyResolver implements RefResolver {
     @Override
-    public Either<SchemaLike, String> resolveRef(String ref) {
-        return Either.makeSecond("Empty resolver cannot resolve: "+ref);
+    public Either<SchemaLike, String> resolveRef(Reference reference) {
+        return Either.makeSecond("Empty resolver cannot resolve: "+reference.toReferenceString());
     }
 }

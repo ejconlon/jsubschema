@@ -2,8 +2,8 @@ package net.exathunk.jsubschema.base;
 
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
 
@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 public class TestReferences {
 
     private static Map<String, Either<Reference, String>> makeCases() {
-        Map<String, Either<Reference, String>> cs = new TreeMap<String, Either<Reference, String>>();
+        Map<String, Either<Reference, String>> cs = new HashMap<String, Either<Reference, String>>();
         cs.put("http://example.com#/foo/0/bar", Either.<Reference, String>makeFirst(
                 new Reference("http://example.com", new Pointer().cons(Part.asKey("foo")).cons(Part.asIndex(0)).cons(Part.asKey("bar")))));
         cs.put("a#/b", Either.<Reference, String>makeFirst(
@@ -23,9 +23,11 @@ public class TestReferences {
         cs.put("a/b", Either.<Reference, String>makeFirst(
                 new Reference("a/b", new Pointer())));
         cs.put("/a/b", Either.<Reference, String>makeFirst(
-                new Reference(null, new Pointer().cons(Part.asKey("a")).cons(Part.asKey("b")))));
+                new Reference("", new Pointer().cons(Part.asKey("a")).cons(Part.asKey("b")))));
         cs.put("#/a/b", Either.<Reference, String>makeFirst(
-                new Reference(null, new Pointer().cons(Part.asKey("a")).cons(Part.asKey("b")))));
+                new Reference("", new Pointer().cons(Part.asKey("a")).cons(Part.asKey("b")))));
+        cs.put("", Either.<Reference, String>makeFirst(new Reference("", new Pointer())));
+        cs.put(null, Either.<Reference, String>makeSecond("Null reference"));
         return cs;
     }
 

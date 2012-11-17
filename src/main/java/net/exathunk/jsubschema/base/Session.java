@@ -18,7 +18,7 @@ import java.util.TreeMap;
  */
 public class Session {
     public final ObjectMapper mapper = Util.makeObjectMapper();
-    public final Map<String, SchemaLike> schemas = new TreeMap<String, SchemaLike>();
+    public final Map<Reference, SchemaLike> schemas = new TreeMap<Reference, SchemaLike>();
     public final Map<Class, Binder> binders = new HashMap<Class, Binder>();
 
     public static Session loadDefaultSession() throws IOException, TypeException {
@@ -33,8 +33,12 @@ public class Session {
     }
 
     public void addSchema(SchemaLike schema) {
-        if (schema.getId() == null) throw new IllegalArgumentException("Null id in "+schema);
-        schemas.put(schema.getId(), schema);
+        if (schema.getId() == null || schema.getId().isEmpty()) throw new IllegalArgumentException("Empty id in "+schema);
+        schemas.put(Reference.fromId(schema.getId()), schema);
+    }
+
+    public SchemaLike getSchema(String refString) {
+        return schemas.get(Reference.fromReferenceString(refString).getFirst());
     }
 
     public void addBinder(DomainFactory factory) {
