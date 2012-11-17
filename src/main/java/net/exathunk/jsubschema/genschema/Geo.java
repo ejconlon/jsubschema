@@ -3,6 +3,8 @@ package net.exathunk.jsubschema.genschema;
 import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Geo implements Cloneable, Serializable, GeoLike {
 
@@ -53,9 +55,9 @@ public class Geo implements Cloneable, Serializable, GeoLike {
         if (this == o) return true;
         if (o instanceof GeoLike) {
             GeoLike other = (GeoLike) o;
-            if (latitude == null) { if (other.hasLatitude()) return false; }
+            if (latitude == null) { if (other.hasLatitude()) { return false; } }
             else if (!latitude.equals(other.getLatitude())) { return false; }
-            if (longitude == null) { if (other.hasLongitude()) return false; }
+            if (longitude == null) { if (other.hasLongitude()) { return false; } }
             else if (!longitude.equals(other.getLongitude())) { return false; }
             return true;
         } else {
@@ -69,6 +71,15 @@ public class Geo implements Cloneable, Serializable, GeoLike {
         result = 31 * result + (latitude == null ? 0 : latitude.hashCode());
         result = 31 * result + (longitude == null ? 0 : longitude.hashCode());
         return result;
+    }
+
+    public Set<String> diff(GeoLike other) {
+            Set<String> s = new TreeSet<String>();
+            if (latitude == null) { if (other == null || other.hasLatitude()) { s.add("latitude"); } }
+            else if (!latitude.equals(other.getLatitude())) { s.add("latitude"); }
+            if (longitude == null) { if (other == null || other.hasLongitude()) { s.add("longitude"); } }
+            else if (!longitude.equals(other.getLongitude())) { s.add("longitude"); }
+            return s;
     }
 
 }

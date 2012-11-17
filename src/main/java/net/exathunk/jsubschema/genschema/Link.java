@@ -3,6 +3,8 @@ package net.exathunk.jsubschema.genschema;
 import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Link implements Cloneable, Serializable, LinkLike {
 
@@ -89,13 +91,13 @@ public class Link implements Cloneable, Serializable, LinkLike {
         if (this == o) return true;
         if (o instanceof LinkLike) {
             LinkLike other = (LinkLike) o;
-            if (href == null) { if (other.hasHref()) return false; }
+            if (href == null) { if (other.hasHref()) { return false; } }
             else if (!href.equals(other.getHref())) { return false; }
-            if (rel == null) { if (other.hasRel()) return false; }
+            if (rel == null) { if (other.hasRel()) { return false; } }
             else if (!rel.equals(other.getRel())) { return false; }
-            if (method == null) { if (other.hasMethod()) return false; }
+            if (method == null) { if (other.hasMethod()) { return false; } }
             else if (!method.equals(other.getMethod())) { return false; }
-            if (enctype == null) { if (other.hasEnctype()) return false; }
+            if (enctype == null) { if (other.hasEnctype()) { return false; } }
             else if (!enctype.equals(other.getEnctype())) { return false; }
             return true;
         } else {
@@ -111,6 +113,19 @@ public class Link implements Cloneable, Serializable, LinkLike {
         result = 31 * result + (method == null ? 0 : method.hashCode());
         result = 31 * result + (enctype == null ? 0 : enctype.hashCode());
         return result;
+    }
+
+    public Set<String> diff(LinkLike other) {
+            Set<String> s = new TreeSet<String>();
+            if (href == null) { if (other == null || other.hasHref()) { s.add("href"); } }
+            else if (!href.equals(other.getHref())) { s.add("href"); }
+            if (rel == null) { if (other == null || other.hasRel()) { s.add("rel"); } }
+            else if (!rel.equals(other.getRel())) { s.add("rel"); }
+            if (method == null) { if (other == null || other.hasMethod()) { s.add("method"); } }
+            else if (!method.equals(other.getMethod())) { s.add("method"); }
+            if (enctype == null) { if (other == null || other.hasEnctype()) { s.add("enctype"); } }
+            else if (!enctype.equals(other.getEnctype())) { s.add("enctype"); }
+            return s;
     }
 
 }

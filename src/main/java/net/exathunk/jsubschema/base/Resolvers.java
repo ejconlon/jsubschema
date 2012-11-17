@@ -9,6 +9,6 @@ public class Resolvers {
     public static Either<SchemaLike, String> resolveRefString(String refString, RefResolver resolver) {
         Either<Reference, String> eitherReference = Reference.fromReferenceString(refString);
         if (eitherReference.isSecond()) return Either.makeSecond(eitherReference.getSecond());
-        return resolver.resolveRef(eitherReference.getFirst());
+        return resolver.resolveRef(eitherReference.getFirst(), resolver);
     }
 }

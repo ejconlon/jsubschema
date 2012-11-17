@@ -69,7 +69,7 @@ public class Reference implements Comparable<Reference> {
 
     public static Reference fromId(String id) {
         if (id == null) id = "";
-        return Reference.fromReferenceString(id).getFirst();
+        return new Reference(id, new Pointer());
     }
 
     @Override

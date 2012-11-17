@@ -1,7 +1,9 @@
 package net.exathunk.jsubschema.base;
 
 import net.exathunk.jsubschema.gen.Loader;
-import net.exathunk.jsubschema.genschema.*;
+import net.exathunk.jsubschema.genschema.Event;
+import net.exathunk.jsubschema.genschema.Geo;
+import net.exathunk.jsubschema.genschema.SchemaLike;
 import net.exathunk.jsubschema.validation.DefaultValidator;
 import net.exathunk.jsubschema.validation.VContext;
 import net.exathunk.jsubschema.validation.VError;
@@ -11,7 +13,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,7 +31,7 @@ public class TestPaths {
         SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
-        Either<SchemaLike, String> reqSchema = Pather.pathSchema(schema, new Pointer().cons(Part.asKey("type")), new EmptyResolver());
+        Either<SchemaLike, String> reqSchema = Pather.pathSchema(schema, new Pointer().cons(Part.asKey("type")).reversed(), new EmptyResolver());
         assertNotNull(reqSchema);
         assertEquals("string", reqSchema.getFirst().getType());
 
@@ -169,5 +173,37 @@ public class TestPaths {
         Validator validator = new DefaultValidator();
         VContext context = Util.runValidator(validator, new PathTuple(schema, node, resolver));
         assertEquals(new ArrayList<VError>(), context.errors);
+    }
+
+    @Test
+    public void testSelfResolver() throws IOException, TypeException {
+        Session session = Session.loadDefaultSession();
+        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
+        assertNotNull(schema);
+        RefResolver resolver = new SelfResolver(schema);
+
+        for (Map.Entry<Reference, SchemaLike> entry : makeCases(schema).entrySet()) {
+            final Reference ref = entry.getKey();
+            final SchemaLike subSchema = entry.getValue();
+            final Either<SchemaLike, String> actual = resolver.resolveRef(ref, resolver);
+            assertEquals(ref.toReferenceString(), actual.getFirst(), subSchema);
+        }
+    }
+
+    private static Map<Reference, SchemaLike> makeCases(SchemaLike schema) {
+        final SchemaLike typeSchema = schema.getProperties().get("type");
+        final SchemaLike propertiesSchema = schema.getProperties().get("properties");
+        assert !schema.equals(typeSchema);
+        assert !schema.equals(propertiesSchema);
+        assert !typeSchema.equals(propertiesSchema);
+        Map<Reference, SchemaLike> cs = new HashMap<Reference, SchemaLike>();
+        for (String url : Util.asSet("", schema.getId())) {
+            cs.put(Reference.fromReferenceString(url+"").getFirst(), schema);
+            cs.put(Reference.fromReferenceString(url+"#/type").getFirst(), typeSchema);
+            cs.put(Reference.fromReferenceString(url+"#/properties").getFirst(), propertiesSchema);
+            cs.put(Reference.fromReferenceString(url+"#/properties/items").getFirst(), schema);
+            cs.put(Reference.fromReferenceString(url+"#/properties/items/type").getFirst(), typeSchema);
+        }
+        return cs;
     }
 }

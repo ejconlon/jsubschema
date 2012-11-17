@@ -13,7 +13,7 @@ public class SessionResolver implements RefResolver {
     }
 
     @Override
-    public Either<SchemaLike, String> resolveRef(Reference reference) {
+    public Either<SchemaLike, String> resolveRef(Reference reference, RefResolver root) {
         final SchemaLike maybeSchema = session.schemas.get(reference);
         if (maybeSchema != null) {
             return Either.makeFirst(maybeSchema);

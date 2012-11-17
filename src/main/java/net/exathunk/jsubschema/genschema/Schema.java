@@ -3,6 +3,8 @@ package net.exathunk.jsubschema.genschema;
 import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Schema implements Cloneable, Serializable, SchemaLike {
 
@@ -215,27 +217,27 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         if (this == o) return true;
         if (o instanceof SchemaLike) {
             SchemaLike other = (SchemaLike) o;
-            if (type == null) { if (other.hasType()) return false; }
+            if (type == null) { if (other.hasType()) { return false; } }
             else if (!type.equals(other.getType())) { return false; }
-            if (description == null) { if (other.hasDescription()) return false; }
+            if (description == null) { if (other.hasDescription()) { return false; } }
             else if (!description.equals(other.getDescription())) { return false; }
-            if (format == null) { if (other.hasFormat()) return false; }
+            if (format == null) { if (other.hasFormat()) { return false; } }
             else if (!format.equals(other.getFormat())) { return false; }
-            if (properties == null) { if (other.hasProperties()) return false; }
+            if (properties == null) { if (other.hasProperties()) { return false; } }
             else if (!properties.equals(other.getProperties())) { return false; }
-            if (declarations == null) { if (other.hasDeclarations()) return false; }
+            if (declarations == null) { if (other.hasDeclarations()) { return false; } }
             else if (!declarations.equals(other.getDeclarations())) { return false; }
-            if (id == null) { if (other.hasId()) return false; }
+            if (id == null) { if (other.hasId()) { return false; } }
             else if (!id.equals(other.getId())) { return false; }
-            if (__dollar__ref == null) { if (other.has__dollar__ref()) return false; }
+            if (__dollar__ref == null) { if (other.has__dollar__ref()) { return false; } }
             else if (!__dollar__ref.equals(other.get__dollar__ref())) { return false; }
-            if (items == null) { if (other.hasItems()) return false; }
+            if (items == null) { if (other.hasItems()) { return false; } }
             else if (!items.equals(other.getItems())) { return false; }
-            if (required == null) { if (other.hasRequired()) return false; }
+            if (required == null) { if (other.hasRequired()) { return false; } }
             else if (!required.equals(other.getRequired())) { return false; }
-            if (requires == null) { if (other.hasRequires()) return false; }
+            if (requires == null) { if (other.hasRequires()) { return false; } }
             else if (!requires.equals(other.getRequires())) { return false; }
-            if (forbids == null) { if (other.hasForbids()) return false; }
+            if (forbids == null) { if (other.hasForbids()) { return false; } }
             else if (!forbids.equals(other.getForbids())) { return false; }
             return true;
         } else {
@@ -258,6 +260,33 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         result = 31 * result + (requires == null ? 0 : requires.hashCode());
         result = 31 * result + (forbids == null ? 0 : forbids.hashCode());
         return result;
+    }
+
+    public Set<String> diff(SchemaLike other) {
+            Set<String> s = new TreeSet<String>();
+            if (type == null) { if (other == null || other.hasType()) { s.add("type"); } }
+            else if (!type.equals(other.getType())) { s.add("type"); }
+            if (description == null) { if (other == null || other.hasDescription()) { s.add("description"); } }
+            else if (!description.equals(other.getDescription())) { s.add("description"); }
+            if (format == null) { if (other == null || other.hasFormat()) { s.add("format"); } }
+            else if (!format.equals(other.getFormat())) { s.add("format"); }
+            if (properties == null) { if (other == null || other.hasProperties()) { s.add("properties"); } }
+            else if (!properties.equals(other.getProperties())) { s.add("properties"); }
+            if (declarations == null) { if (other == null || other.hasDeclarations()) { s.add("declarations"); } }
+            else if (!declarations.equals(other.getDeclarations())) { s.add("declarations"); }
+            if (id == null) { if (other == null || other.hasId()) { s.add("id"); } }
+            else if (!id.equals(other.getId())) { s.add("id"); }
+            if (__dollar__ref == null) { if (other == null || other.has__dollar__ref()) { s.add("__dollar__ref"); } }
+            else if (!__dollar__ref.equals(other.get__dollar__ref())) { s.add("__dollar__ref"); }
+            if (items == null) { if (other == null || other.hasItems()) { s.add("items"); } }
+            else if (!items.equals(other.getItems())) { s.add("items"); }
+            if (required == null) { if (other == null || other.hasRequired()) { s.add("required"); } }
+            else if (!required.equals(other.getRequired())) { s.add("required"); }
+            if (requires == null) { if (other == null || other.hasRequires()) { s.add("requires"); } }
+            else if (!requires.equals(other.getRequires())) { s.add("requires"); }
+            if (forbids == null) { if (other == null || other.hasForbids()) { s.add("forbids"); } }
+            else if (!forbids.equals(other.getForbids())) { s.add("forbids"); }
+            return s;
     }
 
 }

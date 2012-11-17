@@ -1,6 +1,7 @@
 package net.exathunk.jsubschema.base;
 
 /**
+ * TODO MOVE TO EITHER AND DELETE
  * charolastra 11/15/12 12:44 PM
  */
 public class PathException extends Exception {

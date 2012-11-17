@@ -7,11 +7,14 @@ import org.codehaus.jackson.JsonNode;
  * charolastra 11/15/12 12:44 PM
  */
 public class Pather {
-    public static Either<SchemaLike, String> pathSchema(SchemaLike schema, Pointer pointer, RefResolver resolver) throws PathException {
+    public static Either<SchemaLike, String> pathSchema(SchemaLike schema, Pointer pointer, RefResolver resolver) {
+        if (!Pointer.Direction.UP.equals(pointer.getDirection())) {
+            return Either.makeSecond("DOWN pointer, probable bug: "+pointer);
+        }
         return pathSchemaInner(schema, schema, pointer, false, resolver);
     }
 
-    private static Either<SchemaLike, String> pathSchemaInner(SchemaLike schema, SchemaLike root, Pointer pointer, boolean inProperties, RefResolver resolver) throws PathException {
+    private static Either<SchemaLike, String> pathSchemaInner(SchemaLike schema, SchemaLike root, Pointer pointer, boolean inProperties, RefResolver resolver) {
         if (pointer.isEmpty()) {
             if (schema.get__dollar__ref() != null) {
                 return Resolvers.resolveRefString(schema.get__dollar__ref(), resolver);
@@ -51,6 +54,7 @@ public class Pather {
             Part part = pointer.getHead();
             if (part.hasKey()) {
                 if (!node.isObject() || !node.has(part.getKey())) {
+                    // TODO move to EITHER
                     throw new PathException("Expected object: "+ pointer +" "+node);
                 } else {
                     return pathNode(node.get(part.getKey()), pointer.getTail());

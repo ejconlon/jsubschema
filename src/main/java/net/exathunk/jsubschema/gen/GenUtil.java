@@ -134,7 +134,7 @@ public class GenUtil {
                     sb.indent().append(classRep.name).append("Like other = (").append(classRep.name).append("Like) o;");
                     sb.end();
                     for (FieldRep field : classRep.fields) {
-                        sb.indent().append("if (" + field.name + " == null) { if (other.has" + Util.capitalize(field.name) + "()) return false; }");
+                        sb.indent().append("if (" + field.name + " == null) { if (other.has" + Util.capitalize(field.name) + "()) { return false; } }");
                         sb.end();
                         sb.indent().append("else if (!" + field.name + ".equals(other.get" + Util.capitalize(field.name) + "())) { return false; }");
                         sb.end();
@@ -180,4 +180,39 @@ public class GenUtil {
         }
     }
 
+
+    public static class DiffMethodGen implements MethodGen {
+        @Override
+        public MethodRep genMethod(final ClassRep classRep) {
+            final MethodRep method = new MethodRep();
+            method.name = "diff";
+            method.returns = "Set<String>";
+            FieldRep otherField = new FieldRep();
+            otherField.name = "other";
+            otherField.className = classRep.name+"Like";
+            method.parameters.add(otherField);
+
+            method.body = new Stringable() {
+                @Override
+                public void makeString(final Stringer sb) {
+                    sb.indent().append("Set<String> s = new TreeSet<String>();");
+                    sb.end();
+                    for (FieldRep field : classRep.fields) {
+                        sb.indent().append("if (" + field.name + " == null) { if (other == null || other.has" + Util.capitalize(field.name) + "()) { s.add(\""+field.name+"\"); } }");
+                        sb.end();
+                        sb.indent().append("else if (!" + field.name + ".equals(other.get" + Util.capitalize(field.name) + "())) { s.add(\""+field.name+"\"); }");
+                        sb.end();
+                    }
+                    sb.indent().append("return s;");
+                    sb.end();
+                }
+            };
+
+            // HACK
+            classRep.imports.add("java.util.Set");
+            classRep.imports.add("java.util.TreeSet");
+
+            return method;
+        }
+    }
 }

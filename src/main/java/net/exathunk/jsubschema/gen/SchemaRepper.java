@@ -31,6 +31,9 @@ public class SchemaRepper {
         c.methods.add(new GenUtil.ToStringMethodGen().genMethod(c));
         c.methods.add(new GenUtil.EqualsMethodGen().genMethod(c));
         c.methods.add(new GenUtil.HashCodeMethodGen().genMethod(c));
+
+        c.methods.add(new GenUtil.DiffMethodGen().genMethod(c));
+
         return c;
     }
 

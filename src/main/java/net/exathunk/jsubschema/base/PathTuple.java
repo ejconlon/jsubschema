@@ -72,34 +72,30 @@ public class PathTuple implements Iterable<PathTuple> {
 
         @Override
         public PathTuple next() {
-            try {
-                if (nextFields != null) {
-                    final String nextField = nextFields.next();
-                    final JsonNode node = root.node.get(nextField);
-                    final Reference reference = root.reference.cons(Part.asKey(nextField));
-                    final Either<SchemaLike, String> eitherSchema;
-                    if (root.eitherSchema.isFirst()) {
-                        eitherSchema = Pather.pathSchema(root.rootSchema, reference.getPointer().reversed(), root.resolver);
-                    } else {
-                        eitherSchema = Either.makeSecond("[recursive failure]");
-                    }
-                    return new PathTuple(eitherSchema, root.rootSchema, node, reference, root.resolver);
-                } else if (size >= 0) {
-                    final JsonNode node = root.node.get(pos);
-                    final Reference reference = root.reference.cons(Part.asIndex(pos));
-                    final Either<SchemaLike, String> eitherSchema;
-                    if (root.eitherSchema.isFirst()) {
-                        eitherSchema = Pather.pathSchema(root.rootSchema, reference.getPointer().reversed(), root.resolver);
-                    } else {
-                        eitherSchema = Either.makeSecond("[recursive failure]");
-                    }
-                    ++pos;
-                    return new PathTuple(eitherSchema, root.rootSchema, node, reference, root.resolver);
+            if (nextFields != null) {
+                final String nextField = nextFields.next();
+                final JsonNode node = root.node.get(nextField);
+                final Reference reference = root.reference.cons(Part.asKey(nextField));
+                final Either<SchemaLike, String> eitherSchema;
+                if (root.eitherSchema.isFirst()) {
+                    eitherSchema = Pather.pathSchema(root.rootSchema, reference.getPointer().reversed(), root.resolver);
                 } else {
-                    throw new NoSuchElementException();
+                    eitherSchema = Either.makeSecond("[recursive failure]");
                 }
-            } catch (PathException e) {
-                throw new NoSuchElementException(e.toString());
+                return new PathTuple(eitherSchema, root.rootSchema, node, reference, root.resolver);
+            } else if (size >= 0) {
+                final JsonNode node = root.node.get(pos);
+                final Reference reference = root.reference.cons(Part.asIndex(pos));
+                final Either<SchemaLike, String> eitherSchema;
+                if (root.eitherSchema.isFirst()) {
+                    eitherSchema = Pather.pathSchema(root.rootSchema, reference.getPointer().reversed(), root.resolver);
+                } else {
+                    eitherSchema = Either.makeSecond("[recursive failure]");
+                }
+                ++pos;
+                return new PathTuple(eitherSchema, root.rootSchema, node, reference, root.resolver);
+            } else {
+                throw new NoSuchElementException();
             }
         }
 
