@@ -60,7 +60,8 @@ public class GenUtil {
             method.interfaceAnnotations.add(new AnnotationRep("@JsonProperty(\""+Util.unconvert(fieldRep.name)+"\")"));
             if (fieldRep.className.endsWith("Like") || fieldRep.className.endsWith("Like>")) {
                 if (fieldRep.className.startsWith("Map<") || fieldRep.className.startsWith("List<")) {
-                    final int space = fieldRep.className.lastIndexOf(" ");
+                    int space = fieldRep.className.lastIndexOf(" "); // for map
+                    if (space < 0) space = fieldRep.className.lastIndexOf("<"); // for list
                     final String className = fieldRep.className.substring(space+1, fieldRep.className.length()-"Like>".length());
                     method.interfaceAnnotations.add(new AnnotationRep("@JsonDeserialize(contentAs = "+className+".class)"));
                 } else {

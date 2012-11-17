@@ -1,9 +1,9 @@
 package net.exathunk.jsubschema.gen;
 
-import net.exathunk.jsubschema.base.Session;
-import net.exathunk.jsubschema.base.TypeException;
 import net.exathunk.jsubschema.Util;
+import net.exathunk.jsubschema.base.TypeException;
 import net.exathunk.jsubschema.genschema.Schema;
+import net.exathunk.jsubschema.genschema.SchemaFactory;
 import org.codehaus.jackson.JsonNode;
 
 import java.io.*;
@@ -48,8 +48,6 @@ public class RunGen {
 
         final Map<String, ClassRep> genned = new TreeMap<String, ClassRep>();
 
-        final Session session = Session.loadDefaultSession();
-
         for (File schemaFile : schemasDir.listFiles()) {
             System.out.println("Generating "+schemaFile);
             final BufferedReader reader = new BufferedReader(new FileReader(schemaFile));
@@ -60,7 +58,7 @@ public class RunGen {
                 next = reader.readLine();
             }
             final JsonNode node = Util.parse(contents.toString());
-            final Schema schema = (Schema) session.binders.get(Schema.class).bind(node);
+            final Schema schema = Util.quickBind(node, new SchemaFactory());
             putGenned(genned, SchemaRepper.makeClass(schema, basePackage));
             putGenned(genned, SchemaRepper.makeInterface(schema, basePackage));
             putGenned(genned, SchemaRepper.makeFactory(schema, basePackage));

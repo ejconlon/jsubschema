@@ -1,0 +1,19 @@
+{
+    "id": "http://exathunk.net/schemas/proptree",
+    "type": "object",
+    "properties": {
+        "props" : {
+            "type": "object",
+            "items": {
+                "type": "string"
+            }
+        },
+        "children": {
+            "type" : "array",
+            "items" : {
+                "type" : "object",
+                "$ref" : "#"
+            }
+        }
+    }
+}
