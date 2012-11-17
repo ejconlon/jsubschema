@@ -36,10 +36,6 @@ public class Part {
         return new Part(null, index);
     }
 
-    public String toPointerString() {
-        if (key != null) return key;
-        else return index.toString();
-    }
 
     @Override
     public String toString() {
@@ -69,11 +65,25 @@ public class Part {
         return result;
     }
 
-    public static Part asSomething(String raw) {
+    public static Part fromPointerString(String raw) {
+        raw = untransform(raw);
         try {
             return Part.asIndex(Integer.parseInt(raw));
         } catch (NumberFormatException nfe) {
             return Part.asKey(raw);
         }
+    }
+
+    public String toPointerString() {
+        if (key != null) return transform(key);
+        else return index.toString();
+    }
+
+    private static String transform(String s) {
+        return s.replaceAll("~", "~0").replaceAll("/", "~1");
+    }
+
+    private static String untransform(String s) {
+        return s.replaceAll("~1", "/").replaceAll("~0", "~");
     }
 }

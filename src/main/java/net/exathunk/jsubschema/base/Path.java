@@ -39,11 +39,14 @@ public class Path extends ConsList<Part> {
     }
 
     public static Path fromPointer(String pointer) {
-        List<String> parts = Util.split(pointer, "/");
+        if (pointer.length() == 0) return new Path();
+        if (pointer.charAt(0) == '/') pointer = pointer.substring(1);
+        else throw new IllegalArgumentException("Must have leading slash: "+pointer);
+        List<String> parts = Util.asList(pointer.split("/"));
         Path path = new Path();
         for (int i = 0; i < parts.size(); ++i){
             String raw = parts.get(i);
-            Part part = Part.asSomething(raw);
+            Part part = Part.fromPointerString(raw);
             path = path.cons(part);
         }
         return path;
