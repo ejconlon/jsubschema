@@ -3,10 +3,9 @@ package net.exathunk.jsubschema.genschema;
 import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
-import net.exathunk.jsubschema.gendeps.Mergeable;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class Address implements Cloneable, Serializable, Mergeable<Address> {
+public class Address implements Cloneable, Serializable {
 
     @JsonProperty("post-office-box")
     public String post__dash__office__dash__box;
@@ -78,11 +77,6 @@ public class Address implements Cloneable, Serializable, Mergeable<Address> {
         result = 31 * result + (postal__dash__code == null ? 0 : postal__dash__code.hashCode());
         result = 31 * result + (country__dash__name == null ? 0 : country__dash__name.hashCode());
         return result;
-    }
-
-    @Override
-    public void mergeFrom(Address other) {
-        throw new RuntimeException("TODO");
     }
 
 }

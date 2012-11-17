@@ -1,13 +1,11 @@
 package net.exathunk.jsubschema.genschema;
 
-import net.exathunk.jsubschema.gendeps.Mergeable;
-import org.codehaus.jackson.annotate.JsonProperty;
-
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.io.Serializable;
+import org.codehaus.jackson.annotate.JsonProperty;
 
-public class Schema implements Cloneable, Serializable, Mergeable<Schema> {
+public class Schema implements Cloneable, Serializable {
 
     @JsonProperty("type")
     public String type;
@@ -107,11 +105,6 @@ public class Schema implements Cloneable, Serializable, Mergeable<Schema> {
         result = 31 * result + (requires == null ? 0 : requires.hashCode());
         result = 31 * result + (forbids == null ? 0 : forbids.hashCode());
         return result;
-    }
-
-    @Override
-    public void mergeFrom(Schema other) {
-        throw new RuntimeException("TODO");
     }
 
 }

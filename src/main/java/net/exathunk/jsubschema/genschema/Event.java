@@ -3,10 +3,9 @@ package net.exathunk.jsubschema.genschema;
 import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
-import net.exathunk.jsubschema.gendeps.Mergeable;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class Event implements Cloneable, Serializable, Mergeable<Event> {
+public class Event implements Cloneable, Serializable {
 
     @JsonProperty("dtstart")
     public String dtstart;
@@ -106,11 +105,6 @@ public class Event implements Cloneable, Serializable, Mergeable<Event> {
         result = 31 * result + (description == null ? 0 : description.hashCode());
         result = 31 * result + (geo == null ? 0 : geo.hashCode());
         return result;
-    }
-
-    @Override
-    public void mergeFrom(Event other) {
-        throw new RuntimeException("TODO");
     }
 
 }
