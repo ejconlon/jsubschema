@@ -36,11 +36,18 @@ public class Reference {
             pathString = "";
         } else {
             final int poundIndex = ref.indexOf('#');
+            final int slashIndex = ref.indexOf('/');
             if (poundIndex < 0) {
-                return Either.makeSecond("Missing #: "+ref);
+                if (slashIndex == 0) {
+                    url = null;
+                    pathString = ref;
+                } else {
+                    url = ref;
+                    pathString = "";
+                }
             } else if (poundIndex == 0) {
                 url = null;
-                pathString = ref;
+                pathString = ref.substring(1);
             } else {
                 String[] parts = ref.split("#");
                 if (parts.length != 2) {
@@ -59,11 +66,6 @@ public class Reference {
         }
     }
 
-    @Override
-    public String toString() {
-        return "Reference{ referenceString="+toReferenceString()+" }";
-    }
-
     public String toReferenceString() {
         return (url == null ? "" : url) + "#" + pointer.toPointerString();
     }
@@ -75,6 +77,14 @@ public class Reference {
         } else {
             return new Reference(def, new Pointer());
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Reference{" +
+                "url='" + url + '\'' +
+                ", pointer=" + pointer +
+                '}';
     }
 
     @Override
