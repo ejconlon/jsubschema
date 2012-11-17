@@ -1,10 +1,12 @@
 package net.exathunk.jsubschema.genschema;
 
-import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.List;
 import java.util.Map;
+import java.io.Serializable;
+import net.exathunk.jsubschema.gendeps.Mergeable;
+import org.codehaus.jackson.annotate.JsonProperty;
 
-public class Link implements Cloneable {
+public class Link implements Cloneable, Serializable, Mergeable<Link> {
 
     @JsonProperty("href")
     public String href;
@@ -55,6 +57,11 @@ public class Link implements Cloneable {
         result = 31 * result + (method == null ? 0 : method.hashCode());
         result = 31 * result + (enctype == null ? 0 : enctype.hashCode());
         return result;
+    }
+
+    @Override
+    public void mergeFrom(Link other) {
+        throw new RuntimeException("TODO");
     }
 
 }

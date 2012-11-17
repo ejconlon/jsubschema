@@ -1,10 +1,12 @@
 package net.exathunk.jsubschema.genschema;
 
-import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.List;
 import java.util.Map;
+import java.io.Serializable;
+import net.exathunk.jsubschema.gendeps.Mergeable;
+import org.codehaus.jackson.annotate.JsonProperty;
 
-public class Geo implements Cloneable {
+public class Geo implements Cloneable, Serializable, Mergeable<Geo> {
 
     @JsonProperty("latitude")
     public Double latitude;
@@ -41,6 +43,11 @@ public class Geo implements Cloneable {
         result = 31 * result + (latitude == null ? 0 : latitude.hashCode());
         result = 31 * result + (longitude == null ? 0 : longitude.hashCode());
         return result;
+    }
+
+    @Override
+    public void mergeFrom(Geo other) {
+        throw new RuntimeException("TODO");
     }
 
 }

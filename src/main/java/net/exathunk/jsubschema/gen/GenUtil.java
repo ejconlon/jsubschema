@@ -103,4 +103,28 @@ public class GenUtil {
             classRep.methods.add(method);
         }
     }
+
+    public static class MergeFromClassMangler implements ClassMangler {
+        @Override
+        public void mangleClass(final ClassRep classRep) {
+            final MethodRep method = new MethodRep();
+            method.annotations.add(new AnnotationRep("@Override"));
+            method.name = "mergeFrom";
+            method.returns = "void";
+            FieldRep otherField = new FieldRep();
+            otherField.name = "other";
+            otherField.className = classRep.name;
+            method.parameters.add(otherField);
+
+            method.body = new Stringable() {
+                @Override
+                public void makeString(final Stringer sb) {
+                    sb.append("throw new RuntimeException(\"TODO\");");
+                    sb.end();
+                }
+            };
+
+            classRep.methods.add(method);
+        }
+    }
 }

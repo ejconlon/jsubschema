@@ -18,13 +18,18 @@ public class SchemaRepper {
             final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.name);
             c.fields.add(field);
         }
-        c.imports.add("org.codehaus.jackson.annotate.JsonProperty");
         c.imports.add("java.util.List");
         c.imports.add("java.util.Map");
+        c.imports.add("java.io.Serializable");
+        c.imports.add("net.exathunk.jsubschema.gendeps.Mergeable");
+        c.imports.add("org.codehaus.jackson.annotate.JsonProperty");
         c.implemented.add("Cloneable");
+        c.implemented.add("Serializable");
+        c.implemented.add("Mergeable<"+c.name+">");
         new GenUtil.ToStringClassMangler().mangleClass(c);
         new GenUtil.EqualsClassMangler().mangleClass(c);
         new GenUtil.HashCodeClassMangler().mangleClass(c);
+        new GenUtil.MergeFromClassMangler().mangleClass(c);
         return c;
     }
 
