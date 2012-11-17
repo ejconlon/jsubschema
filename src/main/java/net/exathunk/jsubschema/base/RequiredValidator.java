@@ -16,7 +16,7 @@ public class RequiredValidator implements Validator {
                 for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
                     if (Boolean.TRUE.equals(entry.getValue().getRequired())) {
                         if (!tuple.node.has(entry.getKey())) {
-                            context.errors.add(new VError(tuple.path, "Missing required key: "+entry.getKey()));
+                            context.errors.add(new VError(tuple.reference, "Missing required key: "+entry.getKey()));
                         }
                     }
                 }

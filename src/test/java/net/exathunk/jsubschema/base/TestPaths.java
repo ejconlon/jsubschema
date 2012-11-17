@@ -16,16 +16,6 @@ import static org.junit.Assert.assertNotNull;
  * charolastra 11/15/12 12:37 PM
  */
 public class TestPaths {
-    @Test
-    public void testPath() {
-        final String goldPointer = "/foo/0/bar";
-        final Path goldPath = new Path().cons(Part.asKey("foo")).cons(Part.asIndex(0)).cons(Part.asKey("bar"));
-        final Path goldReversed = new Path().cons(Part.asKey("bar")).cons(Part.asIndex(0)).cons(Part.asKey("foo"));
-
-        assertEquals(goldPointer, goldPath.toPointer());
-        assertEquals(goldPath, Path.fromPointer(goldPointer));
-        assertEquals(goldReversed, goldPath.reversed());
-    }
 
     @Test
     public void testPathSchema() throws IOException, TypeException, PathException {
@@ -33,15 +23,15 @@ public class TestPaths {
         SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
-        Either<SchemaLike, String> reqSchema = Pather.pathSchema(schema, new Path().cons(Part.asKey("type")), new EmptyResolver());
+        Either<SchemaLike, String> reqSchema = Pather.pathSchema(schema, new Pointer().cons(Part.asKey("type")), new EmptyResolver());
         assertNotNull(reqSchema);
         assertEquals("string", reqSchema.getFirst().getType());
 
-        Either<SchemaLike, String> idForbidSchema = Pather.pathSchema(schema, new Path().cons(Part.asKey("id")).cons(Part.asKey("forbids")).reversed(), new EmptyResolver());
+        Either<SchemaLike, String> idForbidSchema = Pather.pathSchema(schema, new Pointer().cons(Part.asKey("id")).cons(Part.asKey("forbids")).reversed(), new EmptyResolver());
         assertNotNull(idForbidSchema);
         assertEquals("array", idForbidSchema.getFirst().getType());
 
-        Either<SchemaLike, String> idForbid0Schema = Pather.pathSchema(schema, new Path().cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)).reversed(), new EmptyResolver());
+        Either<SchemaLike, String> idForbid0Schema = Pather.pathSchema(schema, new Pointer().cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)).reversed(), new EmptyResolver());
         assertNotNull(idForbid0Schema);
         assertEquals("string", idForbid0Schema.getFirst().getType());
     }
@@ -50,15 +40,15 @@ public class TestPaths {
     public void testPathNode() throws IOException, TypeException, PathException {
         JsonNode node = Loader.loadSchemaNode("schema");
 
-        JsonNode reqNode = Pather.pathNode(node, new Path().cons(Part.asKey("type")));
+        JsonNode reqNode = Pather.pathNode(node, new Pointer().cons(Part.asKey("type")));
         assertNotNull(reqNode);
         assertEquals("object", reqNode.asText());
 
-        JsonNode idForbidNode = Pather.pathNode(node, new Path().cons(Part.asKey("properties")).cons(Part.asKey("id")).cons(Part.asKey("forbids")).reversed());
+        JsonNode idForbidNode = Pather.pathNode(node, new Pointer().cons(Part.asKey("properties")).cons(Part.asKey("id")).cons(Part.asKey("forbids")).reversed());
         assertNotNull(idForbidNode);
         assertEquals(1, idForbidNode.size());
 
-        JsonNode idForbid0Node = Pather.pathNode(node, new Path().cons(Part.asKey("properties")).cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)).reversed());
+        JsonNode idForbid0Node = Pather.pathNode(node, new Pointer().cons(Part.asKey("properties")).cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)).reversed());
         assertNotNull(idForbid0Node);
         assertEquals("$ref", idForbid0Node.asText());
     }
@@ -75,172 +65,31 @@ public class TestPaths {
         //System.out.println(flattened);
 
         assertEquals("object", flattened.get(0).eitherSchema.getFirst().getType());
-        assertEquals(true, flattened.get(0).path.isEmpty());
+        assertEquals(true, flattened.get(0).reference.getPointer().isEmpty());
 
         assertEquals("string", flattened.get(1).eitherSchema.getFirst().getType());
-        assertEquals("id", flattened.get(1).path.getHead().getKey());
+        assertEquals("id", flattened.get(1).reference.getPointer().getHead().getKey());
 
         assertEquals("string", flattened.get(2).eitherSchema.getFirst().getType());
-        assertEquals("description", flattened.get(2).path.getHead().getKey());
+        assertEquals("description", flattened.get(2).reference.getPointer().getHead().getKey());
 
         assertEquals("string", flattened.get(3).eitherSchema.getFirst().getType());
-        assertEquals("type", flattened.get(3).path.getHead().getKey());
+        assertEquals("type", flattened.get(3).reference.getPointer().getHead().getKey());
 
         assertEquals("object", flattened.get(4).eitherSchema.getFirst().getType());
-        assertEquals("properties", flattened.get(4).path.getHead().getKey());
+        assertEquals("properties", flattened.get(4).reference.getPointer().getHead().getKey());
 
         assertEquals("object", flattened.get(5).eitherSchema.getFirst().getType());
-        assertEquals("latitude", flattened.get(5).path.getHead().getKey());
+        assertEquals("latitude", flattened.get(5).reference.getPointer().getHead().getKey());
 
         assertEquals("string", flattened.get(6).eitherSchema.getFirst().getType());
-        assertEquals("type", flattened.get(6).path.getHead().getKey());
+        assertEquals("type", flattened.get(6).reference.getPointer().getHead().getKey());
 
         assertEquals("object", flattened.get(7).eitherSchema.getFirst().getType());
-        assertEquals("longitude", flattened.get(7).path.getHead().getKey());
+        assertEquals("longitude", flattened.get(7).reference.getPointer().getHead().getKey());
 
         assertEquals("string", flattened.get(8).eitherSchema.getFirst().getType());
-        assertEquals("type", flattened.get(8).path.getHead().getKey());
-    }
-
-    @Test
-    public void testValidTypes() throws IOException, TypeException {
-        Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
-        assertNotNull(schema);
-
-        Validator validator = new TypeValidator();
-
-        {
-            JsonNode node = Loader.loadSchemaNode("geo");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(0, context.errors.size());
-        }
-
-        {
-            JsonNode node = Util.parse("{ \"type\":\"object\" }");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(0, context.errors.size());
-        }
-
-        {
-            JsonNode node = Util.parse("{ \"x\":\"object\" }");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(1, context.errors.size());
-        }
-
-        {
-            JsonNode node = Util.parse("[1, 2]");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(3, context.errors.size());
-        }
-    }
-
-    @Test
-    public void testValidTypes2() throws IOException, TypeException {
-        Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/geo");
-        assertNotNull("schema");
-
-        Validator validator = new TypeValidator();
-
-        {
-            JsonNode node = Util.parse("{ \"latitude\": 3.14, \"longitude\": 5 }");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(0, context.errors.size());
-        }
-
-        {
-            JsonNode node = Util.parse("{ \"latitude\": 3.14, \"longitude\": \"derp\" }");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(1, context.errors.size());
-        }
-
-        {
-            JsonNode node = Util.parse("{ \"x\": [1,2,3] }");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(1, context.errors.size());
-        }
-    }
-
-    @Test
-    public void testRequired() throws IOException, TypeException {
-        Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
-        assertNotNull(schema);
-
-        Validator validator = new RequiredValidator();
-
-        {
-            JsonNode node = Loader.loadSchemaNode("geo");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(0, context.errors.size());
-        }
-
-        {
-            JsonNode node = Util.parse("{ \"type\": \"string\", \"id\":\"foo\" }");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(0, context.errors.size());
-        }
-
-        {
-            JsonNode node = Util.parse("{ \"id\":\"foo\" }");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(1, context.errors.size());
-        }
-    }
-
-    @Test
-    public void testForbidden() throws IOException, TypeException {
-        Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
-        assertNotNull(schema);
-
-        Validator validator = new ForbidsValidator();
-
-        {
-            JsonNode node = Util.parse("{ \"type\": \"object\", \"id\":\"foo\" }");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(0, context.errors.size());
-        }
-
-        {
-            JsonNode node = Util.parse("{ \"type\": \"object\", \"$ref\":\"bar\" }");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(0, context.errors.size());
-        }
-
-        {
-            JsonNode node = Util.parse("{ \"type\": \"object\", \"id\":\"foo\", \"$ref\":\"bar\" }");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(2, context.errors.size());
-        }
-    }
-
-    @Test
-    public void testRequires() throws IOException, TypeException {
-        JsonNode schemaNode = Util.parse("{\"type\":\"object\", \"properties\": { \"a\": {\"type\":\"integer\", \"requires\":[\"b\"]}, \"b\": {\"type\":\"integer\", \"requires\":[\"b\"]} }}");
-        Schema schema = Util.quickBind(schemaNode, new SchemaFactory());
-        assertNotNull(schema);
-
-        Validator validator = new RequiresValidator();
-
-        {
-            JsonNode node = Util.parse("{ \"a\":\"1\" }");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(1, context.errors.size());
-        }
-
-        {
-            JsonNode node = Util.parse("{ \"b\":\"2\" }");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(0, context.errors.size());
-        }
-
-        {
-            JsonNode node = Util.parse("{ \"a\":\"1\", \"b\":\"2\" }");
-            VContext context = Util.runValidator(validator, new PathTuple(schema, node, new EmptyResolver()));
-            assertEquals(0, context.errors.size());
-        }
+        assertEquals("type", flattened.get(8).reference.getPointer().getHead().getKey());
     }
 
     @Test
@@ -272,46 +121,46 @@ public class TestPaths {
         List<PathTuple> flattened = Util.asList(Util.withSelfDepthFirst(new PathTuple(schema, node, resolver)));
 
         assertEquals("object", flattened.get(0).eitherSchema.getFirst().getType());
-        assertEquals(true, flattened.get(0).path.isEmpty());
+        assertEquals(true, flattened.get(0).reference.getPointer().isEmpty());
 
         assertEquals("string", flattened.get(1).eitherSchema.getFirst().getType());
-        assertEquals("dtstart", flattened.get(1).path.getHead().getKey());
+        assertEquals("dtstart", flattened.get(1).reference.getPointer().getHead().getKey());
 
         assertEquals("string", flattened.get(2).eitherSchema.getFirst().getType());
-        assertEquals("dtend", flattened.get(2).path.getHead().getKey());
+        assertEquals("dtend", flattened.get(2).reference.getPointer().getHead().getKey());
 
         assertEquals("string", flattened.get(3).eitherSchema.getFirst().getType());
-        assertEquals("summary", flattened.get(3).path.getHead().getKey());
+        assertEquals("summary", flattened.get(3).reference.getPointer().getHead().getKey());
 
         assertEquals("string", flattened.get(4).eitherSchema.getFirst().getType());
-        assertEquals("location", flattened.get(4).path.getHead().getKey());
+        assertEquals("location", flattened.get(4).reference.getPointer().getHead().getKey());
 
         assertEquals("string", flattened.get(5).eitherSchema.getFirst().getType());
-        assertEquals("url", flattened.get(5).path.getHead().getKey());
+        assertEquals("url", flattened.get(5).reference.getPointer().getHead().getKey());
 
         assertEquals("string", flattened.get(6).eitherSchema.getFirst().getType());
-        assertEquals("duration", flattened.get(6).path.getHead().getKey());
+        assertEquals("duration", flattened.get(6).reference.getPointer().getHead().getKey());
 
         assertEquals("string", flattened.get(7).eitherSchema.getFirst().getType());
-        assertEquals("rdate", flattened.get(7).path.getHead().getKey());
+        assertEquals("rdate", flattened.get(7).reference.getPointer().getHead().getKey());
 
         assertEquals("string", flattened.get(8).eitherSchema.getFirst().getType());
-        assertEquals("rrule", flattened.get(8).path.getHead().getKey());
+        assertEquals("rrule", flattened.get(8).reference.getPointer().getHead().getKey());
 
         assertEquals("string", flattened.get(9).eitherSchema.getFirst().getType());
-        assertEquals("category", flattened.get(9).path.getHead().getKey());
+        assertEquals("category", flattened.get(9).reference.getPointer().getHead().getKey());
 
         assertEquals("string", flattened.get(10).eitherSchema.getFirst().getType());
-        assertEquals("description", flattened.get(10).path.getHead().getKey());
+        assertEquals("description", flattened.get(10).reference.getPointer().getHead().getKey());
 
         assertEquals("object", flattened.get(11).eitherSchema.getFirst().getType());
-        assertEquals("geo", flattened.get(11).path.getHead().getKey());
+        assertEquals("geo", flattened.get(11).reference.getPointer().getHead().getKey());
 
         assertEquals("number", flattened.get(12).eitherSchema.getFirst().getType());
-        assertEquals("latitude", flattened.get(12).path.getHead().getKey());
+        assertEquals("latitude", flattened.get(12).reference.getPointer().getHead().getKey());
 
         assertEquals("number", flattened.get(13).eitherSchema.getFirst().getType());
-        assertEquals("longitude", flattened.get(13).path.getHead().getKey());
+        assertEquals("longitude", flattened.get(13).reference.getPointer().getHead().getKey());
 
         Validator validator = new DefaultValidator();
         VContext context = Util.runValidator(validator, new PathTuple(schema, node, resolver));

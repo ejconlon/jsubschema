@@ -46,7 +46,7 @@ public class Schematizer {
         } else if (node.isNumber()) {
             schema.setType("number");
         } else {
-            context.errors.add(new VError(Path.fromPointer(Util.split(id, "#").get(1)), "Cannot type: "+node));
+            context.errors.add(new VError(Reference.fromReferenceString(id), "Cannot type: "+node));
         }
         return schema;
     }

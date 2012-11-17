@@ -19,7 +19,7 @@ public class RequiresValidator implements Validator {
                     if (childSchema.getRequires() != null && tuple.node.has(childKey)) {
                         for (String requiredKey : childSchema.getRequires()) {
                             if (!tuple.node.has(requiredKey)) {
-                                context.errors.add(new VError(tuple.path, "Missing required key pair: "+childKey+" "+requiredKey));
+                                context.errors.add(new VError(tuple.reference, "Missing required key pair: "+childKey+" "+requiredKey));
                             }
                         }
                     }

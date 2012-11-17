@@ -19,7 +19,7 @@ public class ForbidsValidator implements Validator {
                     if (childSchema.getForbids() != null && tuple.node.has(childKey)) {
                         for (String forbiddenKey : childSchema.getForbids()) {
                             if (tuple.node.has(forbiddenKey)) {
-                                context.errors.add(new VError(tuple.path, "Has forbidden key pair: "+childKey+" "+forbiddenKey));
+                                context.errors.add(new VError(tuple.reference, "Has forbidden key pair: "+childKey+" "+forbiddenKey));
                             }
                         }
                     }

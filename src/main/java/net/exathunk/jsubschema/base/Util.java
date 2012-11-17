@@ -135,7 +135,7 @@ public class Util {
 
     public static void runValidator(Validator validator, PathTuple rootTuple, VContext context) {
         if (rootTuple.eitherSchema.isSecond()) {
-            context.errors.add(new VError(rootTuple.path, rootTuple.eitherSchema.getSecond()));
+            context.errors.add(new VError(rootTuple.reference, rootTuple.eitherSchema.getSecond()));
         } else {
             validator.validate(rootTuple, context);
             for (PathTuple childTuple : rootTuple) {

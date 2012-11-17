@@ -8,10 +8,10 @@ public class TypeValidator implements Validator {
     public void validate(PathTuple tuple, VContext context) {
         final String schemaType = tuple.eitherSchema.getFirst().getType();
         if (schemaType == null) {
-            context.errors.add(new VError(tuple.path, "no schema type"));
+            context.errors.add(new VError(tuple.reference, "no schema type"));
         }
         if (!Util.matchesType(tuple.node, schemaType)) {
-            context.errors.add(new VError(tuple.path, "node/schema mismatch: "+tuple.node+" "+schemaType));
+            context.errors.add(new VError(tuple.reference, "node/schema mismatch: "+tuple.node+" "+schemaType));
         }
     }
 }

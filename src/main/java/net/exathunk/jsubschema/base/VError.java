@@ -6,17 +6,21 @@ import java.util.List;
  * charolastra 11/15/12 11:41 AM
  */
 public class VError {
-    public final Path path;
+    public final Either<Reference, String> eitherReference;
     public final String message;
 
-    public VError(Path path, String message) {
-        this.path = path;
+    public VError(Either<Reference, String> eitherReference, String message) {
+        this.eitherReference = eitherReference;
         this.message = message;
+    }
+
+    public VError(Reference reference, String message) {
+        this(Either.<Reference, String>makeFirst(reference), message);
     }
 
     @Override
     public String toString() {
-        return "VError: "+path.toPointer()+" "+message+"\n";
+        return "VError: "+eitherReference+" "+message+"\n";
     }
 
     public void throwThis(VError ve) throws TypeException {
