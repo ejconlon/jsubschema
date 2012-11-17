@@ -1,17 +1,81 @@
 package net.exathunk.jsubschema.gen;
 
+import net.exathunk.jsubschema.base.Util;
+
 /**
  * charolastra 11/16/12 2:41 PM
  */
 public class GenUtil {
 
-    public static interface ClassMangler {
-        void mangleClass(ClassRep classRep);
+    public static interface MethodGen {
+        MethodRep genMethod(ClassRep classRep);
     }
 
-    public static class ToStringClassMangler implements ClassMangler {
+    public static interface AccessorGen {
+        MethodRep genAccessor(FieldRep fieldRep);
+    }
+
+    public static class GetterAccessorGen implements AccessorGen {
         @Override
-        public void mangleClass(final ClassRep classRep) {
+        public MethodRep genAccessor(final FieldRep fieldRep) {
+            final MethodRep method = new MethodRep();
+            method.annotations.add(new AnnotationRep("@Override"));
+            method.name = "get"+ Util.capitalize(fieldRep.name);
+            method.returns = fieldRep.className;
+            method.body = new Stringable() {
+                @Override
+                public void makeString(final Stringer sb) {
+                    sb.append("return ").append(fieldRep.name);
+                    sb.end();
+                }
+            };
+            return method;
+        }
+    }
+
+    public static class HasAccessorGen implements AccessorGen {
+        @Override
+        public MethodRep genAccessor(final FieldRep fieldRep) {
+            final MethodRep method = new MethodRep();
+            method.annotations.add(new AnnotationRep("@Override"));
+            method.name = "has"+ Util.capitalize(fieldRep.name);
+            method.returns = "boolean";
+            method.body = new Stringable() {
+                @Override
+                public void makeString(final Stringer sb) {
+                    sb.append("return null != ").append(fieldRep.name);
+                    sb.end();
+                }
+            };
+            return method;
+        }
+    }
+
+    public static class SetAccessorGen implements AccessorGen {
+        @Override
+        public MethodRep genAccessor(final FieldRep fieldRep) {
+            final MethodRep method = new MethodRep();
+            method.annotations.add(new AnnotationRep("@Override"));
+            method.name = "set"+ Util.capitalize(fieldRep.name);
+            method.returns = "void";
+            FieldRep otherField = new FieldRep();
+            otherField.name = fieldRep.name;
+            otherField.className = fieldRep.className;
+            method.parameters.add(otherField);
+            method.body = new Stringable() {
+                @Override
+                public void makeString(final Stringer sb) {
+                    sb.append("this.").append(fieldRep.name).append(" = ").append(fieldRep.name).append(";");
+                    sb.end();
+                }
+            };
+            return method;
+        }
+    }
+
+    public static class ToStringMethodGen implements MethodGen {
+        @Override
+        public MethodRep genMethod(final ClassRep classRep) {
             final MethodRep method = new MethodRep();
             method.annotations.add(new AnnotationRep("@Override"));
             method.name = "toString";
@@ -32,13 +96,13 @@ public class GenUtil {
                 }
             };
 
-            classRep.methods.add(method);
+            return method;
         }
     }
 
-    public static class EqualsClassMangler implements ClassMangler {
+    public static class EqualsMethodGen implements MethodGen {
         @Override
-        public void mangleClass(final ClassRep classRep) {
+        public MethodRep genMethod(final ClassRep classRep) {
             final MethodRep method = new MethodRep();
             method.annotations.add(new AnnotationRep("@Override"));
             method.name = "equals";
@@ -74,13 +138,13 @@ public class GenUtil {
                 }
             };
 
-            classRep.methods.add(method);
+            return method;
         }
     }
 
-    public static class HashCodeClassMangler implements ClassMangler {
+    public static class HashCodeMethodGen implements MethodGen {
         @Override
-        public void mangleClass(final ClassRep classRep) {
+        public MethodRep genMethod(final ClassRep classRep) {
             final MethodRep method = new MethodRep();
             method.annotations.add(new AnnotationRep("@Override"));
             method.name = "hashCode";
@@ -100,7 +164,7 @@ public class GenUtil {
                 }
             };
 
-            classRep.methods.add(method);
+            return method;
         }
     }
 

@@ -24,9 +24,9 @@ public class SchemaRepper {
         c.imports.add("org.codehaus.jackson.annotate.JsonProperty");
         c.implemented.add("Cloneable");
         c.implemented.add("Serializable");
-        new GenUtil.ToStringClassMangler().mangleClass(c);
-        new GenUtil.EqualsClassMangler().mangleClass(c);
-        new GenUtil.HashCodeClassMangler().mangleClass(c);
+        c.methods.add(new GenUtil.ToStringMethodGen().genMethod(c));
+        c.methods.add(new GenUtil.EqualsMethodGen().genMethod(c));
+        c.methods.add(new GenUtil.HashCodeMethodGen().genMethod(c));
         return c;
     }
 
