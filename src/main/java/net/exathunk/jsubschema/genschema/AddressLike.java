@@ -3,10 +3,9 @@ package net.exathunk.jsubschema.genschema;
 import java.util.List;
 import java.util.Map;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
-@JsonTypeInfo(defaultImpl = Address.class, use = JsonTypeInfo.Id.NONE)
+@JsonDeserialize(as = Address.class)
 public interface AddressLike {
 
     boolean hasPost__dash__office__dash__box();
