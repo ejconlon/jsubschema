@@ -1,25 +1,28 @@
-package net.exathunk.jsubschema.base;
+package net.exathunk.jsubschema.functional;
 
 /**
  * charolastra 11/16/12 11:28 AM
  */
 public class Either<First, Second> {
-    private final boolean isfirst;
+
+    private static enum Which { FIRST, SECOND }
+
+    private final Which which;
     private final First first;
     private final Second second;
 
-    private Either(boolean isfirst, First first, Second second) {
-        this.isfirst = isfirst;
+    private Either(Which which, First first, Second second) {
+        this.which = which;
         this.first = first;
         this.second = second;
     }
 
     public boolean isFirst() {
-        return isfirst;
+        return Which.FIRST.equals(which);
     }
 
     public boolean isSecond() {
-        return !isFirst();
+        return Which.SECOND.equals(which);
     }
 
     public First getFirst() {
@@ -33,17 +36,18 @@ public class Either<First, Second> {
     }
 
     public static <A, B> Either<A, B> makeFirst(A first) {
-        return new Either<A, B>(true, first, null);
+        return new Either<A, B>(Which.FIRST, first, null);
     }
 
     public static <A, B> Either<A, B> makeSecond(B second) {
-        return new Either<A, B>(false, null, second);
+        return new Either<A, B>(Which.SECOND, null, second);
     }
 
     @Override
     public String toString() {
         return "Either{" +
-                (isfirst ? "first=" + first : "second=" + second) +
+                (isFirst() ? "first=" + first : "") +
+                (isSecond() ? "second=" + second : "") +
                 '}';
     }
 
@@ -54,16 +58,16 @@ public class Either<First, Second> {
 
         Either either = (Either) o;
 
-        if (isfirst != either.isfirst) return false;
         if (first != null ? !first.equals(either.first) : either.first != null) return false;
         if (second != null ? !second.equals(either.second) : either.second != null) return false;
+        if (which != either.which) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = (isfirst ? 1 : 0);
+        int result = which.hashCode();
         result = 31 * result + (first != null ? first.hashCode() : 0);
         result = 31 * result + (second != null ? second.hashCode() : 0);
         return result;

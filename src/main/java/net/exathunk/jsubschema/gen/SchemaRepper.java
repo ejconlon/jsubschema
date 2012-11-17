@@ -1,6 +1,6 @@
 package net.exathunk.jsubschema.gen;
 
-import net.exathunk.jsubschema.base.Util;
+import net.exathunk.jsubschema.Util;
 import net.exathunk.jsubschema.genschema.SchemaLike;
 
 import java.util.Map;

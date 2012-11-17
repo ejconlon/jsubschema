@@ -1,6 +1,6 @@
 package net.exathunk.jsubschema.validation;
 
-import net.exathunk.jsubschema.base.PathTuple;
+import net.exathunk.jsubschema.base.SchemaTuple;
 import net.exathunk.jsubschema.genschema.SchemaLike;
 
 import java.util.Map;
@@ -10,14 +10,14 @@ import java.util.Map;
  */
 public class RequiredValidator implements Validator {
     @Override
-    public void validate(PathTuple tuple, VContext context) {
-        if (tuple.node.isObject()) {
-            final SchemaLike schema = tuple.eitherSchema.getFirst();
+    public void validate(SchemaTuple tuple, VContext context) {
+        if (tuple.getRefTuple().getNode().isObject()) {
+            final SchemaLike schema = tuple.getEitherSchema().getFirst();
             if (schema.getProperties() != null) {
                 for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
                     if (Boolean.TRUE.equals(entry.getValue().getRequired())) {
-                        if (!tuple.node.has(entry.getKey())) {
-                            context.errors.add(new VError(tuple.reference, "Missing required key: "+entry.getKey()));
+                        if (!tuple.getRefTuple().getNode().has(entry.getKey())) {
+                            context.errors.add(new VError(tuple.getRefTuple().getReference(), "Missing required key: "+entry.getKey()));
                         }
                     }
                 }

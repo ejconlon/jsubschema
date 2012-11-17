@@ -1,4 +1,4 @@
-package net.exathunk.jsubschema.base;
+package net.exathunk.jsubschema.pointers;
 
 /**
  * charolastra 11/15/12 11:49 AM

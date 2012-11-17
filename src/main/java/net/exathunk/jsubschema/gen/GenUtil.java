@@ -1,6 +1,6 @@
 package net.exathunk.jsubschema.gen;
 
-import net.exathunk.jsubschema.base.Util;
+import net.exathunk.jsubschema.Util;
 
 /**
  * charolastra 11/16/12 2:41 PM
@@ -200,7 +200,7 @@ public class GenUtil {
                     for (FieldRep field : classRep.fields) {
                         sb.indent().append("if (" + field.name + " == null) { if (other == null || other.has" + Util.capitalize(field.name) + "()) { s.add(\""+field.name+"\"); } }");
                         sb.end();
-                        sb.indent().append("else if (!" + field.name + ".equals(other.get" + Util.capitalize(field.name) + "())) { s.add(\""+field.name+"\"); }");
+                        sb.indent().append("else if (!" + field.name + ".equals(other.get" + Util.capitalize(field.name) + "())) { s.add(\"" + field.name + "\"); }");
                         sb.end();
                     }
                     sb.indent().append("return s;");

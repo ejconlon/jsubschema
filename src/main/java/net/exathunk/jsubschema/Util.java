@@ -1,5 +1,8 @@
-package net.exathunk.jsubschema.base;
+package net.exathunk.jsubschema;
 
+import net.exathunk.jsubschema.base.JacksonBinder;
+import net.exathunk.jsubschema.base.SchemaTuple;
+import net.exathunk.jsubschema.base.TypeException;
 import net.exathunk.jsubschema.gendeps.DomainFactory;
 import net.exathunk.jsubschema.validation.VContext;
 import net.exathunk.jsubschema.validation.VError;
@@ -136,18 +139,18 @@ public class Util {
         return name;
     }
 
-    public static void runValidator(Validator validator, PathTuple rootTuple, VContext context) {
-        if (rootTuple.eitherSchema.isSecond()) {
-            context.errors.add(new VError(rootTuple.reference, rootTuple.eitherSchema.getSecond()));
-        } else {
+    private static void runValidator(Validator validator, SchemaTuple rootTuple, VContext context) {
+        if (rootTuple.getEitherSchema().isFirst()) {
             validator.validate(rootTuple, context);
-            for (PathTuple childTuple : rootTuple) {
+            for (SchemaTuple childTuple : rootTuple) {
                 runValidator(validator, childTuple, context);
             }
+        } else {
+            context.errors.add(new VError(rootTuple.getRefTuple().getReference(), rootTuple.getEitherSchema().getSecond()));
         }
     }
 
-    public static VContext runValidator(Validator validator, PathTuple rootTuple) {
+    public static VContext runValidator(Validator validator, SchemaTuple rootTuple) {
         VContext context = new VContext();
         runValidator(validator, rootTuple, context);
         return context;
@@ -232,5 +235,17 @@ public class Util {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
         return mapper;
+    }
+
+    public static interface Func<A, B> {
+        B runFunc(A a);
+    }
+
+    public static <X, Y> List<Y> map(Func<X, Y> func, List<X> xs) {
+        List<Y> ys = new ArrayList<Y>(xs.size());
+        for (X x : xs) {
+            ys.add(func.runFunc(x));
+        }
+        return ys;
     }
 }

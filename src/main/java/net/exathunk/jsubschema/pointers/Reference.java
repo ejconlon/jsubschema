@@ -1,22 +1,45 @@
-package net.exathunk.jsubschema.base;
+package net.exathunk.jsubschema.pointers;
+
+import net.exathunk.jsubschema.functional.Either;
 
 /**
  * charolastra 11/16/12 8:42 PM
  */
-public class Reference implements Comparable<Reference> {
+public class Reference implements Comparable<Reference>, Consable<Part, Reference> {
     private final String url;
     private final Pointer pointer;
+
+    public Reference() {
+        this("", new Pointer());
+    }
 
     public Reference(String url, Pointer pointer) {
         this.url = url;
         this.pointer = pointer;
         assert url != null;
         assert pointer != null;
+        assert Direction.DOWN.equals(pointer.getDirection());
     }
 
+    public Reference withoutPointer() {
+        return new Reference(url, new Pointer());
+    }
+
+    @Override
     public Reference cons(Part part) {
         return new Reference(url, pointer.cons(part));
     }
+
+    @Override
+    public Reference getTail() {
+        return new Reference(url, pointer.getTail());
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return pointer.isEmpty();
+    }
+
 
     public String getUrl() {
         return url;

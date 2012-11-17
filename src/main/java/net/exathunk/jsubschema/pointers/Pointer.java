@@ -1,49 +1,54 @@
-package net.exathunk.jsubschema.base;
+package net.exathunk.jsubschema.pointers;
 
+import net.exathunk.jsubschema.functional.ConsList;
+import net.exathunk.jsubschema.functional.Either;
+import net.exathunk.jsubschema.Util;
+
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * charolastra 11/15/12 11:52 AM
  */
-public class Pointer extends ConsList<Part> implements Comparable<Pointer> {
-
-    // DOWN <==> /foo/0 <==> (cons 0 (cons "foo" nil)) <==> points to 1 in { "foo": [1,2,3] }
-    // UP <==> /0/foo <==> (cons "foo" (cons 0 nil)) <==> points to [1,2,3] in [{"foo": [1,2,3]}, ...]
-    public static enum Direction { DOWN, UP;
-        public Direction reversed() {
-            if (UP.equals(this)) {
-                return DOWN;
-            } else {
-                return UP;
-            }
-        }
-    };
+public class Pointer implements Comparable<Pointer>, Consable<Part, Pointer>, Reversible<Pointer>, Iterable<Part> {
 
     private final Direction direction;
+    private final ConsList<Part> parts;
 
     public Pointer() {
-        this(Direction.DOWN);
+        this(Direction.DOWN, ConsList.<Part>nil());
     }
 
-    private Pointer(Direction direction) {
-        this(direction, null, null);
-    }
-
-    private Pointer(Direction direction, Part head, Pointer tail) {
-        super(head, tail);
+    private Pointer(Direction direction, ConsList<Part> parts) {
         this.direction = direction;
+        this.parts = parts;
+    }
+
+    public Pointer(Direction direction) {
+        this(direction, ConsList.<Part>nil());
     }
 
     @Override
     public Pointer cons(Part part) {
-        return new Pointer(direction, part, this);
+        return new Pointer(direction, parts.cons(part));
     }
 
     @Override
     public Pointer getTail() {
-        return (Pointer)super.getTail();
+        assert !isEmpty();
+        return new Pointer(direction, parts.getTail());
     }
 
+    @Override
+    public boolean isEmpty() {
+        return parts.isEmpty();
+    }
+
+    public Part getHead() {
+        return parts.getHead();
+    }
+
+    @Override
     public Direction getDirection() {
         return direction;
     }
@@ -79,42 +84,9 @@ public class Pointer extends ConsList<Part> implements Comparable<Pointer> {
         return Either.makeFirst(path);
     }
 
-    private Pointer reversed(Pointer pointer) {
-        if (!isEmpty()) {
-            pointer = pointer.cons(getHead());
-            pointer = getTail().reversed(pointer);
-        }
-        return pointer;
-    }
-
-    public Pointer reversed() {
-        Pointer pointer = new Pointer(direction.reversed());
-        return reversed(pointer);
-    }
-
     @Override
     public String toString() {
         return "Path{ direction='"+direction+"', pointerString='"+toPointerString()+"' }";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Pointer)) return false;
-        if (!super.equals(o)) return false;
-
-        Pointer pointer = (Pointer) o;
-
-        if (direction != pointer.direction) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + direction.hashCode();
-        return result;
     }
 
     @Override
@@ -122,4 +94,38 @@ public class Pointer extends ConsList<Part> implements Comparable<Pointer> {
         return toPointerString().compareTo(pointer.toPointerString());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Pointer)) return false;
+
+        Pointer pointer = (Pointer) o;
+
+        if (direction != pointer.direction) return false;
+        if (!parts.equals(pointer.parts)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = direction.hashCode();
+        result = 31 * result + parts.hashCode();
+        return result;
+    }
+
+    @Override
+    public Pointer reversed() {
+        return reversed(this, new Pointer(direction.reversed(), ConsList.<Part>nil()));
+    }
+
+    private static Pointer reversed(Pointer source, Pointer sink) {
+        if (source.isEmpty()) return sink;
+        else return reversed(source.getTail(), sink.cons(source.getHead()));
+    }
+
+    @Override
+    public Iterator<Part> iterator() {
+        return parts.iterator();
+    }
 }

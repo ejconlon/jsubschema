@@ -1,6 +1,8 @@
 package net.exathunk.jsubschema.base;
 
+import net.exathunk.jsubschema.functional.Either3;
 import net.exathunk.jsubschema.genschema.SchemaLike;
+import net.exathunk.jsubschema.pointers.Reference;
 
 /**
  * charolastra 11/16/12 1:52 PM
@@ -13,12 +15,17 @@ public class SessionResolver implements RefResolver {
     }
 
     @Override
-    public Either<SchemaLike, String> resolveRef(Reference reference, RefResolver root) {
-        final SchemaLike maybeSchema = session.schemas.get(reference);
+    public Either3<SchemaLike, String, Reference> resolveRef(Reference reference) {
+        SchemaLike maybeSchema = session.schemas.get(reference);
         if (maybeSchema != null) {
-            return Either.makeFirst(maybeSchema);
+            return Either3.makeFirst(maybeSchema);
         } else {
-            return Either.makeSecond("Invalid reference: "+reference.toReferenceString());
+            maybeSchema = session.schemas.get(reference.withoutPointer());
+            if (maybeSchema != null) {
+                return Pather.pathSchema(maybeSchema, reference);
+            } else {
+                return Either3.makeThird(reference);
+            }
         }
     }
 }

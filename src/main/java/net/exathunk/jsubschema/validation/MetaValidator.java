@@ -1,6 +1,6 @@
 package net.exathunk.jsubschema.validation;
 
-import net.exathunk.jsubschema.base.PathTuple;
+import net.exathunk.jsubschema.base.SchemaTuple;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ public class MetaValidator implements Validator {
     }
 
     @Override
-    public void validate(PathTuple tuple, VContext context) {
+    public void validate(SchemaTuple tuple, VContext context) {
         for (Validator v : validators) {
             v.validate(tuple, context);
         }

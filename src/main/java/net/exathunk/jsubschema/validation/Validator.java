@@ -1,10 +1,10 @@
 package net.exathunk.jsubschema.validation;
 
-import net.exathunk.jsubschema.base.PathTuple;
+import net.exathunk.jsubschema.base.SchemaTuple;
 
 /**
  * charolastra 11/15/12 11:45 AM
  */
 public interface Validator {
-    void validate(PathTuple tuple, VContext context);
+    void validate(SchemaTuple tuple, VContext context);
 }

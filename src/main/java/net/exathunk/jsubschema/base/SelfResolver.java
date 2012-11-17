@@ -1,6 +1,8 @@
 package net.exathunk.jsubschema.base;
 
+import net.exathunk.jsubschema.functional.Either3;
 import net.exathunk.jsubschema.genschema.SchemaLike;
+import net.exathunk.jsubschema.pointers.Reference;
 
 /**
  * charolastra 11/16/12 10:26 PM
@@ -16,13 +18,11 @@ public class SelfResolver implements RefResolver {
     }
 
     @Override
-    public Either<SchemaLike, String> resolveRef(Reference reference, RefResolver root) {
+    public Either3<SchemaLike, String, Reference> resolveRef(Reference reference) {
         if (reference.getUrl().isEmpty() || selfRef.getUrl().equals(reference.getUrl())) {
-            Either<SchemaLike, String> eitherSchema = Pather.pathSchema(self, reference.getPointer().reversed(), root);
-            if (eitherSchema.isSecond()) return Either.makeSecond(eitherSchema.getSecond());
-            else return Either.makeFirst(eitherSchema.getFirst());
+            return Pather.pathSchema(self, reference);
         } else {
-            return Either.makeSecond("URL mismatch: "+selfRef.getUrl()+" "+reference.getUrl());
+            return Either3.makeThird(reference);
         }
     }
 }

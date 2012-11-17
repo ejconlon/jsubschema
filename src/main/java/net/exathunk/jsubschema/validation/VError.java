@@ -1,7 +1,7 @@
 package net.exathunk.jsubschema.validation;
 
-import net.exathunk.jsubschema.base.Either;
-import net.exathunk.jsubschema.base.Reference;
+import net.exathunk.jsubschema.functional.Either;
+import net.exathunk.jsubschema.pointers.Reference;
 import net.exathunk.jsubschema.base.TypeException;
 
 import java.util.List;

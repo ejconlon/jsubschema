@@ -1,5 +1,11 @@
 package net.exathunk.jsubschema.base;
 
+import net.exathunk.jsubschema.Util;
+import net.exathunk.jsubschema.functional.Either;
+import net.exathunk.jsubschema.pointers.Direction;
+import net.exathunk.jsubschema.pointers.Part;
+import net.exathunk.jsubschema.pointers.Pointer;
+import net.exathunk.jsubschema.pointers.Pointers;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.IntNode;
 import org.codehaus.jackson.node.TextNode;
@@ -93,9 +99,9 @@ public class TestPointers {
     @Test
     public void testReverse() {
         final String goldPointer = "/foo/0/bar";
-        final Pointer goldPath = new Pointer().cons(Part.asKey("foo")).cons(Part.asIndex(0)).cons(Part.asKey("bar"));
-        final Pointer goldReversed = new Pointer().reversed().cons(Part.asKey("bar")).cons(Part.asIndex(0)).cons(Part.asKey("foo"));
-        final Pointer badReversed = new Pointer().cons(Part.asKey("bar")).cons(Part.asIndex(0)).cons(Part.asKey("foo"));
+        final Pointer goldPath = new Pointer(Direction.DOWN).cons(Part.asKey("foo")).cons(Part.asIndex(0)).cons(Part.asKey("bar"));
+        final Pointer goldReversed = new Pointer(Direction.UP).cons(Part.asKey("bar")).cons(Part.asIndex(0)).cons(Part.asKey("foo"));
+        final Pointer badReversed = new Pointer(Direction.DOWN).cons(Part.asKey("bar")).cons(Part.asIndex(0)).cons(Part.asKey("foo"));
 
         assertEquals(goldPointer, goldPath.toPointerString());
         assertEquals(goldPath, Pointer.fromPointerString(goldPointer).getFirst());

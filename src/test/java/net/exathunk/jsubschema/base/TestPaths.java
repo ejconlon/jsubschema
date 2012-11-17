@@ -1,18 +1,20 @@
 package net.exathunk.jsubschema.base;
 
+import net.exathunk.jsubschema.Util;
+import net.exathunk.jsubschema.functional.Either;
+import net.exathunk.jsubschema.functional.Either3;
 import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.genschema.Event;
 import net.exathunk.jsubschema.genschema.Geo;
 import net.exathunk.jsubschema.genschema.SchemaLike;
-import net.exathunk.jsubschema.validation.DefaultValidator;
-import net.exathunk.jsubschema.validation.VContext;
-import net.exathunk.jsubschema.validation.VError;
-import net.exathunk.jsubschema.validation.Validator;
+import net.exathunk.jsubschema.pointers.Part;
+import net.exathunk.jsubschema.pointers.Pointer;
+import net.exathunk.jsubschema.pointers.Reference;
 import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,15 +33,15 @@ public class TestPaths {
         SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
-        Either<SchemaLike, String> reqSchema = Pather.pathSchema(schema, new Pointer().cons(Part.asKey("type")).reversed(), new EmptyResolver());
+        Either3<SchemaLike, String, Reference> reqSchema = Pather.pathSchema(schema, new Reference("", new Pointer().cons(Part.asKey("type"))));
         assertNotNull(reqSchema);
         assertEquals("string", reqSchema.getFirst().getType());
 
-        Either<SchemaLike, String> idForbidSchema = Pather.pathSchema(schema, new Pointer().cons(Part.asKey("id")).cons(Part.asKey("forbids")).reversed(), new EmptyResolver());
+        Either3<SchemaLike, String, Reference> idForbidSchema = Pather.pathSchema(schema, new Reference("", new Pointer().cons(Part.asKey("id")).cons(Part.asKey("forbids"))));
         assertNotNull(idForbidSchema);
         assertEquals("array", idForbidSchema.getFirst().getType());
 
-        Either<SchemaLike, String> idForbid0Schema = Pather.pathSchema(schema, new Pointer().cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)).reversed(), new EmptyResolver());
+        Either3<SchemaLike, String, Reference> idForbid0Schema = Pather.pathSchema(schema, new Reference("", new Pointer().cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0))));
         assertNotNull(idForbid0Schema);
         assertEquals("string", idForbid0Schema.getFirst().getType());
     }
@@ -52,58 +54,90 @@ public class TestPaths {
         assertNotNull(reqNode);
         assertEquals("object", reqNode.asText());
 
-        JsonNode idForbidNode = Pather.pathNode(node, new Pointer().cons(Part.asKey("properties")).cons(Part.asKey("id")).cons(Part.asKey("forbids")).reversed());
+        JsonNode idForbidNode = Pather.pathNode(node, new Pointer().cons(Part.asKey("properties")).cons(Part.asKey("id")).cons(Part.asKey("forbids")));
         assertNotNull(idForbidNode);
         assertEquals(1, idForbidNode.size());
 
-        JsonNode idForbid0Node = Pather.pathNode(node, new Pointer().cons(Part.asKey("properties")).cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)).reversed());
+        JsonNode idForbid0Node = Pather.pathNode(node, new Pointer().cons(Part.asKey("properties")).cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)));
         assertNotNull(idForbid0Node);
         assertEquals("$ref", idForbid0Node.asText());
     }
 
+    private static final Util.Func<RefTuple, String> refTupleRefStrings = new Util.Func<RefTuple, String>() {
+        @Override
+        public String runFunc(RefTuple refTuple) {
+            return refTuple.getReference().toReferenceString();
+        }
+    };
+
     @Test
-    public void testTupling() throws IOException, TypeException, PathException {
+    public void testTupling() throws IOException {
+        JsonNode node = Loader.loadSchemaNode("geo");
+
+        List<RefTuple> flattened = Util.asList(Util.withSelfDepthFirst(new RefTuple(node)));
+
+        List<String> goldRefStrings = Arrays.asList(
+                "#", "#/id", "#/description", "#/type", "#/properties",
+                "#/properties/latitude", "#/properties/latitude/type",
+                "#/properties/longitude", "#/properties/longitude/type");
+
+        List<String> actualRefStrings = Util.map(refTupleRefStrings, flattened);
+
+        assertEquals(goldRefStrings, actualRefStrings);
+    }
+
+    private static final Util.Func<SchemaTuple, String> schemaTupleRefStrings = new Util.Func<SchemaTuple, String>() {
+        @Override
+        public String runFunc(SchemaTuple schemaTuple) {
+            return schemaTuple.getRefTuple().getReference().toReferenceString();
+        }
+    };
+
+    private static final Util.Func<SchemaTuple, String> schemaTupleTypes = new Util.Func<SchemaTuple, String>() {
+        @Override
+        public String runFunc(SchemaTuple schemaTuple) {
+            return schemaTuple.getEitherSchema().getFirst().getType();
+        }
+    };
+
+    private static List<SchemaTuple> flatten(SchemaLike schema, JsonNode node, FullRefResolver fullRefResolver) {
+        return Util.asList(Util.withSelfDepthFirst(new SchemaTuple(schema, new RefTuple(node), fullRefResolver)));
+    }
+
+    @Test
+    public void testScheming() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
         SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
         JsonNode node = Loader.loadSchemaNode("geo");
 
-        List<PathTuple> flattened = Util.asList(Util.withSelfDepthFirst(new PathTuple(schema, node, new EmptyResolver())));
-        //System.out.println(flattened);
+        List<SchemaTuple> flattened = flatten(schema, node, new MetaResolver(new SelfResolver(schema)));
 
-        assertEquals("object", flattened.get(0).eitherSchema.getFirst().getType());
-        assertEquals(true, flattened.get(0).reference.getPointer().isEmpty());
+        List<String> goldRefStrings = Arrays.asList(
+                "#", "#/id", "#/description", "#/type", "#/properties",
+                "#/properties/latitude", "#/properties/latitude/type",
+                "#/properties/longitude", "#/properties/longitude/type");
 
-        assertEquals("string", flattened.get(1).eitherSchema.getFirst().getType());
-        assertEquals("id", flattened.get(1).reference.getPointer().getHead().getKey());
+        List<String> goldTypes = Arrays.asList(
+                "object", "string", "string", "string", "object",
+                "object", "string", "object", "string");
 
-        assertEquals("string", flattened.get(2).eitherSchema.getFirst().getType());
-        assertEquals("description", flattened.get(2).reference.getPointer().getHead().getKey());
+        List<String> actualRefStrings = Util.map(schemaTupleRefStrings, flattened);
 
-        assertEquals("string", flattened.get(3).eitherSchema.getFirst().getType());
-        assertEquals("type", flattened.get(3).reference.getPointer().getHead().getKey());
+        assertEquals(goldRefStrings, actualRefStrings);
 
-        assertEquals("object", flattened.get(4).eitherSchema.getFirst().getType());
-        assertEquals("properties", flattened.get(4).reference.getPointer().getHead().getKey());
+        List<String> actualTypes = Util.map(schemaTupleTypes, flattened);
 
-        assertEquals("object", flattened.get(5).eitherSchema.getFirst().getType());
-        assertEquals("latitude", flattened.get(5).reference.getPointer().getHead().getKey());
-
-        assertEquals("string", flattened.get(6).eitherSchema.getFirst().getType());
-        assertEquals("type", flattened.get(6).reference.getPointer().getHead().getKey());
-
-        assertEquals("object", flattened.get(7).eitherSchema.getFirst().getType());
-        assertEquals("longitude", flattened.get(7).reference.getPointer().getHead().getKey());
-
-        assertEquals("string", flattened.get(8).eitherSchema.getFirst().getType());
-        assertEquals("type", flattened.get(8).reference.getPointer().getHead().getKey());
+        assertEquals(goldTypes, actualTypes);
     }
 
     @Test
     public void testEventGeoRef() throws TypeException, IOException {
         Session session = Session.loadDefaultSession();
-        RefResolver resolver = new SessionResolver(session);
+        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/event");
+        assertNotNull(schema);
+        FullRefResolver fullRefResolver = new MetaResolver(new SessionResolver(session), new SelfResolver(schema));
 
         Event event = new Event();
         event.setDtstart("x");
@@ -122,57 +156,31 @@ public class TestPaths {
         event.setGeo(geo);
 
         JsonNode node = Util.quickUnbind(event);
-        //System.out.println(node);
 
-        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/event");
+        List<SchemaTuple> flattened = flatten(schema, node, fullRefResolver);
 
-        List<PathTuple> flattened = Util.asList(Util.withSelfDepthFirst(new PathTuple(schema, node, resolver)));
+        List<String> goldRefStrings = Arrays.asList(
+             "#", "#/dtstart", "#/dtend", "#/summary", "#/location",
+             "#/url", "#/duration", "#/rdate", "#/rrule", "#/category",
+             "#/description", "#/geo", "#/geo/latitude", "#/geo/longitude"
+        );
+        List<String> goldTypes = Arrays.asList(
+             "object", "string", "string", "string", "string",
+             "string", "string", "string", "string", "string",
+             "string", "object", "number", "number"
+        );
 
-        assertEquals("object", flattened.get(0).eitherSchema.getFirst().getType());
-        assertEquals(true, flattened.get(0).reference.getPointer().isEmpty());
+        List<String> actualRefStrings = Util.map(schemaTupleRefStrings, flattened);
 
-        assertEquals("string", flattened.get(1).eitherSchema.getFirst().getType());
-        assertEquals("dtstart", flattened.get(1).reference.getPointer().getHead().getKey());
+        assertEquals(goldRefStrings, actualRefStrings);
 
-        assertEquals("string", flattened.get(2).eitherSchema.getFirst().getType());
-        assertEquals("dtend", flattened.get(2).reference.getPointer().getHead().getKey());
+        List<String> actualTypes = Util.map(schemaTupleTypes, flattened);
 
-        assertEquals("string", flattened.get(3).eitherSchema.getFirst().getType());
-        assertEquals("summary", flattened.get(3).reference.getPointer().getHead().getKey());
+        assertEquals(goldTypes, actualTypes);
 
-        assertEquals("string", flattened.get(4).eitherSchema.getFirst().getType());
-        assertEquals("location", flattened.get(4).reference.getPointer().getHead().getKey());
-
-        assertEquals("string", flattened.get(5).eitherSchema.getFirst().getType());
-        assertEquals("url", flattened.get(5).reference.getPointer().getHead().getKey());
-
-        assertEquals("string", flattened.get(6).eitherSchema.getFirst().getType());
-        assertEquals("duration", flattened.get(6).reference.getPointer().getHead().getKey());
-
-        assertEquals("string", flattened.get(7).eitherSchema.getFirst().getType());
-        assertEquals("rdate", flattened.get(7).reference.getPointer().getHead().getKey());
-
-        assertEquals("string", flattened.get(8).eitherSchema.getFirst().getType());
-        assertEquals("rrule", flattened.get(8).reference.getPointer().getHead().getKey());
-
-        assertEquals("string", flattened.get(9).eitherSchema.getFirst().getType());
-        assertEquals("category", flattened.get(9).reference.getPointer().getHead().getKey());
-
-        assertEquals("string", flattened.get(10).eitherSchema.getFirst().getType());
-        assertEquals("description", flattened.get(10).reference.getPointer().getHead().getKey());
-
-        assertEquals("object", flattened.get(11).eitherSchema.getFirst().getType());
-        assertEquals("geo", flattened.get(11).reference.getPointer().getHead().getKey());
-
-        assertEquals("number", flattened.get(12).eitherSchema.getFirst().getType());
-        assertEquals("latitude", flattened.get(12).reference.getPointer().getHead().getKey());
-
-        assertEquals("number", flattened.get(13).eitherSchema.getFirst().getType());
-        assertEquals("longitude", flattened.get(13).reference.getPointer().getHead().getKey());
-
-        Validator validator = new DefaultValidator();
-        VContext context = Util.runValidator(validator, new PathTuple(schema, node, resolver));
-        assertEquals(new ArrayList<VError>(), context.errors);
+        //Validator validator = new DefaultValidator();
+        //VContext context = Util.runValidator(validator, new RefTuple(schema, node), new MetaResolver(new SessionResolver(session)));
+        //assertEquals(new ArrayList<VError>(), context.errors);
     }
 
     @Test
@@ -182,27 +190,60 @@ public class TestPaths {
         assertNotNull(schema);
         RefResolver resolver = new SelfResolver(schema);
 
-        for (Map.Entry<Reference, SchemaLike> entry : makeCases(schema).entrySet()) {
-            final Reference ref = entry.getKey();
+        for (Map.Entry<String, SchemaLike> entry : makeSelfCases(schema).entrySet()) {
+            final String refString = entry.getKey();
             final SchemaLike subSchema = entry.getValue();
-            final Either<SchemaLike, String> actual = resolver.resolveRef(ref, resolver);
-            assertEquals(ref.toReferenceString(), actual.getFirst(), subSchema);
+            final Either<SchemaLike, String> actual = MetaResolver.resolveRefString(refString, new MetaResolver(Util.asList(resolver)));
+            assertEquals(refString, actual.getFirst(), subSchema);
         }
     }
 
-    private static Map<Reference, SchemaLike> makeCases(SchemaLike schema) {
+    private static Map<String, SchemaLike> makeSelfCases(SchemaLike schema) {
         final SchemaLike typeSchema = schema.getProperties().get("type");
         final SchemaLike propertiesSchema = schema.getProperties().get("properties");
         assert !schema.equals(typeSchema);
         assert !schema.equals(propertiesSchema);
         assert !typeSchema.equals(propertiesSchema);
-        Map<Reference, SchemaLike> cs = new HashMap<Reference, SchemaLike>();
+        Map<String, SchemaLike> cs = new HashMap<String, SchemaLike>();
         for (String url : Util.asSet("", schema.getId())) {
-            cs.put(Reference.fromReferenceString(url+"").getFirst(), schema);
-            cs.put(Reference.fromReferenceString(url+"#/type").getFirst(), typeSchema);
-            cs.put(Reference.fromReferenceString(url+"#/properties").getFirst(), propertiesSchema);
-            cs.put(Reference.fromReferenceString(url+"#/properties/items").getFirst(), schema);
-            cs.put(Reference.fromReferenceString(url+"#/properties/items/type").getFirst(), typeSchema);
+            cs.put(url+"", schema);
+            cs.put(url+"#/type", typeSchema);
+            cs.put(url+"#/properties", propertiesSchema);
+            cs.put(url+"#/properties/items", schema);
+            cs.put(url+"#/properties/items/type", typeSchema);
+        }
+        return cs;
+    }
+
+    @Test
+    public void testSessionResolver() throws IOException, TypeException {
+        Session session = Session.loadDefaultSession();
+        SchemaLike eventSchema = session.getSchema("http://exathunk.net/schemas/event");
+        SchemaLike geoSchema = session.getSchema("http://exathunk.net/schemas/geo");
+        assertNotNull(eventSchema);
+        assertNotNull(geoSchema);
+        RefResolver resolver = new SessionResolver(session);
+        RefResolver resolver2 = new SelfResolver(eventSchema);
+
+        for (Map.Entry<String, SchemaLike> entry : makeSessionCases(eventSchema, geoSchema).entrySet()) {
+            final String refString = entry.getKey();
+            final SchemaLike subSchema = entry.getValue();
+            // The second resolver captures relative references
+            final Either<SchemaLike, String> actual = MetaResolver.resolveRefString(refString, new MetaResolver(Util.asList(resolver, resolver2)));
+            assertEquals(refString, actual.getFirst(), subSchema);
+        }
+    }
+
+    private static Map<String, SchemaLike> makeSessionCases(SchemaLike schema, SchemaLike geoSchema) {
+        final SchemaLike latitudeSchema = geoSchema.getProperties().get("latitude");
+        assert !schema.equals(geoSchema);
+        assert !schema.equals(latitudeSchema);
+        assert !geoSchema.equals(latitudeSchema);
+        Map<String, SchemaLike> cs = new HashMap<String, SchemaLike>();
+        for (String url : Util.asSet("", schema.getId())) {
+            cs.put(url+"", schema);
+            cs.put(url+"#/geo", geoSchema);
+            cs.put(url+"#/geo/latitude", latitudeSchema);
         }
         return cs;
     }

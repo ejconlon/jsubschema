@@ -1,5 +1,9 @@
 package net.exathunk.jsubschema.base;
 
+import net.exathunk.jsubschema.functional.Either;
+import net.exathunk.jsubschema.pointers.Part;
+import net.exathunk.jsubschema.pointers.Pointer;
+import net.exathunk.jsubschema.pointers.Reference;
 import org.junit.Test;
 
 import java.util.HashMap;

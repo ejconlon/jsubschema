@@ -1,5 +1,6 @@
 package net.exathunk.jsubschema.base;
 
+import net.exathunk.jsubschema.Util;
 import net.exathunk.jsubschema.gen.Assembler;
 import net.exathunk.jsubschema.gen.ClassRep;
 import net.exathunk.jsubschema.gen.Loader;
