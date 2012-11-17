@@ -7,25 +7,18 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Address implements Cloneable, Serializable, AddressLike {
 
-    @JsonProperty("post-office-box")
     public String post__dash__office__dash__box;
 
-    @JsonProperty("extended-address")
     public String extended__dash__address;
 
-    @JsonProperty("street-address")
     public String street__dash__address;
 
-    @JsonProperty("locality")
     public String locality;
 
-    @JsonProperty("region")
     public String region;
 
-    @JsonProperty("postal-code")
     public String postal__dash__code;
 
-    @JsonProperty("country-name")
     public String country__dash__name;
 
     @Override
@@ -34,11 +27,13 @@ public class Address implements Cloneable, Serializable, AddressLike {
     }
 
     @Override
+    @JsonProperty("post-office-box")
     public String getPost__dash__office__dash__box() {
         return post__dash__office__dash__box;
     }
 
     @Override
+    @JsonProperty("post-office-box")
     public void setPost__dash__office__dash__box(String post__dash__office__dash__box) {
         this.post__dash__office__dash__box = post__dash__office__dash__box;
     }
@@ -49,11 +44,13 @@ public class Address implements Cloneable, Serializable, AddressLike {
     }
 
     @Override
+    @JsonProperty("extended-address")
     public String getExtended__dash__address() {
         return extended__dash__address;
     }
 
     @Override
+    @JsonProperty("extended-address")
     public void setExtended__dash__address(String extended__dash__address) {
         this.extended__dash__address = extended__dash__address;
     }
@@ -64,11 +61,13 @@ public class Address implements Cloneable, Serializable, AddressLike {
     }
 
     @Override
+    @JsonProperty("street-address")
     public String getStreet__dash__address() {
         return street__dash__address;
     }
 
     @Override
+    @JsonProperty("street-address")
     public void setStreet__dash__address(String street__dash__address) {
         this.street__dash__address = street__dash__address;
     }
@@ -79,11 +78,13 @@ public class Address implements Cloneable, Serializable, AddressLike {
     }
 
     @Override
+    @JsonProperty("locality")
     public String getLocality() {
         return locality;
     }
 
     @Override
+    @JsonProperty("locality")
     public void setLocality(String locality) {
         this.locality = locality;
     }
@@ -94,11 +95,13 @@ public class Address implements Cloneable, Serializable, AddressLike {
     }
 
     @Override
+    @JsonProperty("region")
     public String getRegion() {
         return region;
     }
 
     @Override
+    @JsonProperty("region")
     public void setRegion(String region) {
         this.region = region;
     }
@@ -109,11 +112,13 @@ public class Address implements Cloneable, Serializable, AddressLike {
     }
 
     @Override
+    @JsonProperty("postal-code")
     public String getPostal__dash__code() {
         return postal__dash__code;
     }
 
     @Override
+    @JsonProperty("postal-code")
     public void setPostal__dash__code(String postal__dash__code) {
         this.postal__dash__code = postal__dash__code;
     }
@@ -124,11 +129,13 @@ public class Address implements Cloneable, Serializable, AddressLike {
     }
 
     @Override
+    @JsonProperty("country-name")
     public String getCountry__dash__name() {
         return country__dash__name;
     }
 
     @Override
+    @JsonProperty("country-name")
     public void setCountry__dash__name(String country__dash__name) {
         this.country__dash__name = country__dash__name;
     }

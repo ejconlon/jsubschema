@@ -7,10 +7,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Geo implements Cloneable, Serializable, GeoLike {
 
-    @JsonProperty("latitude")
     public Double latitude;
 
-    @JsonProperty("longitude")
     public Double longitude;
 
     @Override
@@ -19,11 +17,13 @@ public class Geo implements Cloneable, Serializable, GeoLike {
     }
 
     @Override
+    @JsonProperty("latitude")
     public Double getLatitude() {
         return latitude;
     }
 
     @Override
+    @JsonProperty("latitude")
     public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
@@ -34,11 +34,13 @@ public class Geo implements Cloneable, Serializable, GeoLike {
     }
 
     @Override
+    @JsonProperty("longitude")
     public Double getLongitude() {
         return longitude;
     }
 
     @Override
+    @JsonProperty("longitude")
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }

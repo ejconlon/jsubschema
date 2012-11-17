@@ -20,6 +20,7 @@ public class GenUtil {
         public MethodRep genAccessor(final FieldRep fieldRep) {
             final MethodRep method = new MethodRep();
             method.annotations.add(new AnnotationRep("@Override"));
+            method.annotations.add(new AnnotationRep("@JsonProperty(\""+Util.unconvert(fieldRep.name)+"\")"));
             method.name = "get"+ Util.capitalize(fieldRep.name);
             method.returns = fieldRep.className;
             method.body = new Stringable() {
@@ -56,6 +57,7 @@ public class GenUtil {
         public MethodRep genAccessor(final FieldRep fieldRep) {
             final MethodRep method = new MethodRep();
             method.annotations.add(new AnnotationRep("@Override"));
+            method.annotations.add(new AnnotationRep("@JsonProperty(\""+Util.unconvert(fieldRep.name)+"\")"));
             method.name = "set"+ Util.capitalize(fieldRep.name);
             method.returns = "void";
             FieldRep otherField = new FieldRep();

@@ -128,8 +128,8 @@ public class SchemaRepper {
 
     private static FieldRep makeField(String key, Schema schema, String rootClassName) {
         final FieldRep f = new FieldRep();
+        f.visibility = Visibility.PUBLIC; // TODO change to private
         f.name = Util.convert(key);
-        f.annotations.add(new AnnotationRep("@JsonProperty(\""+key+"\")"));
         f.className = typeOf(schema, rootClassName);
         return f;
     }
