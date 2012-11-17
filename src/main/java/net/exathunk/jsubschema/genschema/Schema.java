@@ -5,7 +5,7 @@ import java.util.Map;
 import java.io.Serializable;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class Schema implements Cloneable, Serializable {
+public class Schema implements Cloneable, Serializable, SchemaLike {
 
     @JsonProperty("type")
     public String type;
@@ -39,6 +39,171 @@ public class Schema implements Cloneable, Serializable {
 
     @JsonProperty("forbids")
     public List<String> forbids;
+
+    @Override
+    public boolean hasType() {
+        return null != type;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public boolean hasDescription() {
+        return null != description;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public boolean hasFormat() {
+        return null != format;
+    }
+
+    @Override
+    public String getFormat() {
+        return format;
+    }
+
+    @Override
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    @Override
+    public boolean hasProperties() {
+        return null != properties;
+    }
+
+    @Override
+    public Map<String, Schema> getProperties() {
+        return properties;
+    }
+
+    @Override
+    public void setProperties(Map<String, Schema> properties) {
+        this.properties = properties;
+    }
+
+    @Override
+    public boolean hasDeclarations() {
+        return null != declarations;
+    }
+
+    @Override
+    public Map<String, Schema> getDeclarations() {
+        return declarations;
+    }
+
+    @Override
+    public void setDeclarations(Map<String, Schema> declarations) {
+        this.declarations = declarations;
+    }
+
+    @Override
+    public boolean hasId() {
+        return null != id;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public boolean has__dollar__ref() {
+        return null != __dollar__ref;
+    }
+
+    @Override
+    public String get__dollar__ref() {
+        return __dollar__ref;
+    }
+
+    @Override
+    public void set__dollar__ref(String __dollar__ref) {
+        this.__dollar__ref = __dollar__ref;
+    }
+
+    @Override
+    public boolean hasItems() {
+        return null != items;
+    }
+
+    @Override
+    public Schema getItems() {
+        return items;
+    }
+
+    @Override
+    public void setItems(Schema items) {
+        this.items = items;
+    }
+
+    @Override
+    public boolean hasRequired() {
+        return null != required;
+    }
+
+    @Override
+    public Boolean getRequired() {
+        return required;
+    }
+
+    @Override
+    public void setRequired(Boolean required) {
+        this.required = required;
+    }
+
+    @Override
+    public boolean hasRequires() {
+        return null != requires;
+    }
+
+    @Override
+    public List<String> getRequires() {
+        return requires;
+    }
+
+    @Override
+    public void setRequires(List<String> requires) {
+        this.requires = requires;
+    }
+
+    @Override
+    public boolean hasForbids() {
+        return null != forbids;
+    }
+
+    @Override
+    public List<String> getForbids() {
+        return forbids;
+    }
+
+    @Override
+    public void setForbids(List<String> forbids) {
+        this.forbids = forbids;
+    }
 
     @Override
     public String toString() {

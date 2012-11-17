@@ -5,13 +5,43 @@ import java.util.Map;
 import java.io.Serializable;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class Geo implements Cloneable, Serializable {
+public class Geo implements Cloneable, Serializable, GeoLike {
 
     @JsonProperty("latitude")
     public Double latitude;
 
     @JsonProperty("longitude")
     public Double longitude;
+
+    @Override
+    public boolean hasLatitude() {
+        return null != latitude;
+    }
+
+    @Override
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    @Override
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    @Override
+    public boolean hasLongitude() {
+        return null != longitude;
+    }
+
+    @Override
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    @Override
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
 
     @Override
     public String toString() {

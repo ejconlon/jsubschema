@@ -15,7 +15,7 @@ public class GenUtil {
         MethodRep genAccessor(FieldRep fieldRep);
     }
 
-    public static class GetterAccessorGen implements AccessorGen {
+    public static class GetAccessorGen implements AccessorGen {
         @Override
         public MethodRep genAccessor(final FieldRep fieldRep) {
             final MethodRep method = new MethodRep();
@@ -25,7 +25,7 @@ public class GenUtil {
             method.body = new Stringable() {
                 @Override
                 public void makeString(final Stringer sb) {
-                    sb.append("return ").append(fieldRep.name);
+                    sb.append("return ").append(fieldRep.name).append(";");
                     sb.end();
                 }
             };
@@ -43,7 +43,7 @@ public class GenUtil {
             method.body = new Stringable() {
                 @Override
                 public void makeString(final Stringer sb) {
-                    sb.append("return null != ").append(fieldRep.name);
+                    sb.append("return null != ").append(fieldRep.name).append(";");
                     sb.end();
                 }
             };

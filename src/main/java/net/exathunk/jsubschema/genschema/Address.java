@@ -5,7 +5,7 @@ import java.util.Map;
 import java.io.Serializable;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class Address implements Cloneable, Serializable {
+public class Address implements Cloneable, Serializable, AddressLike {
 
     @JsonProperty("post-office-box")
     public String post__dash__office__dash__box;
@@ -27,6 +27,111 @@ public class Address implements Cloneable, Serializable {
 
     @JsonProperty("country-name")
     public String country__dash__name;
+
+    @Override
+    public boolean hasPost__dash__office__dash__box() {
+        return null != post__dash__office__dash__box;
+    }
+
+    @Override
+    public String getPost__dash__office__dash__box() {
+        return post__dash__office__dash__box;
+    }
+
+    @Override
+    public void setPost__dash__office__dash__box(String post__dash__office__dash__box) {
+        this.post__dash__office__dash__box = post__dash__office__dash__box;
+    }
+
+    @Override
+    public boolean hasExtended__dash__address() {
+        return null != extended__dash__address;
+    }
+
+    @Override
+    public String getExtended__dash__address() {
+        return extended__dash__address;
+    }
+
+    @Override
+    public void setExtended__dash__address(String extended__dash__address) {
+        this.extended__dash__address = extended__dash__address;
+    }
+
+    @Override
+    public boolean hasStreet__dash__address() {
+        return null != street__dash__address;
+    }
+
+    @Override
+    public String getStreet__dash__address() {
+        return street__dash__address;
+    }
+
+    @Override
+    public void setStreet__dash__address(String street__dash__address) {
+        this.street__dash__address = street__dash__address;
+    }
+
+    @Override
+    public boolean hasLocality() {
+        return null != locality;
+    }
+
+    @Override
+    public String getLocality() {
+        return locality;
+    }
+
+    @Override
+    public void setLocality(String locality) {
+        this.locality = locality;
+    }
+
+    @Override
+    public boolean hasRegion() {
+        return null != region;
+    }
+
+    @Override
+    public String getRegion() {
+        return region;
+    }
+
+    @Override
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    @Override
+    public boolean hasPostal__dash__code() {
+        return null != postal__dash__code;
+    }
+
+    @Override
+    public String getPostal__dash__code() {
+        return postal__dash__code;
+    }
+
+    @Override
+    public void setPostal__dash__code(String postal__dash__code) {
+        this.postal__dash__code = postal__dash__code;
+    }
+
+    @Override
+    public boolean hasCountry__dash__name() {
+        return null != country__dash__name;
+    }
+
+    @Override
+    public String getCountry__dash__name() {
+        return country__dash__name;
+    }
+
+    @Override
+    public void setCountry__dash__name(String country__dash__name) {
+        this.country__dash__name = country__dash__name;
+    }
 
     @Override
     public String toString() {

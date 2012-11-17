@@ -5,7 +5,7 @@ import java.util.Map;
 import java.io.Serializable;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class Link implements Cloneable, Serializable {
+public class Link implements Cloneable, Serializable, LinkLike {
 
     @JsonProperty("href")
     public String href;
@@ -18,6 +18,66 @@ public class Link implements Cloneable, Serializable {
 
     @JsonProperty("enctype")
     public String enctype;
+
+    @Override
+    public boolean hasHref() {
+        return null != href;
+    }
+
+    @Override
+    public String getHref() {
+        return href;
+    }
+
+    @Override
+    public void setHref(String href) {
+        this.href = href;
+    }
+
+    @Override
+    public boolean hasRel() {
+        return null != rel;
+    }
+
+    @Override
+    public String getRel() {
+        return rel;
+    }
+
+    @Override
+    public void setRel(String rel) {
+        this.rel = rel;
+    }
+
+    @Override
+    public boolean hasMethod() {
+        return null != method;
+    }
+
+    @Override
+    public String getMethod() {
+        return method;
+    }
+
+    @Override
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    @Override
+    public boolean hasEnctype() {
+        return null != enctype;
+    }
+
+    @Override
+    public String getEnctype() {
+        return enctype;
+    }
+
+    @Override
+    public void setEnctype(String enctype) {
+        this.enctype = enctype;
+    }
 
     @Override
     public String toString() {

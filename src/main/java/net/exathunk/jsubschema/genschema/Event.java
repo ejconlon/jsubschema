@@ -5,7 +5,7 @@ import java.util.Map;
 import java.io.Serializable;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class Event implements Cloneable, Serializable {
+public class Event implements Cloneable, Serializable, EventLike {
 
     @JsonProperty("dtstart")
     public String dtstart;
@@ -39,6 +39,171 @@ public class Event implements Cloneable, Serializable {
 
     @JsonProperty("geo")
     public Geo geo;
+
+    @Override
+    public boolean hasDtstart() {
+        return null != dtstart;
+    }
+
+    @Override
+    public String getDtstart() {
+        return dtstart;
+    }
+
+    @Override
+    public void setDtstart(String dtstart) {
+        this.dtstart = dtstart;
+    }
+
+    @Override
+    public boolean hasDtend() {
+        return null != dtend;
+    }
+
+    @Override
+    public String getDtend() {
+        return dtend;
+    }
+
+    @Override
+    public void setDtend(String dtend) {
+        this.dtend = dtend;
+    }
+
+    @Override
+    public boolean hasSummary() {
+        return null != summary;
+    }
+
+    @Override
+    public String getSummary() {
+        return summary;
+    }
+
+    @Override
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    @Override
+    public boolean hasLocation() {
+        return null != location;
+    }
+
+    @Override
+    public String getLocation() {
+        return location;
+    }
+
+    @Override
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    @Override
+    public boolean hasUrl() {
+        return null != url;
+    }
+
+    @Override
+    public String getUrl() {
+        return url;
+    }
+
+    @Override
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    @Override
+    public boolean hasDuration() {
+        return null != duration;
+    }
+
+    @Override
+    public String getDuration() {
+        return duration;
+    }
+
+    @Override
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    @Override
+    public boolean hasRdate() {
+        return null != rdate;
+    }
+
+    @Override
+    public String getRdate() {
+        return rdate;
+    }
+
+    @Override
+    public void setRdate(String rdate) {
+        this.rdate = rdate;
+    }
+
+    @Override
+    public boolean hasRrule() {
+        return null != rrule;
+    }
+
+    @Override
+    public String getRrule() {
+        return rrule;
+    }
+
+    @Override
+    public void setRrule(String rrule) {
+        this.rrule = rrule;
+    }
+
+    @Override
+    public boolean hasCategory() {
+        return null != category;
+    }
+
+    @Override
+    public String getCategory() {
+        return category;
+    }
+
+    @Override
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    @Override
+    public boolean hasDescription() {
+        return null != description;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public boolean hasGeo() {
+        return null != geo;
+    }
+
+    @Override
+    public Geo getGeo() {
+        return geo;
+    }
+
+    @Override
+    public void setGeo(Geo geo) {
+        this.geo = geo;
+    }
 
     @Override
     public String toString() {

@@ -61,16 +61,20 @@ public class RunGen {
             }
             final JsonNode node = Util.parse(contents.toString());
             final Schema schema = (Schema) session.binders.get(Schema.class).bind(node);
-            final ClassRep classRep = SchemaRepper.makeClass(schema, basePackage);
-            final ClassRep factoryRep = SchemaRepper.makeFactory(schema, basePackage);
-            genned.put(classRep.name, classRep);
-            genned.put(factoryRep.name, factoryRep);
+            putGenned(genned, SchemaRepper.makeClass(schema, basePackage));
+            putGenned(genned, SchemaRepper.makeInterface(schema, basePackage));
+            putGenned(genned, SchemaRepper.makeFactory(schema, basePackage));
         }
 
         for (Map.Entry<String, ClassRep> entry : genned.entrySet()) {
             final String className = entry.getKey();
             final ClassRep classRep = entry.getValue();
-            final String contents = Assembler.writeClass(classRep);
+            final String contents;
+            if (ClassRep.TYPE.INTERFACE.equals(classRep.type)) {
+                contents = Assembler.writeInterface(classRep);
+            } else {
+                contents = Assembler.writeClass(classRep);
+            }
 
             final File f = new File(dest, className+".java");
             FileWriter writer = new FileWriter(f);
@@ -79,6 +83,10 @@ public class RunGen {
             bufferedWriter.close();
         }
 
+    }
+
+    private static void putGenned(Map<String, ClassRep> genned, ClassRep classRep) {
+        genned.put(classRep.name, classRep);
     }
 
 }

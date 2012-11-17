@@ -12,26 +12,49 @@ public class SchemaRepper {
 
     public static ClassRep makeClass(Schema schema, String basePackageName) {
         final ClassRep c = new ClassRep();
+        c.type = ClassRep.TYPE.CLASS;
         c.name = parseClassName(schema.id);
         c.packageName = basePackageName;
-        for (Map.Entry<String, Schema> entry : schema.properties.entrySet()) {
-            final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.name);
-            c.fields.add(field);
-        }
         c.imports.add("java.util.List");
         c.imports.add("java.util.Map");
         c.imports.add("java.io.Serializable");
         c.imports.add("org.codehaus.jackson.annotate.JsonProperty");
         c.implemented.add("Cloneable");
         c.implemented.add("Serializable");
+        c.implemented.add(c.name+"Like");
+        for (Map.Entry<String, Schema> entry : schema.properties.entrySet()) {
+            final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.name);
+            c.fields.add(field);
+            c.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
+            c.methods.add(new GenUtil.GetAccessorGen().genAccessor(field));
+            c.methods.add(new GenUtil.SetAccessorGen().genAccessor(field));
+        }
         c.methods.add(new GenUtil.ToStringMethodGen().genMethod(c));
         c.methods.add(new GenUtil.EqualsMethodGen().genMethod(c));
         c.methods.add(new GenUtil.HashCodeMethodGen().genMethod(c));
         return c;
     }
 
+
+    public static ClassRep makeInterface(Schema schema, String basePackage) {
+        ClassRep classRep = makeClass(schema, basePackage);
+        ClassRep interfaceRep = new ClassRep();
+        interfaceRep.type = ClassRep.TYPE.INTERFACE;
+        interfaceRep.name = classRep.name+"Like";
+        interfaceRep.packageName = classRep.packageName;
+        interfaceRep.imports.add("java.util.List");
+        interfaceRep.imports.add("java.util.Map");
+        for (FieldRep field : classRep.fields) {
+            interfaceRep.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
+            interfaceRep.methods.add(new GenUtil.GetAccessorGen().genAccessor(field));
+            interfaceRep.methods.add(new GenUtil.SetAccessorGen().genAccessor(field));
+        }
+        return interfaceRep;
+    }
+
     public static ClassRep makeFactory(Schema schema, String basePackageName) {
         final ClassRep c = new ClassRep();
+        c.type = ClassRep.TYPE.CLASS;
         String baseName = parseClassName(schema.id);
         c.name = baseName+"Factory";
         c.packageName = basePackageName;
