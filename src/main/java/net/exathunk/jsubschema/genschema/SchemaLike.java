@@ -1,10 +1,9 @@
 package net.exathunk.jsubschema.genschema;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-
 import java.util.List;
 import java.util.Map;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
 @JsonDeserialize(as = Schema.class)
 public interface SchemaLike {

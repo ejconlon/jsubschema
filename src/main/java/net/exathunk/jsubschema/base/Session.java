@@ -17,7 +17,7 @@ import java.util.TreeMap;
  * charolastra 11/14/12 3:42 PM
  */
 public class Session {
-    public final ObjectMapper mapper = new ObjectMapper();
+    public final ObjectMapper mapper = Util.makeObjectMapper();
     public final Map<String, SchemaLike> schemas = new TreeMap<String, SchemaLike>();
     public final Map<Class, Binder> binders = new HashMap<Class, Binder>();
 
