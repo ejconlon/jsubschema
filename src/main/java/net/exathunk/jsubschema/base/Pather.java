@@ -48,7 +48,9 @@ public class Pather {
                     return pathSchemaInner(root.getProperties().get(part.getKey()), root, url, pointer.getTail(), !inProperties && "properties".equals(part.getKey()));
                 } else if (schema.has__dollar__ref()) {
                     return unDollarRef(schema, pointer);
-                } else  {
+                } else if (schema.hasItems()) {
+                    return pathSchemaInner(schema.getItems(), root, url, pointer.getTail(), false);
+                } else {
                     return Either3.makeSecond("Expected object: "+ pointer +" "+schema);
                 }
             } else {

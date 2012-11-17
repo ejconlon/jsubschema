@@ -10,14 +10,15 @@ import net.exathunk.jsubschema.genschema.SchemaLike;
 import net.exathunk.jsubschema.pointers.Part;
 import net.exathunk.jsubschema.pointers.Pointer;
 import net.exathunk.jsubschema.pointers.Reference;
+import net.exathunk.jsubschema.validation.DefaultValidator;
+import net.exathunk.jsubschema.validation.VContext;
+import net.exathunk.jsubschema.validation.VError;
+import net.exathunk.jsubschema.validation.Validator;
 import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -70,6 +71,17 @@ public class TestPaths {
         }
     };
 
+    private static final Util.Func<RefTuple, String> refTupleStringVals = new Util.Func<RefTuple, String>() {
+        @Override
+        public String runFunc(RefTuple refTuple) {
+            if (refTuple.getNode().isTextual()) {
+                return refTuple.getNode().asText();
+            } else {
+                return null;
+            }
+        }
+    };
+
     @Test
     public void testTupling() throws IOException {
         JsonNode node = Loader.loadSchemaNode("geo");
@@ -86,17 +98,84 @@ public class TestPaths {
         assertEquals(goldRefStrings, actualRefStrings);
     }
 
+    @Test
+    public void testTupling2() throws IOException, TypeException {
+        Session session = Session.loadDefaultSession();
+        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/proptree");
+        assertNotNull(schema);
+
+        JsonNode node = Loader.loadNode("/test/testproptree");
+        //List<RefTuple> flattened = Util.asList(Util.withSelfDepthFirst(new RefTuple(node)));
+        List<SchemaTuple> flattened = flatten(schema, node, new MetaResolver(new SelfResolver(schema)));
+
+        List<String> goldRefStrings = Arrays.asList(
+                "#", "#/props", "#/props/name", "#/props/food", "#/children",
+                "#/children/0", "#/children/0/props", "#/children/0/props/name", "#/children/0/props/location",
+                "#/children/0/children", "#/children/0/children/0", "#/children/0/children/0/props",
+                "#/children/0/children/0/props/name", "#/children/0/children/0/props/born",
+                "#/children/0/children/0/children", "#/children/0/children/0/children/0",
+                "#/children/0/children/0/children/0/props", "#/children/0/children/0/children/0/props/name",
+                "#/children/0/children/0/children/0/props/savior",
+                "#/children/1", "#/children/1/props", "#/children/1/props/name", "#/children/1/props/food");
+
+        List<String> actualRefStrings = Util.map(schemaTupleRefStrings, flattened);
+
+        assertEquals(goldRefStrings, actualRefStrings);
+
+        List<String> goldStringVals = Arrays.asList(
+                null, null, "Pat", "steak", null,
+                null, null, "Eric", "Saturn",
+                null, null, null,
+                "River Rock", "no",
+                null, null,
+                null, "Jesus Jr.", "yes",
+                null, null, "Alec", "taters");
+
+        List<String> actualStringVals = Util.map(schemaTupleStringVals, flattened);
+
+        assertEquals(goldStringVals, actualStringVals);
+
+        List<String> goldTypes = Arrays.asList(
+                "object", "object", "string", "string", "array",
+                "object", "object", "string", "string",
+                "array", "object", "object",
+                "string", "string",
+                "array", "object",
+                "object", "string", "string",
+                "object", "object", "string", "string");
+
+        List<String> actualTypes = Util.map(schemaTupleTypes, flattened);
+
+        assertEquals(goldTypes, actualTypes);
+
+        FullRefResolver fullRefResolver = new MetaResolver(new SelfResolver(schema));
+        Validator validator = new DefaultValidator();
+        VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
+        assertEquals(new ArrayList<VError>(), context.errors);
+    }
+
     private static final Util.Func<SchemaTuple, String> schemaTupleRefStrings = new Util.Func<SchemaTuple, String>() {
         @Override
         public String runFunc(SchemaTuple schemaTuple) {
-            return schemaTuple.getRefTuple().getReference().toReferenceString();
+            return refTupleRefStrings.runFunc(schemaTuple.getRefTuple());
         }
     };
 
     private static final Util.Func<SchemaTuple, String> schemaTupleTypes = new Util.Func<SchemaTuple, String>() {
         @Override
         public String runFunc(SchemaTuple schemaTuple) {
-            return schemaTuple.getEitherSchema().getFirst().getType();
+            if (schemaTuple.getEitherSchema().isFirst()) {
+                return schemaTuple.getEitherSchema().getFirst().getType();
+            } else {
+                return "ERROR: "+schemaTuple.getEitherSchema().getSecond();
+            }
+        }
+    };
+
+    private static final Util.Func<SchemaTuple, String> schemaTupleStringVals = new Util.Func<SchemaTuple, String>() {
+        @Override
+        public String runFunc(SchemaTuple schemaTuple) {
+            return refTupleStringVals.runFunc(schemaTuple.getRefTuple());
         }
     };
 
@@ -178,9 +257,9 @@ public class TestPaths {
 
         assertEquals(goldTypes, actualTypes);
 
-        //Validator validator = new DefaultValidator();
-        //VContext context = Util.runValidator(validator, new RefTuple(schema, node), new MetaResolver(new SessionResolver(session)));
-        //assertEquals(new ArrayList<VError>(), context.errors);
+        Validator validator = new DefaultValidator();
+        VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
+        assertEquals(new ArrayList<VError>(), context.errors);
     }
 
     @Test

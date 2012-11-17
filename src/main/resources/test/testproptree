@@ -1,0 +1,37 @@
+{
+  "props" : {
+    "name" : "Pat",
+    "food" : "steak"
+  },
+
+  "children" : [
+    {
+      "props" : {
+        "name" : "Eric",
+        "location" : "Saturn"
+      },
+      "children" : [
+        {
+          "props" : {
+            "name" : "River Rock",
+            "born" : "no"
+          },
+          "children" : [
+            {
+              "props" : {
+                "name" : "Jesus Jr.",
+                "savior" : "yes"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "props" : {
+        "name" : "Alec",
+        "food" : "taters"
+      }
+    }
+  ]
+}
