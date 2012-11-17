@@ -38,5 +38,35 @@ public class TestSchematize {
         assertEquals(goldSchemaNode, testSchemaNode);
     }
 
+    @Test
+    public void testNotNormalized() throws IOException, TypeException {
+        final String instanceStr = "{\"a\": {\"b\" : {\"c\": 2}}}";
+        String schemaStr = "{ \"id\":\"http://example.com/foo\", \"type\":\"object\", ";
+        schemaStr += "\"properties\": {\"a\": {\"type\":\"object\", ";
+        schemaStr += "\"properties\": {\"b\": {\"type\":\"object\", ";
+        schemaStr += "\"properties\": {\"c\": {\"type\":\"integer\"} ";
+        schemaStr += "} } } } } }";
+        String normalizedStr = "{ \"id\":\"http://example.com/foo\", \"type\":\"object\", ";
+        normalizedStr += "\"properties\": {\"a\": {\"type\":\"object\", ";
+        normalizedStr += "\"properties\": {\"b\": {\"type\":\"object\", \"$ref\": \"#/declarations/a~1b\" } } }, ";
+        normalizedStr += "\"declarations\": {\"a~1b\": {\"type\":\"object\", \"properties\" : {\"c\": \"integer\"} } ";
+        normalizedStr += "} } }";
 
+        JsonNode instanceNode = Util.parse(instanceStr);
+        JsonNode goldSchemaNode = Util.parse(schemaStr);
+        JsonNode goldNormalizedNode = Util.parse(normalizedStr);
+
+        Schematizer schematizer = new Schematizer();
+        VContext context = new VContext();
+
+        SchemaLike schema = schematizer.schematize("http://example.com/foo", instanceNode, context);
+
+        assertEquals(new ArrayList<VError>(), context.errors);
+
+        JsonNode testSchemaNode = Util.quickUnbind(schema);
+
+        assertEquals(goldSchemaNode, testSchemaNode);
+
+        // TODO normalize and check
+    }
 }
