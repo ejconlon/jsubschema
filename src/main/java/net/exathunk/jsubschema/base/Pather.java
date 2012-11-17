@@ -1,17 +1,17 @@
 package net.exathunk.jsubschema.base;
 
-import net.exathunk.jsubschema.genschema.Schema;
+import net.exathunk.jsubschema.genschema.SchemaLike;
 import org.codehaus.jackson.JsonNode;
 
 /**
  * charolastra 11/15/12 12:44 PM
  */
 public class Pather {
-    public static Either<Schema, String> pathSchema(Schema schema, Path path, RefResolver resolver) throws PathException {
+    public static Either<SchemaLike, String> pathSchema(SchemaLike schema, Path path, RefResolver resolver) throws PathException {
         return pathSchemaInner(schema, schema, path, false, resolver);
     }
 
-    private static Either<Schema, String> pathSchemaInner(Schema schema, Schema root, Path path, boolean inProperties, RefResolver resolver) throws PathException {
+    private static Either<SchemaLike, String> pathSchemaInner(SchemaLike schema, SchemaLike root, Path path, boolean inProperties, RefResolver resolver) throws PathException {
         if (path.isEmpty()) {
             if (schema.get__dollar__ref() != null) {
                 return resolver.resolveRef(schema.get__dollar__ref());
@@ -26,7 +26,7 @@ public class Pather {
                 } else if (root.getProperties().containsKey(part.getKey())) {
                     return pathSchemaInner(root.getProperties().get(part.getKey()), root, path.getTail(), !inProperties && "properties".equals(part.getKey()), resolver);
                 } else if (schema.get__dollar__ref() != null) {
-                    Either<Schema, String> eitherSchema = resolver.resolveRef(schema.get__dollar__ref());
+                    Either<SchemaLike, String> eitherSchema = resolver.resolveRef(schema.get__dollar__ref());
                     if (eitherSchema.isFirst()) {
                         return pathSchemaInner(eitherSchema.getFirst(), eitherSchema.getFirst(), path, false, resolver);
                     } else {

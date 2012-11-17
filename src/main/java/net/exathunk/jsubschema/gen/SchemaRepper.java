@@ -1,7 +1,7 @@
 package net.exathunk.jsubschema.gen;
 
 import net.exathunk.jsubschema.base.Util;
-import net.exathunk.jsubschema.genschema.Schema;
+import net.exathunk.jsubschema.genschema.SchemaLike;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class SchemaRepper {
 
-    public static ClassRep makeClass(Schema schema, String basePackageName) {
+    public static ClassRep makeClass(SchemaLike schema, String basePackageName) {
         final ClassRep c = new ClassRep();
         c.type = ClassRep.TYPE.CLASS;
         c.name = parseClassName(schema.getId());
@@ -18,11 +18,10 @@ public class SchemaRepper {
         c.imports.add("java.util.List");
         c.imports.add("java.util.Map");
         c.imports.add("java.io.Serializable");
-        c.imports.add("org.codehaus.jackson.annotate.JsonProperty");
         c.implemented.add("Cloneable");
         c.implemented.add("Serializable");
         c.implemented.add(c.name+"Like");
-        for (Map.Entry<String, Schema> entry : schema.getProperties().entrySet()) {
+        for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
             final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.name);
             c.fields.add(field);
             c.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
@@ -36,14 +35,17 @@ public class SchemaRepper {
     }
 
 
-    public static ClassRep makeInterface(Schema schema, String basePackage) {
+    public static ClassRep makeInterface(SchemaLike schema, String basePackage) {
         ClassRep classRep = makeClass(schema, basePackage);
         ClassRep interfaceRep = new ClassRep();
         interfaceRep.type = ClassRep.TYPE.INTERFACE;
         interfaceRep.name = classRep.name+"Like";
+        interfaceRep.interfaceAnnotations.add(new AnnotationRep("@JsonTypeInfo(defaultImpl = "+classRep.name+".class, use = JsonTypeInfo.Id.CLASS)"));
         interfaceRep.packageName = classRep.packageName;
         interfaceRep.imports.add("java.util.List");
         interfaceRep.imports.add("java.util.Map");
+        interfaceRep.imports.add("org.codehaus.jackson.annotate.JsonProperty");
+        interfaceRep.imports.add("org.codehaus.jackson.annotate.JsonTypeInfo");
         for (FieldRep field : classRep.fields) {
             interfaceRep.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
             interfaceRep.methods.add(new GenUtil.GetAccessorGen().genAccessor(field));
@@ -52,7 +54,7 @@ public class SchemaRepper {
         return interfaceRep;
     }
 
-    public static ClassRep makeFactory(Schema schema, String basePackageName) {
+    public static ClassRep makeFactory(SchemaLike schema, String basePackageName) {
         final ClassRep c = new ClassRep();
         c.type = ClassRep.TYPE.CLASS;
         String baseName = parseClassName(schema.getId());
@@ -78,7 +80,7 @@ public class SchemaRepper {
             }
         };
         method.returns = className;
-        method.annotations.add(new AnnotationRep("@Override"));
+        method.classAnnotations.add(new AnnotationRep("@Override"));
         return method;
     }
 
@@ -95,7 +97,7 @@ public class SchemaRepper {
             }
         };
         method.returns = "Class<"+className+">";
-        method.annotations.add(new AnnotationRep("@Override"));
+        method.classAnnotations.add(new AnnotationRep("@Override"));
         return method;
     }
 
@@ -103,11 +105,11 @@ public class SchemaRepper {
         return Util.upperFirst(Util.last(Util.split(url, "/")));
     }
 
-    private static String typeOf(Schema schema, String rootClassName) {
+    private static String typeOf(SchemaLike schema, String rootClassName) {
         if (schema.getType().equals("object")) {
             if (schema.get__dollar__ref() != null) {
                 if (schema.get__dollar__ref().equals("#")) return rootClassName;
-                else return parseClassName(schema.get__dollar__ref());
+                else return parseClassName(schema.get__dollar__ref())+"Like";
             } else {
                 return "Map<String, "+typeOf(schema.getItems(), rootClassName)+">";
             }
@@ -126,11 +128,11 @@ public class SchemaRepper {
         }
     }
 
-    private static FieldRep makeField(String key, Schema schema, String rootClassName) {
+    private static FieldRep makeField(String key, SchemaLike schema, String rootClassName) {
         final FieldRep f = new FieldRep();
         f.visibility = Visibility.PRIVATE;
         f.name = Util.convert(key);
-        f.className = typeOf(schema, rootClassName);
+        f.className = typeOf(schema, rootClassName+"Like");
         return f;
     }
 

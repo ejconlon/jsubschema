@@ -11,7 +11,8 @@ public class MethodRep {
     public Visibility visibility = Visibility.PUBLIC;
     public String returns;
     public List<FieldRep> parameters = new ArrayList<FieldRep>();
-    public List<AnnotationRep> annotations = new ArrayList<AnnotationRep>();
+    public List<AnnotationRep> classAnnotations = new ArrayList<AnnotationRep>();
+    public List<AnnotationRep> interfaceAnnotations = new ArrayList<AnnotationRep>();
     public Stringable body;
 
     private static void writeList(List<FieldRep> list, Stringer sb) {
@@ -25,7 +26,7 @@ public class MethodRep {
     }
 
     public void makeClassString(Stringer sb) {
-        for (AnnotationRep annotation : annotations) {
+        for (AnnotationRep annotation : classAnnotations) {
             sb.append(annotation.toString());
             sb.end();
         }
@@ -44,8 +45,13 @@ public class MethodRep {
     }
 
     public void makeInterfaceString(Stringer sb) {
+        for (AnnotationRep annotation : interfaceAnnotations) {
+            sb.append(annotation.toString());
+            sb.end();
+        }
         sb.append(returns.toString()).append(" ").append(name).append("(");
         writeList(parameters, sb);
         sb.cont().append(");");
+        sb.end();
     }
 }

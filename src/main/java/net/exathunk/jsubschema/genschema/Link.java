@@ -3,7 +3,6 @@ package net.exathunk.jsubschema.genschema;
 import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Link implements Cloneable, Serializable, LinkLike {
 
@@ -21,13 +20,11 @@ public class Link implements Cloneable, Serializable, LinkLike {
     }
 
     @Override
-    @JsonProperty("href")
     public String getHref() {
         return href;
     }
 
     @Override
-    @JsonProperty("href")
     public void setHref(String href) {
         this.href = href;
     }
@@ -38,13 +35,11 @@ public class Link implements Cloneable, Serializable, LinkLike {
     }
 
     @Override
-    @JsonProperty("rel")
     public String getRel() {
         return rel;
     }
 
     @Override
-    @JsonProperty("rel")
     public void setRel(String rel) {
         this.rel = rel;
     }
@@ -55,13 +50,11 @@ public class Link implements Cloneable, Serializable, LinkLike {
     }
 
     @Override
-    @JsonProperty("method")
     public String getMethod() {
         return method;
     }
 
     @Override
-    @JsonProperty("method")
     public void setMethod(String method) {
         this.method = method;
     }
@@ -72,13 +65,11 @@ public class Link implements Cloneable, Serializable, LinkLike {
     }
 
     @Override
-    @JsonProperty("enctype")
     public String getEnctype() {
         return enctype;
     }
 
     @Override
-    @JsonProperty("enctype")
     public void setEnctype(String enctype) {
         this.enctype = enctype;
     }

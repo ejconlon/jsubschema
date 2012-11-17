@@ -6,6 +6,7 @@ import net.exathunk.jsubschema.gen.SchemaRepper;
 import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.genschema.Schema;
 import net.exathunk.jsubschema.genschema.SchemaFactory;
+import net.exathunk.jsubschema.genschema.SchemaLike;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
@@ -64,7 +65,7 @@ public class TestNodes {
     @Test
     public void testGenSchema() throws IOException, TypeException {
         final Session session = Session.loadDefaultSession();
-        final Schema schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        final SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
         final ClassRep classRep = SchemaRepper.makeClass(schema, "net.exathunk.jsubschema.genschema");
         final String classString = Assembler.writeClass(classRep);

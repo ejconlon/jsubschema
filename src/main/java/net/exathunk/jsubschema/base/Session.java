@@ -4,6 +4,7 @@ import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.gendeps.DomainFactory;
 import net.exathunk.jsubschema.genschema.Schema;
 import net.exathunk.jsubschema.genschema.SchemaFactory;
+import net.exathunk.jsubschema.genschema.SchemaLike;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -17,7 +18,7 @@ import java.util.TreeMap;
  */
 public class Session {
     public final ObjectMapper mapper = new ObjectMapper();
-    public final Map<String, Schema> schemas = new TreeMap<String, Schema>();
+    public final Map<String, SchemaLike> schemas = new TreeMap<String, SchemaLike>();
     public final Map<Class, Binder> binders = new HashMap<Class, Binder>();
 
     public static Session loadDefaultSession() throws IOException, TypeException {
@@ -31,7 +32,7 @@ public class Session {
         return session;
     }
 
-    public void addSchema(Schema schema) {
+    public void addSchema(SchemaLike schema) {
         if (schema.getId() == null) throw new IllegalArgumentException("Null id in "+schema);
         schemas.put(schema.getId(), schema);
     }

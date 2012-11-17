@@ -1,10 +1,7 @@
 package net.exathunk.jsubschema.base;
 
 import net.exathunk.jsubschema.gen.Loader;
-import net.exathunk.jsubschema.genschema.Event;
-import net.exathunk.jsubschema.genschema.Geo;
-import net.exathunk.jsubschema.genschema.Schema;
-import net.exathunk.jsubschema.genschema.SchemaFactory;
+import net.exathunk.jsubschema.genschema.*;
 import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
@@ -33,18 +30,18 @@ public class TestPaths {
     @Test
     public void testPathSchema() throws IOException, TypeException, PathException {
         Session session = Session.loadDefaultSession();
-        Schema schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
-        Either<Schema, String> reqSchema = Pather.pathSchema(schema, new Path().cons(Part.asKey("type")), new EmptyResolver());
+        Either<SchemaLike, String> reqSchema = Pather.pathSchema(schema, new Path().cons(Part.asKey("type")), new EmptyResolver());
         assertNotNull(reqSchema);
         assertEquals("string", reqSchema.getFirst().getType());
 
-        Either<Schema, String> idForbidSchema = Pather.pathSchema(schema, new Path().cons(Part.asKey("id")).cons(Part.asKey("forbids")).reversed(), new EmptyResolver());
+        Either<SchemaLike, String> idForbidSchema = Pather.pathSchema(schema, new Path().cons(Part.asKey("id")).cons(Part.asKey("forbids")).reversed(), new EmptyResolver());
         assertNotNull(idForbidSchema);
         assertEquals("array", idForbidSchema.getFirst().getType());
 
-        Either<Schema, String> idForbid0Schema = Pather.pathSchema(schema, new Path().cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)).reversed(), new EmptyResolver());
+        Either<SchemaLike, String> idForbid0Schema = Pather.pathSchema(schema, new Path().cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)).reversed(), new EmptyResolver());
         assertNotNull(idForbid0Schema);
         assertEquals("string", idForbid0Schema.getFirst().getType());
     }
@@ -69,7 +66,7 @@ public class TestPaths {
     @Test
     public void testTupling() throws IOException, TypeException, PathException {
         Session session = Session.loadDefaultSession();
-        Schema schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
         JsonNode node = Loader.loadSchemaNode("geo");
@@ -108,7 +105,7 @@ public class TestPaths {
     @Test
     public void testValidTypes() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        Schema schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
         Validator validator = new TypeValidator();
@@ -141,7 +138,7 @@ public class TestPaths {
     @Test
     public void testValidTypes2() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        Schema schema = session.schemas.get("http://exathunk.net/schemas/geo");
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/geo");
         assertNotNull("schema");
 
         Validator validator = new TypeValidator();
@@ -168,7 +165,7 @@ public class TestPaths {
     @Test
     public void testRequired() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        Schema schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
         Validator validator = new RequiredValidator();
@@ -195,7 +192,7 @@ public class TestPaths {
     @Test
     public void testForbidden() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        Schema schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
         Validator validator = new ForbidsValidator();
@@ -270,7 +267,7 @@ public class TestPaths {
         JsonNode node = Util.quickUnbind(event);
         //System.out.println(node);
 
-        Schema schema = resolver.resolveRef("http://exathunk.net/schemas/event").getFirst();
+        SchemaLike schema = resolver.resolveRef("http://exathunk.net/schemas/event").getFirst();
 
         List<PathTuple> flattened = Util.asList(Util.withSelfDepthFirst(new PathTuple(schema, node, resolver)));
 

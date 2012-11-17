@@ -3,7 +3,6 @@ package net.exathunk.jsubschema.genschema;
 import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Schema implements Cloneable, Serializable, SchemaLike {
 
@@ -13,15 +12,15 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
 
     private String format;
 
-    private Map<String, Schema> properties;
+    private Map<String, SchemaLike> properties;
 
-    private Map<String, Schema> declarations;
+    private Map<String, SchemaLike> declarations;
 
     private String id;
 
     private String __dollar__ref;
 
-    private Schema items;
+    private SchemaLike items;
 
     private Boolean required;
 
@@ -35,13 +34,11 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    @JsonProperty("type")
     public String getType() {
         return type;
     }
 
     @Override
-    @JsonProperty("type")
     public void setType(String type) {
         this.type = type;
     }
@@ -52,13 +49,11 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    @JsonProperty("description")
     public String getDescription() {
         return description;
     }
 
     @Override
-    @JsonProperty("description")
     public void setDescription(String description) {
         this.description = description;
     }
@@ -69,13 +64,11 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    @JsonProperty("format")
     public String getFormat() {
         return format;
     }
 
     @Override
-    @JsonProperty("format")
     public void setFormat(String format) {
         this.format = format;
     }
@@ -86,14 +79,12 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    @JsonProperty("properties")
-    public Map<String, Schema> getProperties() {
+    public Map<String, SchemaLike> getProperties() {
         return properties;
     }
 
     @Override
-    @JsonProperty("properties")
-    public void setProperties(Map<String, Schema> properties) {
+    public void setProperties(Map<String, SchemaLike> properties) {
         this.properties = properties;
     }
 
@@ -103,14 +94,12 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    @JsonProperty("declarations")
-    public Map<String, Schema> getDeclarations() {
+    public Map<String, SchemaLike> getDeclarations() {
         return declarations;
     }
 
     @Override
-    @JsonProperty("declarations")
-    public void setDeclarations(Map<String, Schema> declarations) {
+    public void setDeclarations(Map<String, SchemaLike> declarations) {
         this.declarations = declarations;
     }
 
@@ -120,13 +109,11 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    @JsonProperty("id")
     public String getId() {
         return id;
     }
 
     @Override
-    @JsonProperty("id")
     public void setId(String id) {
         this.id = id;
     }
@@ -137,13 +124,11 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    @JsonProperty("$ref")
     public String get__dollar__ref() {
         return __dollar__ref;
     }
 
     @Override
-    @JsonProperty("$ref")
     public void set__dollar__ref(String __dollar__ref) {
         this.__dollar__ref = __dollar__ref;
     }
@@ -154,14 +139,12 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    @JsonProperty("items")
-    public Schema getItems() {
+    public SchemaLike getItems() {
         return items;
     }
 
     @Override
-    @JsonProperty("items")
-    public void setItems(Schema items) {
+    public void setItems(SchemaLike items) {
         this.items = items;
     }
 
@@ -171,13 +154,11 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    @JsonProperty("required")
     public Boolean getRequired() {
         return required;
     }
 
     @Override
-    @JsonProperty("required")
     public void setRequired(Boolean required) {
         this.required = required;
     }
@@ -188,13 +169,11 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    @JsonProperty("requires")
     public List<String> getRequires() {
         return requires;
     }
 
     @Override
-    @JsonProperty("requires")
     public void setRequires(List<String> requires) {
         this.requires = requires;
     }
@@ -205,13 +184,11 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    @JsonProperty("forbids")
     public List<String> getForbids() {
         return forbids;
     }
 
     @Override
-    @JsonProperty("forbids")
     public void setForbids(List<String> forbids) {
         this.forbids = forbids;
     }

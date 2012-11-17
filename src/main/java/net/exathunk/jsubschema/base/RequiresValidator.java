@@ -1,6 +1,6 @@
 package net.exathunk.jsubschema.base;
 
-import net.exathunk.jsubschema.genschema.Schema;
+import net.exathunk.jsubschema.genschema.SchemaLike;
 
 import java.util.Map;
 
@@ -11,11 +11,11 @@ public class RequiresValidator implements Validator {
     @Override
     public void validate(PathTuple tuple, VContext context) {
         if (tuple.node.isObject()) {
-            final Schema schema = tuple.eitherSchema.getFirst();
+            final SchemaLike schema = tuple.eitherSchema.getFirst();
             if (schema.getProperties() != null) {
-                for (Map.Entry<String, Schema> entry : schema.getProperties().entrySet()) {
+                for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
                     final String childKey = entry.getKey();
-                    final Schema childSchema = entry.getValue();
+                    final SchemaLike childSchema = entry.getValue();
                     if (childSchema.getRequires() != null && tuple.node.has(childKey)) {
                         for (String requiredKey : childSchema.getRequires()) {
                             if (!tuple.node.has(requiredKey)) {

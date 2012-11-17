@@ -1,6 +1,6 @@
 package net.exathunk.jsubschema.base;
 
-import net.exathunk.jsubschema.genschema.Schema;
+import net.exathunk.jsubschema.genschema.SchemaLike;
 import org.codehaus.jackson.JsonNode;
 
 import java.util.Iterator;
@@ -10,17 +10,17 @@ import java.util.NoSuchElementException;
  * charolastra 11/15/12 12:48 PM
  */
 public class PathTuple implements Iterable<PathTuple> {
-    public final Either<Schema, String> eitherSchema;
-    public final Schema rootSchema;
+    public final Either<SchemaLike, String> eitherSchema;
+    public final SchemaLike rootSchema;
     public final JsonNode node;
     public final Path path;
     public final RefResolver resolver;
 
-    public PathTuple(Schema schema, JsonNode node, RefResolver resolver) {
-        this(Either.<Schema, String>makeFirst(schema), schema, node, new Path(), resolver);
+    public PathTuple(SchemaLike schema, JsonNode node, RefResolver resolver) {
+        this(Either.<SchemaLike, String>makeFirst(schema), schema, node, new Path(), resolver);
     }
 
-    private PathTuple(Either<Schema, String> eitherSchema, Schema rootSchema, JsonNode node, Path path, RefResolver resolver) {
+    private PathTuple(Either<SchemaLike, String> eitherSchema, SchemaLike rootSchema, JsonNode node, Path path, RefResolver resolver) {
         this.eitherSchema = eitherSchema;
         this.rootSchema = rootSchema;
         this.node = node;
@@ -77,7 +77,7 @@ public class PathTuple implements Iterable<PathTuple> {
                     final String nextField = nextFields.next();
                     final JsonNode node = root.node.get(nextField);
                     final Path path = root.path.cons(Part.asKey(nextField));
-                    final Either<Schema, String> eitherSchema;
+                    final Either<SchemaLike, String> eitherSchema;
                     if (root.eitherSchema.isFirst()) {
                         eitherSchema = Pather.pathSchema(root.rootSchema, path.reversed(), root.resolver);
                     } else {
@@ -87,7 +87,7 @@ public class PathTuple implements Iterable<PathTuple> {
                 } else if (size >= 0) {
                     final JsonNode node = root.node.get(pos);
                     final Path path = root.path.cons(Part.asIndex(pos));
-                    final Either<Schema, String> eitherSchema;
+                    final Either<SchemaLike, String> eitherSchema;
                     if (root.eitherSchema.isFirst()) {
                         eitherSchema = Pather.pathSchema(root.rootSchema, path.reversed(), root.resolver);
                     } else {

@@ -3,7 +3,6 @@ package net.exathunk.jsubschema.genschema;
 import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Event implements Cloneable, Serializable, EventLike {
 
@@ -27,7 +26,7 @@ public class Event implements Cloneable, Serializable, EventLike {
 
     private String description;
 
-    private Geo geo;
+    private GeoLike geo;
 
     @Override
     public boolean hasDtstart() {
@@ -35,13 +34,11 @@ public class Event implements Cloneable, Serializable, EventLike {
     }
 
     @Override
-    @JsonProperty("dtstart")
     public String getDtstart() {
         return dtstart;
     }
 
     @Override
-    @JsonProperty("dtstart")
     public void setDtstart(String dtstart) {
         this.dtstart = dtstart;
     }
@@ -52,13 +49,11 @@ public class Event implements Cloneable, Serializable, EventLike {
     }
 
     @Override
-    @JsonProperty("dtend")
     public String getDtend() {
         return dtend;
     }
 
     @Override
-    @JsonProperty("dtend")
     public void setDtend(String dtend) {
         this.dtend = dtend;
     }
@@ -69,13 +64,11 @@ public class Event implements Cloneable, Serializable, EventLike {
     }
 
     @Override
-    @JsonProperty("summary")
     public String getSummary() {
         return summary;
     }
 
     @Override
-    @JsonProperty("summary")
     public void setSummary(String summary) {
         this.summary = summary;
     }
@@ -86,13 +79,11 @@ public class Event implements Cloneable, Serializable, EventLike {
     }
 
     @Override
-    @JsonProperty("location")
     public String getLocation() {
         return location;
     }
 
     @Override
-    @JsonProperty("location")
     public void setLocation(String location) {
         this.location = location;
     }
@@ -103,13 +94,11 @@ public class Event implements Cloneable, Serializable, EventLike {
     }
 
     @Override
-    @JsonProperty("url")
     public String getUrl() {
         return url;
     }
 
     @Override
-    @JsonProperty("url")
     public void setUrl(String url) {
         this.url = url;
     }
@@ -120,13 +109,11 @@ public class Event implements Cloneable, Serializable, EventLike {
     }
 
     @Override
-    @JsonProperty("duration")
     public String getDuration() {
         return duration;
     }
 
     @Override
-    @JsonProperty("duration")
     public void setDuration(String duration) {
         this.duration = duration;
     }
@@ -137,13 +124,11 @@ public class Event implements Cloneable, Serializable, EventLike {
     }
 
     @Override
-    @JsonProperty("rdate")
     public String getRdate() {
         return rdate;
     }
 
     @Override
-    @JsonProperty("rdate")
     public void setRdate(String rdate) {
         this.rdate = rdate;
     }
@@ -154,13 +139,11 @@ public class Event implements Cloneable, Serializable, EventLike {
     }
 
     @Override
-    @JsonProperty("rrule")
     public String getRrule() {
         return rrule;
     }
 
     @Override
-    @JsonProperty("rrule")
     public void setRrule(String rrule) {
         this.rrule = rrule;
     }
@@ -171,13 +154,11 @@ public class Event implements Cloneable, Serializable, EventLike {
     }
 
     @Override
-    @JsonProperty("category")
     public String getCategory() {
         return category;
     }
 
     @Override
-    @JsonProperty("category")
     public void setCategory(String category) {
         this.category = category;
     }
@@ -188,13 +169,11 @@ public class Event implements Cloneable, Serializable, EventLike {
     }
 
     @Override
-    @JsonProperty("description")
     public String getDescription() {
         return description;
     }
 
     @Override
-    @JsonProperty("description")
     public void setDescription(String description) {
         this.description = description;
     }
@@ -205,14 +184,12 @@ public class Event implements Cloneable, Serializable, EventLike {
     }
 
     @Override
-    @JsonProperty("geo")
-    public Geo getGeo() {
+    public GeoLike getGeo() {
         return geo;
     }
 
     @Override
-    @JsonProperty("geo")
-    public void setGeo(Geo geo) {
+    public void setGeo(GeoLike geo) {
         this.geo = geo;
     }
 

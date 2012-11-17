@@ -19,8 +19,8 @@ public class GenUtil {
         @Override
         public MethodRep genAccessor(final FieldRep fieldRep) {
             final MethodRep method = new MethodRep();
-            method.annotations.add(new AnnotationRep("@Override"));
-            method.annotations.add(new AnnotationRep("@JsonProperty(\""+Util.unconvert(fieldRep.name)+"\")"));
+            method.classAnnotations.add(new AnnotationRep("@Override"));
+            method.interfaceAnnotations.add(new AnnotationRep("@JsonProperty(\""+Util.unconvert(fieldRep.name)+"\")"));
             method.name = "get"+ Util.capitalize(fieldRep.name);
             method.returns = fieldRep.className;
             method.body = new Stringable() {
@@ -38,7 +38,7 @@ public class GenUtil {
         @Override
         public MethodRep genAccessor(final FieldRep fieldRep) {
             final MethodRep method = new MethodRep();
-            method.annotations.add(new AnnotationRep("@Override"));
+            method.classAnnotations.add(new AnnotationRep("@Override"));
             method.name = "has"+ Util.capitalize(fieldRep.name);
             method.returns = "boolean";
             method.body = new Stringable() {
@@ -56,8 +56,8 @@ public class GenUtil {
         @Override
         public MethodRep genAccessor(final FieldRep fieldRep) {
             final MethodRep method = new MethodRep();
-            method.annotations.add(new AnnotationRep("@Override"));
-            method.annotations.add(new AnnotationRep("@JsonProperty(\""+Util.unconvert(fieldRep.name)+"\")"));
+            method.classAnnotations.add(new AnnotationRep("@Override"));
+            method.interfaceAnnotations.add(new AnnotationRep("@JsonProperty(\""+Util.unconvert(fieldRep.name)+"\")"));
             method.name = "set"+ Util.capitalize(fieldRep.name);
             method.returns = "void";
             FieldRep otherField = new FieldRep();
@@ -79,7 +79,7 @@ public class GenUtil {
         @Override
         public MethodRep genMethod(final ClassRep classRep) {
             final MethodRep method = new MethodRep();
-            method.annotations.add(new AnnotationRep("@Override"));
+            method.classAnnotations.add(new AnnotationRep("@Override"));
             method.name = "toString";
             method.returns = "String";
 
@@ -106,7 +106,7 @@ public class GenUtil {
         @Override
         public MethodRep genMethod(final ClassRep classRep) {
             final MethodRep method = new MethodRep();
-            method.annotations.add(new AnnotationRep("@Override"));
+            method.classAnnotations.add(new AnnotationRep("@Override"));
             method.name = "equals";
             method.returns = "boolean";
             FieldRep otherField = new FieldRep();
@@ -148,7 +148,7 @@ public class GenUtil {
         @Override
         public MethodRep genMethod(final ClassRep classRep) {
             final MethodRep method = new MethodRep();
-            method.annotations.add(new AnnotationRep("@Override"));
+            method.classAnnotations.add(new AnnotationRep("@Override"));
             method.name = "hashCode";
             method.returns = "int";
 

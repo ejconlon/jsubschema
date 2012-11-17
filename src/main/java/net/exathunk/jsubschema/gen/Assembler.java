@@ -43,6 +43,10 @@ public class Assembler {
     }
 
     private static void writeOpenClass(ClassRep classRep, Stringer s) {
+        for (AnnotationRep anno : classRep.classAnnotations) {
+            s.append(anno.toString());
+            s.end();
+        }
         s.append("public class "+classRep.name);
         if (!classRep.extended.isEmpty()) {
             s.cont().append(" extends ");
@@ -58,6 +62,10 @@ public class Assembler {
     }
 
     private static void writeOpenInterface(ClassRep classRep, Stringer s) {
+        for (AnnotationRep anno : classRep.interfaceAnnotations) {
+            s.append(anno.toString());
+            s.end();
+        }
         s.append("public interface "+classRep.name);
         if (!classRep.extended.isEmpty()) {
             s.cont().append(" extends ");
