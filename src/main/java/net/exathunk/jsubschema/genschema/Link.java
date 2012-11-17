@@ -92,16 +92,16 @@ public class Link implements Cloneable, Serializable, LinkLike {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o instanceof Link) {
-            Link other = (Link) o;
-            if (href == null) { if (other.href != null) return false; }
-            else if (!href.equals(other.href)) { return false; }
-            if (rel == null) { if (other.rel != null) return false; }
-            else if (!rel.equals(other.rel)) { return false; }
-            if (method == null) { if (other.method != null) return false; }
-            else if (!method.equals(other.method)) { return false; }
-            if (enctype == null) { if (other.enctype != null) return false; }
-            else if (!enctype.equals(other.enctype)) { return false; }
+        if (o instanceof LinkLike) {
+            LinkLike other = (LinkLike) o;
+            if (href == null) { if (other.hasHref()) return false; }
+            else if (!href.equals(other.getHref())) { return false; }
+            if (rel == null) { if (other.hasRel()) return false; }
+            else if (!rel.equals(other.getRel())) { return false; }
+            if (method == null) { if (other.hasMethod()) return false; }
+            else if (!method.equals(other.getMethod())) { return false; }
+            if (enctype == null) { if (other.hasEnctype()) return false; }
+            else if (!enctype.equals(other.getEnctype())) { return false; }
             return true;
         } else {
             return false;

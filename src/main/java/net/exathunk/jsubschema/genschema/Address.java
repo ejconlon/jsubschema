@@ -149,22 +149,22 @@ public class Address implements Cloneable, Serializable, AddressLike {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o instanceof Address) {
-            Address other = (Address) o;
-            if (post__dash__office__dash__box == null) { if (other.post__dash__office__dash__box != null) return false; }
-            else if (!post__dash__office__dash__box.equals(other.post__dash__office__dash__box)) { return false; }
-            if (extended__dash__address == null) { if (other.extended__dash__address != null) return false; }
-            else if (!extended__dash__address.equals(other.extended__dash__address)) { return false; }
-            if (street__dash__address == null) { if (other.street__dash__address != null) return false; }
-            else if (!street__dash__address.equals(other.street__dash__address)) { return false; }
-            if (locality == null) { if (other.locality != null) return false; }
-            else if (!locality.equals(other.locality)) { return false; }
-            if (region == null) { if (other.region != null) return false; }
-            else if (!region.equals(other.region)) { return false; }
-            if (postal__dash__code == null) { if (other.postal__dash__code != null) return false; }
-            else if (!postal__dash__code.equals(other.postal__dash__code)) { return false; }
-            if (country__dash__name == null) { if (other.country__dash__name != null) return false; }
-            else if (!country__dash__name.equals(other.country__dash__name)) { return false; }
+        if (o instanceof AddressLike) {
+            AddressLike other = (AddressLike) o;
+            if (post__dash__office__dash__box == null) { if (other.hasPost__dash__office__dash__box()) return false; }
+            else if (!post__dash__office__dash__box.equals(other.getPost__dash__office__dash__box())) { return false; }
+            if (extended__dash__address == null) { if (other.hasExtended__dash__address()) return false; }
+            else if (!extended__dash__address.equals(other.getExtended__dash__address())) { return false; }
+            if (street__dash__address == null) { if (other.hasStreet__dash__address()) return false; }
+            else if (!street__dash__address.equals(other.getStreet__dash__address())) { return false; }
+            if (locality == null) { if (other.hasLocality()) return false; }
+            else if (!locality.equals(other.getLocality())) { return false; }
+            if (region == null) { if (other.hasRegion()) return false; }
+            else if (!region.equals(other.getRegion())) { return false; }
+            if (postal__dash__code == null) { if (other.hasPostal__dash__code()) return false; }
+            else if (!postal__dash__code.equals(other.getPostal__dash__code())) { return false; }
+            if (country__dash__name == null) { if (other.hasCountry__dash__name()) return false; }
+            else if (!country__dash__name.equals(other.getCountry__dash__name())) { return false; }
             return true;
         } else {
             return false;

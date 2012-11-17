@@ -225,30 +225,30 @@ public class Event implements Cloneable, Serializable, EventLike {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o instanceof Event) {
-            Event other = (Event) o;
-            if (dtstart == null) { if (other.dtstart != null) return false; }
-            else if (!dtstart.equals(other.dtstart)) { return false; }
-            if (dtend == null) { if (other.dtend != null) return false; }
-            else if (!dtend.equals(other.dtend)) { return false; }
-            if (summary == null) { if (other.summary != null) return false; }
-            else if (!summary.equals(other.summary)) { return false; }
-            if (location == null) { if (other.location != null) return false; }
-            else if (!location.equals(other.location)) { return false; }
-            if (url == null) { if (other.url != null) return false; }
-            else if (!url.equals(other.url)) { return false; }
-            if (duration == null) { if (other.duration != null) return false; }
-            else if (!duration.equals(other.duration)) { return false; }
-            if (rdate == null) { if (other.rdate != null) return false; }
-            else if (!rdate.equals(other.rdate)) { return false; }
-            if (rrule == null) { if (other.rrule != null) return false; }
-            else if (!rrule.equals(other.rrule)) { return false; }
-            if (category == null) { if (other.category != null) return false; }
-            else if (!category.equals(other.category)) { return false; }
-            if (description == null) { if (other.description != null) return false; }
-            else if (!description.equals(other.description)) { return false; }
-            if (geo == null) { if (other.geo != null) return false; }
-            else if (!geo.equals(other.geo)) { return false; }
+        if (o instanceof EventLike) {
+            EventLike other = (EventLike) o;
+            if (dtstart == null) { if (other.hasDtstart()) return false; }
+            else if (!dtstart.equals(other.getDtstart())) { return false; }
+            if (dtend == null) { if (other.hasDtend()) return false; }
+            else if (!dtend.equals(other.getDtend())) { return false; }
+            if (summary == null) { if (other.hasSummary()) return false; }
+            else if (!summary.equals(other.getSummary())) { return false; }
+            if (location == null) { if (other.hasLocation()) return false; }
+            else if (!location.equals(other.getLocation())) { return false; }
+            if (url == null) { if (other.hasUrl()) return false; }
+            else if (!url.equals(other.getUrl())) { return false; }
+            if (duration == null) { if (other.hasDuration()) return false; }
+            else if (!duration.equals(other.getDuration())) { return false; }
+            if (rdate == null) { if (other.hasRdate()) return false; }
+            else if (!rdate.equals(other.getRdate())) { return false; }
+            if (rrule == null) { if (other.hasRrule()) return false; }
+            else if (!rrule.equals(other.getRrule())) { return false; }
+            if (category == null) { if (other.hasCategory()) return false; }
+            else if (!category.equals(other.getCategory())) { return false; }
+            if (description == null) { if (other.hasDescription()) return false; }
+            else if (!description.equals(other.getDescription())) { return false; }
+            if (geo == null) { if (other.hasGeo()) return false; }
+            else if (!geo.equals(other.getGeo())) { return false; }
             return true;
         } else {
             return false;

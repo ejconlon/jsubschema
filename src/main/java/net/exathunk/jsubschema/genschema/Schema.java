@@ -225,30 +225,30 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o instanceof Schema) {
-            Schema other = (Schema) o;
-            if (type == null) { if (other.type != null) return false; }
-            else if (!type.equals(other.type)) { return false; }
-            if (description == null) { if (other.description != null) return false; }
-            else if (!description.equals(other.description)) { return false; }
-            if (format == null) { if (other.format != null) return false; }
-            else if (!format.equals(other.format)) { return false; }
-            if (properties == null) { if (other.properties != null) return false; }
-            else if (!properties.equals(other.properties)) { return false; }
-            if (declarations == null) { if (other.declarations != null) return false; }
-            else if (!declarations.equals(other.declarations)) { return false; }
-            if (id == null) { if (other.id != null) return false; }
-            else if (!id.equals(other.id)) { return false; }
-            if (__dollar__ref == null) { if (other.__dollar__ref != null) return false; }
-            else if (!__dollar__ref.equals(other.__dollar__ref)) { return false; }
-            if (items == null) { if (other.items != null) return false; }
-            else if (!items.equals(other.items)) { return false; }
-            if (required == null) { if (other.required != null) return false; }
-            else if (!required.equals(other.required)) { return false; }
-            if (requires == null) { if (other.requires != null) return false; }
-            else if (!requires.equals(other.requires)) { return false; }
-            if (forbids == null) { if (other.forbids != null) return false; }
-            else if (!forbids.equals(other.forbids)) { return false; }
+        if (o instanceof SchemaLike) {
+            SchemaLike other = (SchemaLike) o;
+            if (type == null) { if (other.hasType()) return false; }
+            else if (!type.equals(other.getType())) { return false; }
+            if (description == null) { if (other.hasDescription()) return false; }
+            else if (!description.equals(other.getDescription())) { return false; }
+            if (format == null) { if (other.hasFormat()) return false; }
+            else if (!format.equals(other.getFormat())) { return false; }
+            if (properties == null) { if (other.hasProperties()) return false; }
+            else if (!properties.equals(other.getProperties())) { return false; }
+            if (declarations == null) { if (other.hasDeclarations()) return false; }
+            else if (!declarations.equals(other.getDeclarations())) { return false; }
+            if (id == null) { if (other.hasId()) return false; }
+            else if (!id.equals(other.getId())) { return false; }
+            if (__dollar__ref == null) { if (other.has__dollar__ref()) return false; }
+            else if (!__dollar__ref.equals(other.get__dollar__ref())) { return false; }
+            if (items == null) { if (other.hasItems()) return false; }
+            else if (!items.equals(other.getItems())) { return false; }
+            if (required == null) { if (other.hasRequired()) return false; }
+            else if (!required.equals(other.getRequired())) { return false; }
+            if (requires == null) { if (other.hasRequires()) return false; }
+            else if (!requires.equals(other.getRequires())) { return false; }
+            if (forbids == null) { if (other.hasForbids()) return false; }
+            else if (!forbids.equals(other.getForbids())) { return false; }
             return true;
         } else {
             return false;

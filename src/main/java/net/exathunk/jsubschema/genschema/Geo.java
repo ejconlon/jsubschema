@@ -54,12 +54,12 @@ public class Geo implements Cloneable, Serializable, GeoLike {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o instanceof Geo) {
-            Geo other = (Geo) o;
-            if (latitude == null) { if (other.latitude != null) return false; }
-            else if (!latitude.equals(other.latitude)) { return false; }
-            if (longitude == null) { if (other.longitude != null) return false; }
-            else if (!longitude.equals(other.longitude)) { return false; }
+        if (o instanceof GeoLike) {
+            GeoLike other = (GeoLike) o;
+            if (latitude == null) { if (other.hasLatitude()) return false; }
+            else if (!latitude.equals(other.getLatitude())) { return false; }
+            if (longitude == null) { if (other.hasLongitude()) return false; }
+            else if (!longitude.equals(other.getLongitude())) { return false; }
             return true;
         } else {
             return false;

@@ -117,14 +117,14 @@ public class GenUtil {
                 public void makeString(final Stringer sb) {
                     sb.append("if (this == o) return true;");
                     sb.end();
-                    sb.append("if (o instanceof ").append(classRep.name).append(") {");
+                    sb.append("if (o instanceof ").append(classRep.name).append("Like) {");
                     sb.end();
-                    sb.indent().append(classRep.name).append(" other = (").append(classRep.name).append(") o;");
+                    sb.indent().append(classRep.name).append("Like other = (").append(classRep.name).append("Like) o;");
                     sb.end();
                     for (FieldRep field : classRep.fields) {
-                        sb.indent().append("if (" + field.name + " == null) { if (other." + field.name + " != null) return false; }");
+                        sb.indent().append("if (" + field.name + " == null) { if (other.has" + Util.capitalize(field.name) + "()) return false; }");
                         sb.end();
-                        sb.indent().append("else if (!" + field.name + ".equals(other." + field.name + ")) { return false; }");
+                        sb.indent().append("else if (!" + field.name + ".equals(other.get" + Util.capitalize(field.name) + "())) { return false; }");
                         sb.end();
                     }
                     sb.indent().append("return true;");
