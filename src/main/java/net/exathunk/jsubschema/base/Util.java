@@ -1,6 +1,9 @@
 package net.exathunk.jsubschema.base;
 
 import net.exathunk.jsubschema.gendeps.DomainFactory;
+import net.exathunk.jsubschema.validation.VContext;
+import net.exathunk.jsubschema.validation.VError;
+import net.exathunk.jsubschema.validation.Validator;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;

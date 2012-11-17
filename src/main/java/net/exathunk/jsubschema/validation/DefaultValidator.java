@@ -1,4 +1,6 @@
-package net.exathunk.jsubschema.base;
+package net.exathunk.jsubschema.validation;
+
+import net.exathunk.jsubschema.validation.*;
 
 import java.util.Arrays;
 

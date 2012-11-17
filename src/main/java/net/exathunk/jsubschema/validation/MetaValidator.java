@@ -1,4 +1,6 @@
-package net.exathunk.jsubschema.base;
+package net.exathunk.jsubschema.validation;
+
+import net.exathunk.jsubschema.base.PathTuple;
 
 import java.util.List;
 

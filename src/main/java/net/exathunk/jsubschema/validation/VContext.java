@@ -1,4 +1,4 @@
-package net.exathunk.jsubschema.base;
+package net.exathunk.jsubschema.validation;
 
 import java.util.ArrayList;
 import java.util.List;

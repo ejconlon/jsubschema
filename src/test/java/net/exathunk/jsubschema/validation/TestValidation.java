@@ -1,9 +1,11 @@
-package net.exathunk.jsubschema.base;
+package net.exathunk.jsubschema.validation;
 
+import net.exathunk.jsubschema.base.*;
 import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.genschema.Schema;
 import net.exathunk.jsubschema.genschema.SchemaFactory;
 import net.exathunk.jsubschema.genschema.SchemaLike;
+import net.exathunk.jsubschema.validation.*;
 import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
