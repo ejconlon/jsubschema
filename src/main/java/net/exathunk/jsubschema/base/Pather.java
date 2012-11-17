@@ -13,8 +13,8 @@ public class Pather {
 
     private static Either<Schema, String> pathSchemaInner(Schema schema, Schema root, Path path, boolean inProperties, RefResolver resolver) throws PathException {
         if (path.isEmpty()) {
-            if (schema.__dollar__ref != null) {
-                return resolver.resolveRef(schema.__dollar__ref);
+            if (schema.get__dollar__ref() != null) {
+                return resolver.resolveRef(schema.get__dollar__ref());
             } else {
                 return Either.makeFirst(schema);
             }
@@ -23,10 +23,10 @@ public class Pather {
             if (part.hasKey()) {
                 if (inProperties) {
                     return pathSchemaInner(root, root, path.getTail(), false, resolver);
-                } else if (root.properties.containsKey(part.getKey())) {
-                    return pathSchemaInner(root.properties.get(part.getKey()), root, path.getTail(), !inProperties && "properties".equals(part.getKey()), resolver);
-                } else if (schema.__dollar__ref != null) {
-                    Either<Schema, String> eitherSchema = resolver.resolveRef(schema.__dollar__ref);
+                } else if (root.getProperties().containsKey(part.getKey())) {
+                    return pathSchemaInner(root.getProperties().get(part.getKey()), root, path.getTail(), !inProperties && "properties".equals(part.getKey()), resolver);
+                } else if (schema.get__dollar__ref() != null) {
+                    Either<Schema, String> eitherSchema = resolver.resolveRef(schema.get__dollar__ref());
                     if (eitherSchema.isFirst()) {
                         return pathSchemaInner(eitherSchema.getFirst(), eitherSchema.getFirst(), path, false, resolver);
                     } else {
@@ -36,10 +36,10 @@ public class Pather {
                     return Either.makeSecond("Expected object: "+path+" "+schema);
                 }
             } else {
-                if (!schema.type.equals("array") || schema.items == null) {
+                if (!schema.getType().equals("array") || schema.getItems() == null) {
                     return Either.makeSecond("Expected array: "+path+" "+schema);
                 } else {
-                    return pathSchemaInner(schema.items, root, path.getTail(), false, resolver);
+                    return pathSchemaInner(schema.getItems(), root, path.getTail(), false, resolver);
                 }
             }
         }

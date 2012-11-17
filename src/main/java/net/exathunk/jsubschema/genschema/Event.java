@@ -7,27 +7,27 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Event implements Cloneable, Serializable, EventLike {
 
-    public String dtstart;
+    private String dtstart;
 
-    public String dtend;
+    private String dtend;
 
-    public String summary;
+    private String summary;
 
-    public String location;
+    private String location;
 
-    public String url;
+    private String url;
 
-    public String duration;
+    private String duration;
 
-    public String rdate;
+    private String rdate;
 
-    public String rrule;
+    private String rrule;
 
-    public String category;
+    private String category;
 
-    public String description;
+    private String description;
 
-    public Geo geo;
+    private Geo geo;
 
     @Override
     public boolean hasDtstart() {

@@ -7,19 +7,19 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Address implements Cloneable, Serializable, AddressLike {
 
-    public String post__dash__office__dash__box;
+    private String post__dash__office__dash__box;
 
-    public String extended__dash__address;
+    private String extended__dash__address;
 
-    public String street__dash__address;
+    private String street__dash__address;
 
-    public String locality;
+    private String locality;
 
-    public String region;
+    private String region;
 
-    public String postal__dash__code;
+    private String postal__dash__code;
 
-    public String country__dash__name;
+    private String country__dash__name;
 
     @Override
     public boolean hasPost__dash__office__dash__box() {

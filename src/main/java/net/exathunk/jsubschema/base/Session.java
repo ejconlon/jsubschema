@@ -32,8 +32,8 @@ public class Session {
     }
 
     public void addSchema(Schema schema) {
-        if (schema.id == null) throw new IllegalArgumentException("Null id in "+schema);
-        schemas.put(schema.id, schema);
+        if (schema.getId() == null) throw new IllegalArgumentException("Null id in "+schema);
+        schemas.put(schema.getId(), schema);
     }
 
     public void addBinder(DomainFactory factory) {

@@ -6,7 +6,7 @@ package net.exathunk.jsubschema.base;
 public class TypeValidator implements Validator {
     @Override
     public void validate(PathTuple tuple, VContext context) {
-        final String schemaType = tuple.eitherSchema.getFirst().type;
+        final String schemaType = tuple.eitherSchema.getFirst().getType();
         if (schemaType == null) {
             context.errors.add(new VError(tuple.path, "no schema type"));
         }

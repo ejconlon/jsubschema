@@ -7,13 +7,13 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Link implements Cloneable, Serializable, LinkLike {
 
-    public String href;
+    private String href;
 
-    public String rel;
+    private String rel;
 
-    public String method;
+    private String method;
 
-    public String enctype;
+    private String enctype;
 
     @Override
     public boolean hasHref() {

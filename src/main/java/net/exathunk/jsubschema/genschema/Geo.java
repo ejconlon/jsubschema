@@ -7,9 +7,9 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Geo implements Cloneable, Serializable, GeoLike {
 
-    public Double latitude;
+    private Double latitude;
 
-    public Double longitude;
+    private Double longitude;
 
     @Override
     public boolean hasLatitude() {

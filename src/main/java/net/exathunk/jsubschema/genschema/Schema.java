@@ -7,27 +7,27 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Schema implements Cloneable, Serializable, SchemaLike {
 
-    public String type;
+    private String type;
 
-    public String description;
+    private String description;
 
-    public String format;
+    private String format;
 
-    public Map<String, Schema> properties;
+    private Map<String, Schema> properties;
 
-    public Map<String, Schema> declarations;
+    private Map<String, Schema> declarations;
 
-    public String id;
+    private String id;
 
-    public String __dollar__ref;
+    private String __dollar__ref;
 
-    public Schema items;
+    private Schema items;
 
-    public Boolean required;
+    private Boolean required;
 
-    public List<String> requires;
+    private List<String> requires;
 
-    public List<String> forbids;
+    private List<String> forbids;
 
     @Override
     public boolean hasType() {

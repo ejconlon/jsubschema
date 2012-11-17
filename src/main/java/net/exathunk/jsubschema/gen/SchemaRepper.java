@@ -13,7 +13,7 @@ public class SchemaRepper {
     public static ClassRep makeClass(Schema schema, String basePackageName) {
         final ClassRep c = new ClassRep();
         c.type = ClassRep.TYPE.CLASS;
-        c.name = parseClassName(schema.id);
+        c.name = parseClassName(schema.getId());
         c.packageName = basePackageName;
         c.imports.add("java.util.List");
         c.imports.add("java.util.Map");
@@ -22,7 +22,7 @@ public class SchemaRepper {
         c.implemented.add("Cloneable");
         c.implemented.add("Serializable");
         c.implemented.add(c.name+"Like");
-        for (Map.Entry<String, Schema> entry : schema.properties.entrySet()) {
+        for (Map.Entry<String, Schema> entry : schema.getProperties().entrySet()) {
             final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.name);
             c.fields.add(field);
             c.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
@@ -55,7 +55,7 @@ public class SchemaRepper {
     public static ClassRep makeFactory(Schema schema, String basePackageName) {
         final ClassRep c = new ClassRep();
         c.type = ClassRep.TYPE.CLASS;
-        String baseName = parseClassName(schema.id);
+        String baseName = parseClassName(schema.getId());
         c.name = baseName+"Factory";
         c.packageName = basePackageName;
         c.imports.add("net.exathunk.jsubschema.gendeps.DomainFactory");
@@ -104,22 +104,22 @@ public class SchemaRepper {
     }
 
     private static String typeOf(Schema schema, String rootClassName) {
-        if (schema.type.equals("object")) {
-            if (schema.__dollar__ref != null) {
-                if (schema.__dollar__ref.equals("#")) return rootClassName;
-                else return parseClassName(schema.__dollar__ref);
+        if (schema.getType().equals("object")) {
+            if (schema.get__dollar__ref() != null) {
+                if (schema.get__dollar__ref().equals("#")) return rootClassName;
+                else return parseClassName(schema.get__dollar__ref());
             } else {
-                return "Map<String, "+typeOf(schema.items, rootClassName)+">";
+                return "Map<String, "+typeOf(schema.getItems(), rootClassName)+">";
             }
-        } else if (schema.type.equals("array")) {
-            return "List<"+typeOf(schema.items, rootClassName)+">";
-        } else if (schema.type.equals("string")) {
+        } else if (schema.getType().equals("array")) {
+            return "List<"+typeOf(schema.getItems(), rootClassName)+">";
+        } else if (schema.getType().equals("string")) {
             return "String";
-        } else if (schema.type.equals("boolean")) {
+        } else if (schema.getType().equals("boolean")) {
             return "Boolean";
-        } else if (schema.type.equals("integer")) {
+        } else if (schema.getType().equals("integer")) {
             return "Long";
-        } else if (schema.type.equals("number")) {
+        } else if (schema.getType().equals("number")) {
             return "Double";
         } else {
             throw new IllegalArgumentException("Cannot type: "+schema);
@@ -128,7 +128,7 @@ public class SchemaRepper {
 
     private static FieldRep makeField(String key, Schema schema, String rootClassName) {
         final FieldRep f = new FieldRep();
-        f.visibility = Visibility.PUBLIC; // TODO change to private
+        f.visibility = Visibility.PRIVATE;
         f.name = Util.convert(key);
         f.className = typeOf(schema, rootClassName);
         return f;
