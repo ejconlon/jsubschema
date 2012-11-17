@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
-@JsonTypeInfo(defaultImpl = Schema.class, use = JsonTypeInfo.Id.CLASS)
+@JsonTypeInfo(defaultImpl = Schema.class, use = JsonTypeInfo.Id.NONE)
 public interface SchemaLike {
 
     boolean hasType();
@@ -38,6 +39,7 @@ public interface SchemaLike {
     Map<String, SchemaLike> getProperties();
 
     @JsonProperty("properties")
+    @JsonDeserialize(contentAs = Schema.class)
     void setProperties(Map<String, SchemaLike> properties);
 
     boolean hasDeclarations();
@@ -46,6 +48,7 @@ public interface SchemaLike {
     Map<String, SchemaLike> getDeclarations();
 
     @JsonProperty("declarations")
+    @JsonDeserialize(contentAs = Schema.class)
     void setDeclarations(Map<String, SchemaLike> declarations);
 
     boolean hasId();
@@ -70,6 +73,7 @@ public interface SchemaLike {
     SchemaLike getItems();
 
     @JsonProperty("items")
+    @JsonDeserialize(as = Schema.class)
     void setItems(SchemaLike items);
 
     boolean hasRequired();

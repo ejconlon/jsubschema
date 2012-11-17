@@ -58,6 +58,16 @@ public class GenUtil {
             final MethodRep method = new MethodRep();
             method.classAnnotations.add(new AnnotationRep("@Override"));
             method.interfaceAnnotations.add(new AnnotationRep("@JsonProperty(\""+Util.unconvert(fieldRep.name)+"\")"));
+            if (fieldRep.className.endsWith("Like") || fieldRep.className.endsWith("Like>")) {
+                if (fieldRep.className.startsWith("Map<") || fieldRep.className.startsWith("List<")) {
+                    final int space = fieldRep.className.lastIndexOf(" ");
+                    final String className = fieldRep.className.substring(space+1, fieldRep.className.length()-"Like>".length());
+                    method.interfaceAnnotations.add(new AnnotationRep("@JsonDeserialize(contentAs = "+className+".class)"));
+                } else {
+                    final String className = fieldRep.className.substring(0, fieldRep.className.length()-"Like".length());
+                    method.interfaceAnnotations.add(new AnnotationRep("@JsonDeserialize(as = "+className+".class)"));
+                }
+            }
             method.name = "set"+ Util.capitalize(fieldRep.name);
             method.returns = "void";
             FieldRep otherField = new FieldRep();

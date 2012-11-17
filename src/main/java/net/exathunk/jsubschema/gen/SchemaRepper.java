@@ -40,12 +40,13 @@ public class SchemaRepper {
         ClassRep interfaceRep = new ClassRep();
         interfaceRep.type = ClassRep.TYPE.INTERFACE;
         interfaceRep.name = classRep.name+"Like";
-        interfaceRep.interfaceAnnotations.add(new AnnotationRep("@JsonTypeInfo(defaultImpl = "+classRep.name+".class, use = JsonTypeInfo.Id.CLASS)"));
+        interfaceRep.interfaceAnnotations.add(new AnnotationRep("@JsonTypeInfo(defaultImpl = "+classRep.name+".class, use = JsonTypeInfo.Id.NONE)"));
         interfaceRep.packageName = classRep.packageName;
         interfaceRep.imports.add("java.util.List");
         interfaceRep.imports.add("java.util.Map");
         interfaceRep.imports.add("org.codehaus.jackson.annotate.JsonProperty");
         interfaceRep.imports.add("org.codehaus.jackson.annotate.JsonTypeInfo");
+        interfaceRep.imports.add("org.codehaus.jackson.map.annotate.JsonDeserialize");
         for (FieldRep field : classRep.fields) {
             interfaceRep.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
             interfaceRep.methods.add(new GenUtil.GetAccessorGen().genAccessor(field));

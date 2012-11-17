@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
-@JsonTypeInfo(defaultImpl = Event.class, use = JsonTypeInfo.Id.CLASS)
+@JsonTypeInfo(defaultImpl = Event.class, use = JsonTypeInfo.Id.NONE)
 public interface EventLike {
 
     boolean hasDtstart();
@@ -94,6 +95,7 @@ public interface EventLike {
     GeoLike getGeo();
 
     @JsonProperty("geo")
+    @JsonDeserialize(as = Geo.class)
     void setGeo(GeoLike geo);
 
 }
