@@ -24,11 +24,11 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
 
     private SchemaLike items;
 
-    private Boolean required;
-
     private List<String> requires;
 
     private List<String> forbids;
+
+    private List<String> requiredList;
 
     @Override
     public boolean hasType() {
@@ -151,21 +151,6 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    public boolean hasRequired() {
-        return null != required;
-    }
-
-    @Override
-    public Boolean getRequired() {
-        return required;
-    }
-
-    @Override
-    public void setRequired(Boolean required) {
-        this.required = required;
-    }
-
-    @Override
     public boolean hasRequires() {
         return null != requires;
     }
@@ -196,6 +181,21 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
+    public boolean hasRequiredList() {
+        return null != requiredList;
+    }
+
+    @Override
+    public List<String> getRequiredList() {
+        return requiredList;
+    }
+
+    @Override
+    public void setRequiredList(List<String> requiredList) {
+        this.requiredList = requiredList;
+    }
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Schema{ ");
         if (type != null) sb.append("type='").append(type).append("', ");
@@ -206,9 +206,9 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         if (id != null) sb.append("id='").append(id).append("', ");
         if (__dollar__ref != null) sb.append("__dollar__ref='").append(__dollar__ref).append("', ");
         if (items != null) sb.append("items='").append(items).append("', ");
-        if (required != null) sb.append("required='").append(required).append("', ");
         if (requires != null) sb.append("requires='").append(requires).append("', ");
         if (forbids != null) sb.append("forbids='").append(forbids).append("', ");
+        if (requiredList != null) sb.append("requiredList='").append(requiredList).append("', ");
         return sb.append("}").toString();
     }
 
@@ -233,12 +233,12 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!__dollar__ref.equals(other.get__dollar__ref())) { return false; }
             if (items == null) { if (other.hasItems()) { return false; } }
             else if (!items.equals(other.getItems())) { return false; }
-            if (required == null) { if (other.hasRequired()) { return false; } }
-            else if (!required.equals(other.getRequired())) { return false; }
             if (requires == null) { if (other.hasRequires()) { return false; } }
             else if (!requires.equals(other.getRequires())) { return false; }
             if (forbids == null) { if (other.hasForbids()) { return false; } }
             else if (!forbids.equals(other.getForbids())) { return false; }
+            if (requiredList == null) { if (other.hasRequiredList()) { return false; } }
+            else if (!requiredList.equals(other.getRequiredList())) { return false; }
             return true;
         } else {
             return false;
@@ -256,9 +256,9 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         result = 31 * result + (id == null ? 0 : id.hashCode());
         result = 31 * result + (__dollar__ref == null ? 0 : __dollar__ref.hashCode());
         result = 31 * result + (items == null ? 0 : items.hashCode());
-        result = 31 * result + (required == null ? 0 : required.hashCode());
         result = 31 * result + (requires == null ? 0 : requires.hashCode());
         result = 31 * result + (forbids == null ? 0 : forbids.hashCode());
+        result = 31 * result + (requiredList == null ? 0 : requiredList.hashCode());
         return result;
     }
 
@@ -280,12 +280,12 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!__dollar__ref.equals(other.get__dollar__ref())) { s.add("__dollar__ref"); }
             if (items == null) { if (other == null || other.hasItems()) { s.add("items"); } }
             else if (!items.equals(other.getItems())) { s.add("items"); }
-            if (required == null) { if (other == null || other.hasRequired()) { s.add("required"); } }
-            else if (!required.equals(other.getRequired())) { s.add("required"); }
             if (requires == null) { if (other == null || other.hasRequires()) { s.add("requires"); } }
             else if (!requires.equals(other.getRequires())) { s.add("requires"); }
             if (forbids == null) { if (other == null || other.hasForbids()) { s.add("forbids"); } }
             else if (!forbids.equals(other.getForbids())) { s.add("forbids"); }
+            if (requiredList == null) { if (other == null || other.hasRequiredList()) { s.add("requiredList"); } }
+            else if (!requiredList.equals(other.getRequiredList())) { s.add("requiredList"); }
             return s;
     }
 

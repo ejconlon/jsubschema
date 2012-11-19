@@ -2,15 +2,15 @@
 	"id" : "http://exathunk.net/schema/link",
 	"type" : "object",
 
+    "requiredList" : ["href", "rel"],
+
 	"properties" : {
 		"href" : {
-			"type" : "string",
-			"required": true
+			"type" : "string"
 		},
 
 		"rel" : {
-			"type" : "string",
-			"required": true
+			"type" : "string"
 		},
 
 		"method" : {

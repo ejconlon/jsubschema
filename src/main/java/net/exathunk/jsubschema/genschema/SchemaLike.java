@@ -75,14 +75,6 @@ public interface SchemaLike {
     @JsonDeserialize(as = Schema.class)
     void setItems(SchemaLike items);
 
-    boolean hasRequired();
-
-    @JsonProperty("required")
-    Boolean getRequired();
-
-    @JsonProperty("required")
-    void setRequired(Boolean required);
-
     boolean hasRequires();
 
     @JsonProperty("requires")
@@ -98,5 +90,13 @@ public interface SchemaLike {
 
     @JsonProperty("forbids")
     void setForbids(List<String> forbids);
+
+    boolean hasRequiredList();
+
+    @JsonProperty("requiredList")
+    List<String> getRequiredList();
+
+    @JsonProperty("requiredList")
+    void setRequiredList(List<String> requiredList);
 
 }

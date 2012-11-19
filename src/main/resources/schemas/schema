@@ -13,11 +13,26 @@
     }
   },
 
+  "requiredList": ["type", "$ref"],
+
+  /*"forbidsMap" : {
+    "type" : ["$ref"],
+    "properties" : ["items"],
+    "items" : ["properties"]
+  },
+
+  "allowsMap" : {
+    "$ref" : []
+  },
+
+  "dependenciesMap" : {
+
+  }, */
+
   "properties" : {
 
     "type" : {
       "type" : "string",
-      "required" : true,
       "forbids" : ["$ref"]
     },
 
@@ -50,17 +65,12 @@
 
     "$ref" : {
       "type" : "string",
-      "required" : true,
       "forbids" : ["id", "description", "format", "properties", "declarations", "items", "type"]
     },
 
     "items" : {
       "$ref" : "#",
       "forbids" : ["properties"]
-    },
-
-    "required" : {
-      "type" : "boolean"
     },
 
     "requires" : {
@@ -75,16 +85,16 @@
       "items" : {
           "type": "string"
       }
-    }
+    },
 
-    /*, "requiredList" : {
+    "requiredList" : {
       "type" : "array",
       "items" : {
         "type" : "string"
       }
-    },
+    }
 
-    "dependenciesMap" : {
+    /*, "dependenciesMap" : {
       "type" : "object",
       "items" : {
           "$ref" : "#/declarations/stringArray"

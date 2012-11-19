@@ -4,7 +4,8 @@ import net.exathunk.jsubschema.base.SchemaTuple;
 import net.exathunk.jsubschema.genschema.SchemaLike;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * charolastra 11/16/12 12:51 PM
@@ -14,36 +15,36 @@ public class RequiredValidator implements Validator {
     public void validate(SchemaTuple tuple, VContext context) {
         if (tuple.getRefTuple().getNode().isObject()) {
             final SchemaLike schema = tuple.getEitherSchema().getFirst().getSchema();
-            if (schema.getProperties() != null) {
-                for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
-                    if (Boolean.TRUE.equals(entry.getValue().getRequired())) {
-                        if (!tuple.getRefTuple().getNode().has(entry.getKey())) {
-                            // The key is missing, but may be omitted if a mutually-forbidden AND REQUIRED key is present
-                            boolean skippable = false;
-                            final List<String> forbids = entry.getValue().getForbids();
-                            if (forbids != null) {
-                                for (String f : forbids) {
-                                    if (tuple.getRefTuple().getNode().has(f)) {
-                                        final SchemaLike subSchema = schema.getProperties().get(f);
-                                        if (Boolean.TRUE.equals(subSchema.getRequired())) {
-                                            final List<String> nextForbids = schema.getProperties().get(f).getForbids();
-                                            if (nextForbids != null) {
-                                                for (String f2 : nextForbids) {
-                                                    if (f2.equals(entry.getKey())) {
-                                                        skippable = true;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (!skippable)
-                                context.errors.add(
-                                        new VError(tuple.getRefTuple().getReference(), "Missing required key: "+entry.getKey()));
+            final List<String> requiredKeys = schema.getRequiredList();
+            if (requiredKeys != null) {
+                if (schema.getProperties() == null) {
+                    context.errors.add(new VError(tuple.getRefTuple().getReference(), "No properties"));
+                } else {
+                    final Set<String> missingKeys = new TreeSet<String>();
+                    for (String requiredKey : requiredKeys) {
+                        if (!tuple.getRefTuple().getNode().has(requiredKey)) {
+                            missingKeys.add(requiredKey);
                         }
+                    }
+                    for (String missingKey : missingKeys) {
+                        boolean skip = false;
+                        final List<String> forbids = schema.getProperties().get(missingKey).getForbids();
+                        if (forbids != null) {
+                           for (String forbidden : forbids) {
+                               if (tuple.getRefTuple().getNode().has(forbidden) && requiredKeys.contains(forbidden)) {
+                                   final List<String> forbids2 = schema.getProperties().get(forbidden).getForbids();
+                                   if (forbids2 != null) {
+                                       if (forbids2.contains(missingKey)) {
+                                           skip = true;
+                                           break;
+                                       }
+                                   }
+                               }
+                           }
+                        }
+                        if (!skip)
+                            context.errors.add(
+                                new VError(tuple.getRefTuple().getReference(), "Missing required key: "+missingKey));
                     }
                 }
             }
