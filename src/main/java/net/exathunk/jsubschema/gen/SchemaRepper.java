@@ -109,13 +109,11 @@ public class SchemaRepper {
     }
 
     private static String typeOf(SchemaLike schema, String rootClassName) {
-        if (schema.getType().equals("object")) {
-            if (schema.get__dollar__ref() != null) {
-                if (schema.get__dollar__ref().equals("#")) return rootClassName;
-                else return parseClassName(schema.get__dollar__ref())+"Like";
-            } else {
-                return "Map<String, "+typeOf(schema.getItems(), rootClassName)+">";
-            }
+        if (!schema.hasType() && schema.has__dollar__ref()) {
+            if (schema.get__dollar__ref().equals("#")) return rootClassName;
+            else return parseClassName(schema.get__dollar__ref())+"Like";
+        } else if (schema.getType().equals("object")) {
+            return "Map<String, "+typeOf(schema.getItems(), rootClassName)+">";
         } else if (schema.getType().equals("array")) {
             return "List<"+typeOf(schema.getItems(), rootClassName)+">";
         } else if (schema.getType().equals("string")) {

@@ -108,6 +108,18 @@ public class TestValidation {
             VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
             assertEquals(1, context.errors.size());
         }
+
+        {
+            JsonNode node = Util.parse("{ \"type\": \"string\" }");
+            VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
+            assertEquals(new ArrayList<VError>(), context.errors);
+        }
+
+        {
+            JsonNode node = Util.parse("{ \"$ref\": \"bar\" }");
+            VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
+            assertEquals(new ArrayList<VError>(), context.errors);
+        }
     }
 
     @Test
@@ -126,13 +138,13 @@ public class TestValidation {
         }
 
         {
-            JsonNode node = Util.parse("{ \"type\": \"object\", \"$ref\":\"bar\" }");
+            JsonNode node = Util.parse("{ \"$ref\":\"bar\" }");
             VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
             assertEquals(new ArrayList<VError>(), context.errors);
         }
 
         {
-            JsonNode node = Util.parse("{ \"type\": \"object\", \"id\":\"foo\", \"$ref\":\"bar\" }");
+            JsonNode node = Util.parse("{ \"id\":\"foo\", \"$ref\":\"bar\" }");
             VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
             assertEquals(2, context.errors.size());
         }

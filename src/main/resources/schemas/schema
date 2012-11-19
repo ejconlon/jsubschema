@@ -8,7 +8,8 @@
 
     "type" : {
       "type" : "string",
-      "required" : true
+      "required" : true,
+      "forbids" : ["$ref"]
     },
 
     "description" : {
@@ -22,7 +23,6 @@
     "properties" : {
       "type" : "object",
       "items" : {
-        "type" : "object",
         "$ref" : "#"
       },
       "forbids" : ["items"]
@@ -31,7 +31,6 @@
     "declarations" : {
       "type" : "object",
       "items" : {
-        "type" : "object",
         "$ref" : "#"
       }
     },
@@ -43,13 +42,11 @@
 
     "$ref" : {
       "type" : "string",
-      "forbids" : ["id", "description", "format", "properties", "declarations", "items", "required", "requires", "forbids"]
+      "forbids" : ["id", "description", "format", "properties", "declarations", "items", "required", "requires", "forbids", "type"]
     },
 
     "items" : {
-      "type" : "object",
-      "$ref" : "#",
-      "forbids" : ["properties"]
+      "$ref" : "#"
     },
 
     "required" : {
