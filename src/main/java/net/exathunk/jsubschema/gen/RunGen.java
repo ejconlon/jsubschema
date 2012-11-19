@@ -59,9 +59,8 @@ public class RunGen {
             }
             final JsonNode node = Util.parse(contents.toString());
             final Schema schema = Util.quickBind(node, new SchemaFactory());
-            putGenned(genned, SchemaRepper.makeClass(schema, basePackage));
-            putGenned(genned, SchemaRepper.makeInterface(schema, basePackage));
-            putGenned(genned, SchemaRepper.makeFactory(schema, basePackage));
+
+            SchemaRepper.makeAll(schema, basePackage, genned);
         }
 
         for (Map.Entry<String, ClassRep> entry : genned.entrySet()) {
@@ -81,10 +80,6 @@ public class RunGen {
             bufferedWriter.close();
         }
 
-    }
-
-    private static void putGenned(Map<String, ClassRep> genned, ClassRep classRep) {
-        genned.put(classRep.name, classRep);
     }
 
 }

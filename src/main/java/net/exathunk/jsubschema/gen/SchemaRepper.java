@@ -1,6 +1,7 @@
 package net.exathunk.jsubschema.gen;
 
 import net.exathunk.jsubschema.Util;
+import net.exathunk.jsubschema.genschema.Schema;
 import net.exathunk.jsubschema.genschema.SchemaLike;
 
 import java.util.Map;
@@ -137,4 +138,13 @@ public class SchemaRepper {
         return f;
     }
 
+    public static void makeAll(Schema schema, String basePackage, Map<String, ClassRep> genned) {
+        putGenned(genned, SchemaRepper.makeClass(schema, basePackage));
+        putGenned(genned, SchemaRepper.makeInterface(schema, basePackage));
+        putGenned(genned, SchemaRepper.makeFactory(schema, basePackage));
+    }
+
+    private static void putGenned(Map<String, ClassRep> genned, ClassRep classRep) {
+        genned.put(classRep.name, classRep);
+    }
 }
