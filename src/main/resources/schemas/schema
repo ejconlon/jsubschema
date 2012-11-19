@@ -13,7 +13,7 @@
     }
   },
 
-  "requiredList": ["type", "$ref"],
+  "required": ["type", "$ref"],
 
   /*"forbidsMap" : {
     "type" : ["$ref"],
@@ -87,7 +87,7 @@
       }
     },
 
-    "requiredList" : {
+    "required" : {
       "type" : "array",
       "items" : {
         "type" : "string"

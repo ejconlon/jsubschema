@@ -2,7 +2,7 @@
 	"id" : "http://exathunk.net/schema/link",
 	"type" : "object",
 
-    "requiredList" : ["href", "rel"],
+    "required" : ["href", "rel"],
 
 	"properties" : {
 		"href" : {

@@ -28,7 +28,7 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
 
     private List<String> forbids;
 
-    private List<String> requiredList;
+    private List<String> required;
 
     @Override
     public boolean hasType() {
@@ -181,18 +181,18 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    public boolean hasRequiredList() {
-        return null != requiredList;
+    public boolean hasRequired() {
+        return null != required;
     }
 
     @Override
-    public List<String> getRequiredList() {
-        return requiredList;
+    public List<String> getRequired() {
+        return required;
     }
 
     @Override
-    public void setRequiredList(List<String> requiredList) {
-        this.requiredList = requiredList;
+    public void setRequired(List<String> required) {
+        this.required = required;
     }
 
     @Override
@@ -208,7 +208,7 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         if (items != null) sb.append("items='").append(items).append("', ");
         if (requires != null) sb.append("requires='").append(requires).append("', ");
         if (forbids != null) sb.append("forbids='").append(forbids).append("', ");
-        if (requiredList != null) sb.append("requiredList='").append(requiredList).append("', ");
+        if (required != null) sb.append("required='").append(required).append("', ");
         return sb.append("}").toString();
     }
 
@@ -237,8 +237,8 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!requires.equals(other.getRequires())) { return false; }
             if (forbids == null) { if (other.hasForbids()) { return false; } }
             else if (!forbids.equals(other.getForbids())) { return false; }
-            if (requiredList == null) { if (other.hasRequiredList()) { return false; } }
-            else if (!requiredList.equals(other.getRequiredList())) { return false; }
+            if (required == null) { if (other.hasRequired()) { return false; } }
+            else if (!required.equals(other.getRequired())) { return false; }
             return true;
         } else {
             return false;
@@ -258,7 +258,7 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         result = 31 * result + (items == null ? 0 : items.hashCode());
         result = 31 * result + (requires == null ? 0 : requires.hashCode());
         result = 31 * result + (forbids == null ? 0 : forbids.hashCode());
-        result = 31 * result + (requiredList == null ? 0 : requiredList.hashCode());
+        result = 31 * result + (required == null ? 0 : required.hashCode());
         return result;
     }
 
@@ -284,8 +284,8 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!requires.equals(other.getRequires())) { s.add("requires"); }
             if (forbids == null) { if (other == null || other.hasForbids()) { s.add("forbids"); } }
             else if (!forbids.equals(other.getForbids())) { s.add("forbids"); }
-            if (requiredList == null) { if (other == null || other.hasRequiredList()) { s.add("requiredList"); } }
-            else if (!requiredList.equals(other.getRequiredList())) { s.add("requiredList"); }
+            if (required == null) { if (other == null || other.hasRequired()) { s.add("required"); } }
+            else if (!required.equals(other.getRequired())) { s.add("required"); }
             return s;
     }
 

@@ -1,9 +1,10 @@
 package net.exathunk.jsubschema.genschema;
 
-import java.util.List;
-import java.util.Map;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
+
+import java.util.List;
+import java.util.Map;
 
 @JsonDeserialize(as = Schema.class)
 public interface SchemaLike {
@@ -91,12 +92,12 @@ public interface SchemaLike {
     @JsonProperty("forbids")
     void setForbids(List<String> forbids);
 
-    boolean hasRequiredList();
+    boolean hasRequired();
 
-    @JsonProperty("requiredList")
-    List<String> getRequiredList();
+    @JsonProperty("required")
+    List<String> getRequired();
 
-    @JsonProperty("requiredList")
-    void setRequiredList(List<String> requiredList);
+    @JsonProperty("required")
+    void setRequired(List<String> required);
 
 }

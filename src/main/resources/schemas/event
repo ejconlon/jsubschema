@@ -3,7 +3,7 @@
 	"description": "A representation of an event",
 	"type": "object",
 
-	"requiredList" : ["dtstart", "summary"],
+	"required" : ["dtstart", "summary"],
 
 	"properties": {
 		"dtstart": {

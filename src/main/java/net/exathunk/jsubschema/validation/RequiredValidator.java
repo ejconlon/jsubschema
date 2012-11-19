@@ -15,7 +15,7 @@ public class RequiredValidator implements Validator {
     public void validate(SchemaTuple tuple, VContext context) {
         if (tuple.getRefTuple().getNode().isObject()) {
             final SchemaLike schema = tuple.getEitherSchema().getFirst().getSchema();
-            final List<String> requiredKeys = schema.getRequiredList();
+            final List<String> requiredKeys = schema.getRequired();
             if (requiredKeys != null) {
                 if (schema.getProperties() == null) {
                     context.errors.add(new VError(tuple.getRefTuple().getReference(), "No properties"));
