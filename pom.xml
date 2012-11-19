@@ -61,7 +61,7 @@
                                             <arg value="${classpath}"/>
                                             <arg value="net.exathunk.jsubschema.gen.RunGen"/>
                                             <arg value="src/main/resources/schemas"/>
-                                            <arg value="target/generated-sources/gen-javabean/net/exathunk/jsubschema/genschema"/>
+                                            <arg value="target/generated-sources/gen-javabean"/>
                                             <arg value="net.exathunk.jsubschema.genschema"/>
                                         </exec>
                                         <delete>

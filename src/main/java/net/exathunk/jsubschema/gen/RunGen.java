@@ -73,7 +73,18 @@ public class RunGen {
                 contents = Assembler.writeClass(classRep);
             }
 
-            final File f = new File(dest, className+".java");
+            String[] parts = className.split("\\.");
+            StringBuilder dsb = new StringBuilder(destDir);
+            if (!destDir.endsWith("/") && parts.length > 0) dsb.append("/");
+            for (int i = 0; i < parts.length - 1; ++i) {
+                dsb.append(parts[i]);
+                if (i < parts.length - 2) {
+                    dsb.append("/");
+                }
+            }
+            final File d = new File(dsb.toString());
+            d.mkdirs();
+            final File f = new File(d, parts[parts.length-1]+".java");
             FileWriter writer = new FileWriter(f);
             BufferedWriter bufferedWriter = new BufferedWriter(writer);
             bufferedWriter.write(contents, 0, contents.length());

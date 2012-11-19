@@ -35,6 +35,8 @@ public class SchemaRepper {
 
         c.methods.add(new GenUtil.DiffMethodGen().genMethod(c));
 
+        assert c.innerClasses.isEmpty();
+
         return c;
     }
 
@@ -139,12 +141,12 @@ public class SchemaRepper {
     }
 
     public static void makeAll(Schema schema, String basePackage, Map<String, ClassRep> genned) {
-        putGenned(genned, SchemaRepper.makeClass(schema, basePackage));
-        putGenned(genned, SchemaRepper.makeInterface(schema, basePackage));
-        putGenned(genned, SchemaRepper.makeFactory(schema, basePackage));
+        putGenned(SchemaRepper.makeClass(schema, basePackage), genned);
+        putGenned(SchemaRepper.makeInterface(schema, basePackage), genned);
+        putGenned(SchemaRepper.makeFactory(schema, basePackage), genned);
     }
 
-    private static void putGenned(Map<String, ClassRep> genned, ClassRep classRep) {
-        genned.put(classRep.name, classRep);
+    private static void putGenned(ClassRep classRep, Map<String, ClassRep> genned) {
+        genned.put(classRep.packageName + "." + classRep.name, classRep);
     }
 }
