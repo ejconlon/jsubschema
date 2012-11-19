@@ -18,7 +18,7 @@ public class SelfResolver implements RefResolver {
     }
 
     @Override
-    public Either3<SchemaLike, String, Reference> resolveRef(Reference reference) {
+    public Either3<SchemaRef, String, Reference> resolveRef(Reference reference) {
         if (reference.getUrl().isEmpty() || selfRef.getUrl().equals(reference.getUrl())) {
             return Pather.pathSchema(self, reference);
         } else {

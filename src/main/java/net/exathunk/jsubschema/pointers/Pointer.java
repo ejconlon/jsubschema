@@ -128,4 +128,9 @@ public class Pointer implements Comparable<Pointer>, Consable<Part, Pointer>, Re
     public Iterator<Part> iterator() {
         return parts.iterator();
     }
+
+    public int size() {
+        if (isEmpty()) return 0;
+        else return 1 + getTail().size();
+    }
 }

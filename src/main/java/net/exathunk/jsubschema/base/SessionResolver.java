@@ -15,10 +15,10 @@ public class SessionResolver implements RefResolver {
     }
 
     @Override
-    public Either3<SchemaLike, String, Reference> resolveRef(Reference reference) {
+    public Either3<SchemaRef, String, Reference> resolveRef(Reference reference) {
         SchemaLike maybeSchema = session.schemas.get(reference);
         if (maybeSchema != null) {
-            return Either3.makeFirst(maybeSchema);
+            return Either3.makeFirst(new SchemaRef(maybeSchema, reference));
         } else {
             maybeSchema = session.schemas.get(reference.withoutPointer());
             if (maybeSchema != null) {

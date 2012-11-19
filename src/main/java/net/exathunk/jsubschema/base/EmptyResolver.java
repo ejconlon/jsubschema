@@ -10,12 +10,12 @@ import net.exathunk.jsubschema.pointers.Reference;
  */
 public class EmptyResolver implements RefResolver, FullRefResolver {
     @Override
-    public Either3<SchemaLike, String, Reference> resolveRef(Reference reference) {
+    public Either3<SchemaRef, String, Reference> resolveRef(Reference reference) {
         return Either3.makeSecond("Empty resolver will never resolve: "+reference.toReferenceString());
     }
 
     @Override
-    public Either<SchemaLike, String> fullyResolveRef(Either3<SchemaLike, String, Reference> either3) {
+    public Either<SchemaRef, String> fullyResolveRef(Either3<SchemaRef, String, Reference> either3) {
         return Either.makeSecond("Empty resolver will never resolve: "+either3);
     }
 }

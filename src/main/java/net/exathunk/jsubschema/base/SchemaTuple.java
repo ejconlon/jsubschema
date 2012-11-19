@@ -11,15 +11,15 @@ import java.util.Iterator;
  * charolastra 11/17/12 2:10 AM
  */
 public class SchemaTuple implements Iterable<SchemaTuple> {
-    private final Either<SchemaLike, String> eitherSchema;
+    private final Either<SchemaRef, String> eitherSchema;
     private final RefTuple refTuple;
     private final FullRefResolver fullRefResolver;
 
     public SchemaTuple(SchemaLike schema, RefTuple refTuple, FullRefResolver fullRefResolver) {
-        this(Either.<SchemaLike, String>makeFirst(schema), refTuple, fullRefResolver);
+        this(Either.<SchemaRef, String>makeFirst(new SchemaRef(schema, refTuple.getReference().withDefaultId(schema.getId()))), refTuple, fullRefResolver);
     }
 
-    private SchemaTuple(Either<SchemaLike, String> eitherSchema, RefTuple refTuple, FullRefResolver fullRefResolver) {
+    private SchemaTuple(Either<SchemaRef, String> eitherSchema, RefTuple refTuple, FullRefResolver fullRefResolver) {
         this.eitherSchema = eitherSchema;
         this.refTuple = refTuple;
         this.fullRefResolver = fullRefResolver;
@@ -30,7 +30,7 @@ public class SchemaTuple implements Iterable<SchemaTuple> {
         return new SchemaTupleIterator(this);
     }
 
-    public Either<SchemaLike, String> getEitherSchema() {
+    public Either<SchemaRef, String> getEitherSchema() {
         return eitherSchema;
     }
 
@@ -55,7 +55,7 @@ public class SchemaTuple implements Iterable<SchemaTuple> {
         @Override
         public SchemaTuple next() {
             final RefTuple next = it.next();
-            final Either<SchemaLike, String> eitherSchema = root.fullRefResolver.fullyResolveRef(Either3.<SchemaLike, String, Reference>makeThird(next.getReference()));
+            final Either<SchemaRef, String> eitherSchema = root.fullRefResolver.fullyResolveRef(Either3.<SchemaRef, String, Reference>makeThird(next.getReference()));
             return new SchemaTuple(eitherSchema, next, root.fullRefResolver);
         }
 

@@ -132,4 +132,18 @@ public class Reference implements Comparable<Reference>, Consable<Part, Referenc
             return pointer.compareTo(reference.pointer);
         }
     }
+
+    public Reference consAll(Pointer nextParts) {
+        assert nextParts.getDirection().equals(Direction.UP);
+        Reference r = this;
+        for (Part part : nextParts) {
+            r = r.cons(part);
+        }
+        return r;
+    }
+
+    public Reference withDefaultId(String id) {
+        if (id == null || url.length() > 0) return this;
+        else return new Reference(id, getPointer());
+    }
 }

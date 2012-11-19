@@ -1,0 +1,13 @@
+{
+  "props" : {
+    "name" : "parent"
+  },
+
+  "children" : [
+    {
+      "props" : {
+        "name" : "child"
+      }
+    }
+  ]
+}

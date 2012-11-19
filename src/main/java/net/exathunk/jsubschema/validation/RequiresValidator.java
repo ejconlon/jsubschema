@@ -12,7 +12,7 @@ public class RequiresValidator implements Validator {
     @Override
     public void validate(SchemaTuple tuple, VContext context) {
         if (tuple.getRefTuple().getNode().isObject()) {
-            final SchemaLike schema = tuple.getEitherSchema().getFirst();
+            final SchemaLike schema = tuple.getEitherSchema().getFirst().getSchema();
             if (schema.getProperties() != null) {
                 for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
                     final String childKey = entry.getKey();
