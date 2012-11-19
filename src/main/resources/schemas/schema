@@ -4,6 +4,15 @@
 
   "id" : "http://exathunk.net/schemas/schema",
 
+  "declarations" : {
+    "stringArray" : {
+      "type" : "array",
+      "items" : {
+        "type": "string"
+      }
+    }
+  },
+
   "properties" : {
 
     "type" : {
@@ -68,6 +77,33 @@
       }
     }
 
+    /*, "requiredList" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
+    },
+
+    "dependenciesMap" : {
+      "type" : "object",
+      "items" : {
+          "$ref" : "#/declarations/stringArray"
+      }
+    },
+
+    "allowsMap" : {
+      "type" : "object",
+      "items" : {
+        "$ref" : "#/declarations/stringArray"
+      }
+    },
+
+    "forbidsMap" : {
+      "type" : "object",
+      "items" : {
+          "$ref" : "#/declarations/stringArray"
+      }
+    }*/
   }
 
 }

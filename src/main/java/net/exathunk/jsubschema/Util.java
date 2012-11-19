@@ -8,6 +8,7 @@ import net.exathunk.jsubschema.validation.VContext;
 import net.exathunk.jsubschema.validation.VError;
 import net.exathunk.jsubschema.validation.Validator;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -234,6 +235,7 @@ public class Util {
     public static ObjectMapper makeObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
+        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         return mapper;
     }
 
