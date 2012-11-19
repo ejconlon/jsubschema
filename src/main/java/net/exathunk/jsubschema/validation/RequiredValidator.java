@@ -18,18 +18,21 @@ public class RequiredValidator implements Validator {
                 for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
                     if (Boolean.TRUE.equals(entry.getValue().getRequired())) {
                         if (!tuple.getRefTuple().getNode().has(entry.getKey())) {
-                            // The key is missing, but may be omitted if a mutually-forbidden key is present!
+                            // The key is missing, but may be omitted if a mutually-forbidden AND REQUIRED key is present
                             boolean skippable = false;
                             final List<String> forbids = entry.getValue().getForbids();
                             if (forbids != null) {
                                 for (String f : forbids) {
                                     if (tuple.getRefTuple().getNode().has(f)) {
-                                        final List<String> nextForbids = schema.getProperties().get(f).getForbids();
-                                        if (nextForbids != null) {
-                                            for (String f2 : nextForbids) {
-                                                if (f2.equals(entry.getKey())) {
-                                                    skippable = true;
-                                                    break;
+                                        final SchemaLike subSchema = schema.getProperties().get(f);
+                                        if (Boolean.TRUE.equals(subSchema.getRequired())) {
+                                            final List<String> nextForbids = schema.getProperties().get(f).getForbids();
+                                            if (nextForbids != null) {
+                                                for (String f2 : nextForbids) {
+                                                    if (f2.equals(entry.getKey())) {
+                                                        skippable = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }

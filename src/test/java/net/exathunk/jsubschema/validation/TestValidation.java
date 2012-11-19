@@ -106,7 +106,7 @@ public class TestValidation {
         {
             JsonNode node = Util.parse("{ \"id\":\"foo\" }");
             VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
-            assertEquals(1, context.errors.size());
+            assertEquals(2, context.errors.size());  // one for type and one for ref
         }
 
         {
