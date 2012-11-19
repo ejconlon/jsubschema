@@ -2,6 +2,8 @@ package net.exathunk.jsubschema.gen;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * charolastra 11/14/12 9:57 PM
@@ -12,7 +14,8 @@ public class FieldRep {
     public String className;
     public Visibility visibility = Visibility.PUBLIC;
     public List<AnnotationRep> annotations = new ArrayList<AnnotationRep>();
-
+    public String declaredName;
+    public Set<String> imports = new TreeSet<String>();
 
     public void makeDeclarationString(Stringer s) {
         for (AnnotationRep annotationRep : annotations) {

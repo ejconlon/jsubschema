@@ -1,8 +1,8 @@
 package net.exathunk.jsubschema.genschema.event;
 
 import java.io.Serializable;
-import net.exathunk.jsubschema.genschema.geo.GeoLike;
 import net.exathunk.jsubschema.genschema.geo.Geo;
+import net.exathunk.jsubschema.genschema.geo.GeoLike;
 import java.util.Set;
 import java.util.TreeSet;
 

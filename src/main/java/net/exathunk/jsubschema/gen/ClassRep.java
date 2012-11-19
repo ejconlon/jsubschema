@@ -16,7 +16,6 @@ public class ClassRep {
     public List<String> extended = new ArrayList<String>();
     public List<String> implemented = new ArrayList<String>();
     public List<String> imports = new ArrayList<String>();
-    public List<ClassRep> innerClasses = new ArrayList<ClassRep>();
     public List<FieldRep> fields = new ArrayList<FieldRep>();
     public List<MethodRep> methods = new ArrayList<MethodRep>();
     public List<AnnotationRep> classAnnotations = new ArrayList<AnnotationRep>();

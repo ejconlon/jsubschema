@@ -2,8 +2,11 @@ package net.exathunk.jsubschema.genschema.schema;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 @JsonDeserialize(as = Schema.class)
 public interface SchemaLike {
