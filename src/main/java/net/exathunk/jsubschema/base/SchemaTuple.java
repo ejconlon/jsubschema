@@ -2,7 +2,7 @@ package net.exathunk.jsubschema.base;
 
 import net.exathunk.jsubschema.functional.Either;
 import net.exathunk.jsubschema.functional.Either3;
-import net.exathunk.jsubschema.genschema.SchemaLike;
+import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.pointers.Reference;
 
 import java.util.Iterator;

@@ -1,7 +1,7 @@
 package net.exathunk.jsubschema.gen;
 
 import net.exathunk.jsubschema.Util;
-import net.exathunk.jsubschema.genschema.Geo;
+import net.exathunk.jsubschema.genschema.geo.Geo;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

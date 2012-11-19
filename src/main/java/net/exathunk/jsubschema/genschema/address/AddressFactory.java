@@ -1,4 +1,4 @@
-package net.exathunk.jsubschema.genschema;
+package net.exathunk.jsubschema.genschema.address;
 
 import net.exathunk.jsubschema.gendeps.DomainFactory;
 

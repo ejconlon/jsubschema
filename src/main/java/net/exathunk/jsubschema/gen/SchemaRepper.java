@@ -1,9 +1,10 @@
 package net.exathunk.jsubschema.gen;
 
 import net.exathunk.jsubschema.Util;
-import net.exathunk.jsubschema.genschema.Schema;
-import net.exathunk.jsubschema.genschema.SchemaLike;
+import net.exathunk.jsubschema.genschema.schema.Schema;
+import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,15 +16,14 @@ public class SchemaRepper {
         final ClassRep c = new ClassRep();
         c.type = ClassRep.TYPE.CLASS;
         c.name = parseClassName(schema.getId());
-        c.packageName = basePackageName;
-        c.imports.add("java.util.List");
-        c.imports.add("java.util.Map");
+        c.packageName = basePackageName + "." + c.name.toLowerCase();
         c.imports.add("java.io.Serializable");
         c.implemented.add("Cloneable");
         c.implemented.add("Serializable");
         c.implemented.add(c.name+"Like");
         for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
             final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.name);
+            addImports(basePackageName, field, c.imports, c.packageName);
             c.fields.add(field);
             c.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
             c.methods.add(new GenUtil.GetAccessorGen().genAccessor(field));
@@ -48,11 +48,10 @@ public class SchemaRepper {
         interfaceRep.name = classRep.name+"Like";
         interfaceRep.interfaceAnnotations.add(new AnnotationRep("@JsonDeserialize(as = "+classRep.name+".class)"));
         interfaceRep.packageName = classRep.packageName;
-        interfaceRep.imports.add("java.util.List");
-        interfaceRep.imports.add("java.util.Map");
         interfaceRep.imports.add("org.codehaus.jackson.annotate.JsonProperty");
         interfaceRep.imports.add("org.codehaus.jackson.map.annotate.JsonDeserialize");
         for (FieldRep field : classRep.fields) {
+            addImports(basePackage, field, interfaceRep.imports, interfaceRep.packageName);
             interfaceRep.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
             interfaceRep.methods.add(new GenUtil.GetAccessorGen().genAccessor(field));
             interfaceRep.methods.add(new GenUtil.SetAccessorGen().genAccessor(field));
@@ -65,7 +64,7 @@ public class SchemaRepper {
         c.type = ClassRep.TYPE.CLASS;
         String baseName = parseClassName(schema.getId());
         c.name = baseName+"Factory";
-        c.packageName = basePackageName;
+        c.packageName = basePackageName + "." + baseName.toLowerCase();
         c.imports.add("net.exathunk.jsubschema.gendeps.DomainFactory");
         c.methods.add(makeDomainClassMethod(baseName));
         c.methods.add(makeMakeDomainMethod(baseName));
@@ -129,6 +128,39 @@ public class SchemaRepper {
             return "Double";
         } else {
             throw new IllegalArgumentException("Cannot type: "+schema);
+        }
+    }
+
+    private static void addToSet(String newPackage, String newClass, List<String> ss, String selfPackage) {
+        if (!newPackage.equals(selfPackage)) {
+            final String x = newPackage + "." + newClass;
+            if (!ss.contains(x)) {
+                ss.add(x);
+            }
+        }
+    }
+
+    private static void addImports(String basePackage, FieldRep field, List<String> imports, String selfPackage) {
+        final String s = field.className;
+        final String t;
+        final boolean isMap = s.startsWith("Map<");
+        final boolean isList = s.startsWith("List<");
+        if (s.contains("Like")) {
+            if (isMap) {
+                t = s.substring(s.lastIndexOf(" ")+1, s.indexOf("Like")+4);
+            } else if (isList) {
+                t = s.substring(s.lastIndexOf("<")+1, s.indexOf("Like")+4);
+            } else {
+                t = s;
+            }
+            String newBp = basePackage + "." + t.substring(0, t.length()-4).toLowerCase();
+            addToSet(newBp, t, imports, selfPackage);
+            addToSet(newBp, t.substring(0, t.length()-4), imports, selfPackage);
+        }
+        if (isMap) {
+            addToSet("java.util", "Map", imports, selfPackage);
+        } else if (isList) {
+            addToSet("java.util", "List", imports, selfPackage);
         }
     }
 

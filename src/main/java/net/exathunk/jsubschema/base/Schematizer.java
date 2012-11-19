@@ -1,8 +1,8 @@
 package net.exathunk.jsubschema.base;
 
 import net.exathunk.jsubschema.Util;
-import net.exathunk.jsubschema.genschema.Schema;
-import net.exathunk.jsubschema.genschema.SchemaLike;
+import net.exathunk.jsubschema.genschema.schema.Schema;
+import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.pointers.Reference;
 import net.exathunk.jsubschema.validation.VContext;
 import net.exathunk.jsubschema.validation.VError;

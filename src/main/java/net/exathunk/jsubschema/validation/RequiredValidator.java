@@ -1,7 +1,7 @@
 package net.exathunk.jsubschema.validation;
 
 import net.exathunk.jsubschema.base.SchemaTuple;
-import net.exathunk.jsubschema.genschema.SchemaLike;
+import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 
 import java.util.List;
 import java.util.Set;

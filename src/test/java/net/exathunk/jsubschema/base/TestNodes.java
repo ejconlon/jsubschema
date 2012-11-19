@@ -5,9 +5,9 @@ import net.exathunk.jsubschema.gen.Assembler;
 import net.exathunk.jsubschema.gen.ClassRep;
 import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.gen.SchemaRepper;
-import net.exathunk.jsubschema.genschema.Schema;
-import net.exathunk.jsubschema.genschema.SchemaFactory;
-import net.exathunk.jsubschema.genschema.SchemaLike;
+import net.exathunk.jsubschema.genschema.schema.Schema;
+import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
+import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 

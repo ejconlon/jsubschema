@@ -2,8 +2,8 @@ package net.exathunk.jsubschema.gen;
 
 import net.exathunk.jsubschema.Util;
 import net.exathunk.jsubschema.base.TypeException;
-import net.exathunk.jsubschema.genschema.Schema;
-import net.exathunk.jsubschema.genschema.SchemaFactory;
+import net.exathunk.jsubschema.genschema.schema.Schema;
+import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
 import org.codehaus.jackson.JsonNode;
 
 import java.io.*;
@@ -78,7 +78,7 @@ public class RunGen {
             if (!destDir.endsWith("/") && parts.length > 0) dsb.append("/");
             for (int i = 0; i < parts.length - 1; ++i) {
                 dsb.append(parts[i]);
-                if (i < parts.length - 2) {
+                if (i < parts.length - 1) {
                     dsb.append("/");
                 }
             }

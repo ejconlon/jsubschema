@@ -1,7 +1,5 @@
-package net.exathunk.jsubschema.genschema;
+package net.exathunk.jsubschema.genschema.link;
 
-import java.util.List;
-import java.util.Map;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
