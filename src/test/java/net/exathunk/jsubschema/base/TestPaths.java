@@ -168,8 +168,70 @@ public class TestPaths {
 
         final String x = "http://exathunk.net/schemas/proptree";
         List<String> goldSchemaRefs = Arrays.asList(
-                x+"#", x+"#/properties/props", x+"#/properties/props/items/name", x+"#/properties/children",
-                x+"#", x+"#/properties/props", x+"#/properties/props/items/name");
+                x+"#", x+"#/properties/props", x+"#/properties/props/items", x+"#/properties/children",
+                x+"#", x+"#/properties/props", x+"#/properties/props/items");
+
+        List<String> actualSchemaRefs = Util.map(schemaTupleSchemaRefs, flattened);
+
+        assertEquals(goldSchemaRefs, actualSchemaRefs);
+
+        FullRefResolver fullRefResolver = new MetaResolver(new SelfResolver(schema));
+        Validator validator = new DefaultValidator();
+        VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
+        assertEquals(new ArrayList<VError>(), context.errors);
+    }
+
+    @Test
+    public void testTupling4() throws IOException, TypeException {
+        Session session = Session.loadDefaultSession();
+        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/stringmultimap");
+        assertNotNull(schema);
+
+        JsonNode node = Loader.loadNode("/test/teststringmultimap");
+        List<RefTuple> flattened = Util.asList(Util.withSelfDepthFirst(new RefTuple(node)));
+
+        List<String> goldRefStrings = Arrays.asList(
+                "#", "#/a", "#/a/0", "#/a/1", "#/b", "#/b/0", "#/c");
+
+        List<String> actualRefStrings = Util.map(refTupleRefStrings, flattened);
+
+        assertEquals(goldRefStrings, actualRefStrings);
+    }
+
+    @Test
+    public void testTupling5() throws IOException, TypeException {
+        Session session = Session.loadDefaultSession();
+        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/stringmultimap");
+        assertNotNull(schema);
+
+        JsonNode node = Loader.loadNode("/test/teststringmultimap");
+        List<SchemaTuple> flattened = flatten(schema, node, new MetaResolver(new SelfResolver(schema)));
+
+        List<String> goldRefStrings = Arrays.asList(
+                "#", "#/a", "#/a/0", "#/a/1", "#/b", "#/b/0", "#/c");
+
+        List<String> actualRefStrings = Util.map(schemaTupleRefStrings, flattened);
+
+        assertEquals(goldRefStrings, actualRefStrings);
+
+        List<String> goldStringVals = Arrays.asList(
+                null, null, "alpha", "apple", null, "beta", null);
+
+        List<String> actualStringVals = Util.map(schemaTupleStringVals, flattened);
+
+        assertEquals(goldStringVals, actualStringVals);
+
+        List<String> goldTypes = Arrays.asList(
+                "object", "array", "string", "string", "array", "string", "array");
+
+        List<String> actualTypes = Util.map(schemaTupleTypes, flattened);
+
+        assertEquals(goldTypes, actualTypes);
+
+        final String x = "http://exathunk.net/schemas/stringmultimap";
+        List<String> goldSchemaRefs = Arrays.asList(
+                x+"#", x+"#/declarations/stringArray", x+"#/declarations/stringArray/items", x+"#/declarations/stringArray/items",
+                x+"#/declarations/stringArray", x+"#/declarations/stringArray/items", x+"#/declarations/stringArray");
 
         List<String> actualSchemaRefs = Util.map(schemaTupleSchemaRefs, flattened);
 

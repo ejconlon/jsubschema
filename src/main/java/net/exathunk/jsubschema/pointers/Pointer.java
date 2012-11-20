@@ -133,4 +133,13 @@ public class Pointer implements Comparable<Pointer>, Consable<Part, Pointer>, Re
         if (isEmpty()) return 0;
         else return 1 + getTail().size();
     }
+
+    public Pointer consAll(Pointer pointer) {
+        assert !direction.equals(pointer.getDirection());
+        Pointer p = this;
+        for (Part part : pointer) {
+            p = p.cons(part);
+        }
+        return p;
+    }
 }

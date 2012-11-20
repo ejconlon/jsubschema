@@ -175,12 +175,13 @@ public class Util {
         return new Iterator<X>() {
 
             private boolean hasYieldedSelf = false;
-            private Iterator<X> rootIt = x.iterator();
+            private final Iterator<X> rootIt = x.iterator();
             private Iterator<X> childIt;
 
             private void advance() {
                 while ((childIt == null || !childIt.hasNext()) && rootIt.hasNext()) {
-                    childIt = withSelfDepthFirst(rootIt.next());
+                    final X next = rootIt.next();
+                    childIt = withSelfDepthFirst(next);
                 }
             }
 
