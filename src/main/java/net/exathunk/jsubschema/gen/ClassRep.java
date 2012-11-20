@@ -22,4 +22,7 @@ public class ClassRep {
     public List<MethodRep> methods = new ArrayList<MethodRep>();
     public List<AnnotationRep> classAnnotations = new ArrayList<AnnotationRep>();
     public List<AnnotationRep> interfaceAnnotations = new ArrayList<AnnotationRep>();
+
+    // Contains field info for "items"
+    public FieldRep virtual;
 }

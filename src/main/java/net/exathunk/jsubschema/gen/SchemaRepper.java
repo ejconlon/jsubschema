@@ -46,6 +46,7 @@ public class SchemaRepper {
                 final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), c.name, basePackageName);
                 c.imports.addAll(virtualField.imports);
                 c.extended.add("TreeMap<String, "+virtualField.className+">");
+                c.virtual = virtualField;
             } else {
                 throw new IllegalArgumentException("Schema without properties or items!");
             }
@@ -55,6 +56,7 @@ public class SchemaRepper {
             final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), c.name, basePackageName);
             c.imports.addAll(virtualField.imports);
             c.extended.add("ArrayList<"+virtualField.className+">");
+            c.virtual = virtualField;
         } else {
             throw new IllegalArgumentException("Invalid root type: "+schema.getType());
         }
@@ -237,10 +239,17 @@ public class SchemaRepper {
         putGenned(SchemaRepper.makeFactory(reference, schema, basePackage), genned);
 
         for (final FieldRep field : classRep.fields) {
-            if (field.declaredName != null) {
-                makeAll(reference.cons(Part.asKey("declarations")).cons(Part.asKey(field.declaredName)),
-                        schema.getDeclarations().get(field.declaredName), classRep.packageName + ".declarations", genned);
-            }
+            genIt(reference, schema, field, classRep.packageName, genned);
+        }
+        if (classRep.virtual != null) {
+            genIt(reference, schema, classRep.virtual, classRep.packageName, genned);
+        }
+    }
+
+    public static void genIt(Reference reference, SchemaLike schema, FieldRep field, String packageName, Map<String, ClassRep> genned) {
+        if (field.declaredName != null) {
+            makeAll(reference.cons(Part.asKey("declarations")).cons(Part.asKey(field.declaredName)),
+                    schema.getDeclarations().get(field.declaredName), packageName + ".declarations", genned);
         }
     }
 
