@@ -9,6 +9,7 @@ public class DefaultValidator extends MetaValidator {
     public DefaultValidator() {
         super(Arrays.asList(
                 new TypeValidator(),
+                new PropAttrsValidator(),
                 new RequiredValidator(),
                 new DependenciesValidator(),
                 new ForbidsValidator()
