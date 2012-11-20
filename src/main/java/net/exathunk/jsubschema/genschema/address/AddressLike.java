@@ -1,10 +1,10 @@
 package net.exathunk.jsubschema.genschema.address;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import java.io.Serializable;
 import java.util.Set;
 import java.util.TreeSet;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
 @JsonDeserialize(as = Address.class)
 public interface AddressLike {

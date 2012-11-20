@@ -1,12 +1,14 @@
 package net.exathunk.jsubschema.genschema.schema;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import java.io.Serializable;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import net.exathunk.jsubschema.genschema.schema.declarations.stringarray.StringArray;
+import net.exathunk.jsubschema.genschema.schema.declarations.stringarray.StringArrayLike;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
 @JsonDeserialize(as = Schema.class)
 public interface SchemaLike {
@@ -101,5 +103,14 @@ public interface SchemaLike {
 
     @JsonProperty("required")
     void setRequired(List<String> required);
+
+    boolean hasForbidsMap();
+
+    @JsonProperty("forbidsMap")
+    Map<String, StringArrayLike> getForbidsMap();
+
+    @JsonProperty("forbidsMap")
+    @JsonDeserialize(contentAs = StringArray.class)
+    void setForbidsMap(Map<String, StringArrayLike> forbidsMap);
 
 }

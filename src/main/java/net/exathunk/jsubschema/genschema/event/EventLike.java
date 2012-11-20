@@ -1,12 +1,12 @@
 package net.exathunk.jsubschema.genschema.event;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import java.io.Serializable;
-import net.exathunk.jsubschema.genschema.geo.Geo;
-import net.exathunk.jsubschema.genschema.geo.GeoLike;
 import java.util.Set;
 import java.util.TreeSet;
+import net.exathunk.jsubschema.genschema.geo.Geo;
+import net.exathunk.jsubschema.genschema.geo.GeoLike;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
 @JsonDeserialize(as = Event.class)
 public interface EventLike {

@@ -1,8 +1,14 @@
 package net.exathunk.jsubschema.gen;
 
 import net.exathunk.jsubschema.Util;
+import net.exathunk.jsubschema.base.TypeException;
 import net.exathunk.jsubschema.genschema.geo.Geo;
+import net.exathunk.jsubschema.genschema.schema.Schema;
+import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
+import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -58,6 +64,17 @@ public class TestGen {
         assert a.hashCode() != b.hashCode();
         assert !a.toString().equals(b.toString());
         assertEquals(Util.asSet("latitude", "longitude"), a.diff(b));
+    }
+
+    @Test
+    public void testArrays() throws IOException, TypeException {
+        final String schemaStr = "{\"type\":\"object\", \"forbidsMap\": {\"a\": [\"b\"]}}, \"properties\" : {\"a\": {\"type\":\"integer\"}, \"b\": {\"type\":\"integer\"} }";
+        final JsonNode schemaNode = Util.parse(schemaStr);
+        final Schema schema = Util.quickBind(schemaNode, new SchemaFactory());
+        assertEquals(1, schema.getForbidsMap().size());
+        assertEquals(true, schema.getForbidsMap().containsKey("a"));
+        assertEquals(1, schema.getForbidsMap().get("a").size());
+        assertEquals("b", schema.getForbidsMap().get("a").get(0));
     }
 
 }

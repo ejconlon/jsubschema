@@ -1,10 +1,12 @@
 package net.exathunk.jsubschema.genschema.schema;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import net.exathunk.jsubschema.genschema.schema.declarations.stringarray.StringArray;
+import net.exathunk.jsubschema.genschema.schema.declarations.stringarray.StringArrayLike;
 
 public class Schema implements Cloneable, Serializable, SchemaLike {
 
@@ -29,6 +31,8 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     private List<String> forbids;
 
     private List<String> required;
+
+    private Map<String, StringArrayLike> forbidsMap;
 
     @Override
     public boolean hasType() {
@@ -196,6 +200,21 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
+    public boolean hasForbidsMap() {
+        return null != forbidsMap;
+    }
+
+    @Override
+    public Map<String, StringArrayLike> getForbidsMap() {
+        return forbidsMap;
+    }
+
+    @Override
+    public void setForbidsMap(Map<String, StringArrayLike> forbidsMap) {
+        this.forbidsMap = forbidsMap;
+    }
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Schema{ ");
         if (type != null) sb.append("type='").append(type).append("', ");
@@ -209,6 +228,7 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         if (requires != null) sb.append("requires='").append(requires).append("', ");
         if (forbids != null) sb.append("forbids='").append(forbids).append("', ");
         if (required != null) sb.append("required='").append(required).append("', ");
+        if (forbidsMap != null) sb.append("forbidsMap='").append(forbidsMap).append("', ");
         return sb.append("}").toString();
     }
 
@@ -239,6 +259,8 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!forbids.equals(other.getForbids())) { return false; }
             if (required == null) { if (other.hasRequired()) { return false; } }
             else if (!required.equals(other.getRequired())) { return false; }
+            if (forbidsMap == null) { if (other.hasForbidsMap()) { return false; } }
+            else if (!forbidsMap.equals(other.getForbidsMap())) { return false; }
             return true;
         } else {
             return false;
@@ -259,6 +281,7 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         result = 31 * result + (requires == null ? 0 : requires.hashCode());
         result = 31 * result + (forbids == null ? 0 : forbids.hashCode());
         result = 31 * result + (required == null ? 0 : required.hashCode());
+        result = 31 * result + (forbidsMap == null ? 0 : forbidsMap.hashCode());
         return result;
     }
 
@@ -286,6 +309,8 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!forbids.equals(other.getForbids())) { s.add("forbids"); }
             if (required == null) { if (other == null || other.hasRequired()) { s.add("required"); } }
             else if (!required.equals(other.getRequired())) { s.add("required"); }
+            if (forbidsMap == null) { if (other == null || other.hasForbidsMap()) { s.add("forbidsMap"); } }
+            else if (!forbidsMap.equals(other.getForbidsMap())) { s.add("forbidsMap"); }
             return s;
     }
 

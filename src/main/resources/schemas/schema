@@ -15,13 +15,13 @@
 
   "required": ["type", "$ref"],
 
-  /*"forbidsMap" : {
+  "forbidsMap" : {
     "type" : ["$ref"],
     "properties" : ["items"],
     "items" : ["properties"]
   },
 
-  "allowsMap" : {
+  /*"allowsMap" : {
     "$ref" : []
   },
 
@@ -108,12 +108,13 @@
       }
     },*/
 
-    /*, "forbidsMap" : {
+    , "forbidsMap" : {
       "type" : "object",
       "items" : {
           "$ref" : "#/declarations/stringArray"
       }
-    }*/
+    }
+
   }
 
 }

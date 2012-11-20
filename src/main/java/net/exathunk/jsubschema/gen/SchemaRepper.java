@@ -24,26 +24,40 @@ public class SchemaRepper {
         c.implemented.add("Cloneable");
         c.implemented.add("Serializable");
         c.implemented.add(c.name+"Like");
-        if (schema.hasProperties()) {
-            for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
-                final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.name, basePackageName);
-                for (String impStr : field.imports) {
-                    if (!c.imports.contains(impStr)) {
-                        c.imports.add(impStr);
-                    }
+        if (schema.getType().equals("object")) {
+            if (schema.hasProperties()) {
+                for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
+                    final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.name, basePackageName);
+                    c.imports.addAll(field.imports);
+                    c.fields.add(field);
+                    c.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
+                    c.methods.add(new GenUtil.GetAccessorGen().genAccessor(field));
+                    c.methods.add(new GenUtil.SetAccessorGen().genAccessor(field));
                 }
-                c.fields.add(field);
-                c.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
-                c.methods.add(new GenUtil.GetAccessorGen().genAccessor(field));
-                c.methods.add(new GenUtil.SetAccessorGen().genAccessor(field));
+
+                c.methods.add(new GenUtil.ToStringMethodGen().genMethod(c));
+                c.methods.add(new GenUtil.EqualsMethodGen().genMethod(c));
+                c.methods.add(new GenUtil.HashCodeMethodGen().genMethod(c));
+
+                c.methods.add(new GenUtil.DiffMethodGen().genMethod(c));
+            } else if (schema.hasItems()) {
+                c.imports.add("java.util.Map");
+                c.imports.add("java.util.TreeMap");
+                final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), c.name, basePackageName);
+                c.imports.addAll(virtualField.imports);
+                c.extended.add("TreeMap<String, "+virtualField.className+">");
+            } else {
+                throw new IllegalArgumentException("Schema without properties or items!");
             }
+        } else if (schema.getType().equals("array")) {
+            c.imports.add("java.util.List");
+            c.imports.add("java.util.ArrayList");
+            final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), c.name, basePackageName);
+            c.imports.addAll(virtualField.imports);
+            c.extended.add("ArrayList<"+virtualField.className+">");
+        } else {
+            throw new IllegalArgumentException("Invalid root type: "+schema.getType());
         }
-        c.methods.add(new GenUtil.ToStringMethodGen().genMethod(c));
-        c.methods.add(new GenUtil.EqualsMethodGen().genMethod(c));
-        c.methods.add(new GenUtil.HashCodeMethodGen().genMethod(c));
-
-        c.methods.add(new GenUtil.DiffMethodGen().genMethod(c));
-
         return c;
     }
 
@@ -62,6 +76,25 @@ public class SchemaRepper {
             interfaceRep.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
             interfaceRep.methods.add(new GenUtil.GetAccessorGen().genAccessor(field));
             interfaceRep.methods.add(new GenUtil.SetAccessorGen().genAccessor(field));
+        }
+        if (schema.getType().equals("object")) {
+            if (schema.hasProperties()) {
+                // pass
+            } else if (schema.hasItems()) {
+                interfaceRep.imports.add("java.util.Map");
+                final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), classRep.name, basePackage);
+                interfaceRep.imports.addAll(virtualField.imports);
+                interfaceRep.extended.add("Map<String, "+virtualField.className+">");
+            } else {
+                throw new IllegalArgumentException("Schema without properties or items!");
+            }
+        } else if (schema.getType().equals("array")) {
+            interfaceRep.imports.add("java.util.List");
+            final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), classRep.name, basePackage);
+            interfaceRep.imports.addAll(virtualField.imports);
+            interfaceRep.extended.add("List<"+virtualField.className+">");
+        } else {
+            throw new IllegalArgumentException("Invalid root type: "+schema.getType());
         }
         return interfaceRep;
     }
