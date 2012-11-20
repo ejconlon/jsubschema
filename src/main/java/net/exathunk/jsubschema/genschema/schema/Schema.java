@@ -32,6 +32,10 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
 
     private List<String> required;
 
+    private Map<String, StringArrayLike> dependencies;
+
+    private Map<String, StringArrayLike> allows;
+
     private Map<String, StringArrayLike> forbidsMap;
 
     @Override
@@ -197,6 +201,36 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     @Override
     public void setRequired(List<String> required) {
         this.required = required;
+    }
+
+    @Override
+    public boolean hasDependencies() {
+        return null != dependencies;
+    }
+
+    @Override
+    public Map<String, StringArrayLike> getDependencies() {
+        return dependencies;
+    }
+
+    @Override
+    public void setDependencies(Map<String, StringArrayLike> dependencies) {
+        this.dependencies = dependencies;
+    }
+    
+    @Override
+    public boolean hasAllows() {
+        return null != allows;
+    }
+
+    @Override
+    public Map<String, StringArrayLike> getAllows() {
+        return allows;
+    }
+
+    @Override
+    public void setAllows(Map<String, StringArrayLike> allows) {
+        this.allows = allows;
     }
 
     @Override

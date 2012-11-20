@@ -1,14 +1,12 @@
 package net.exathunk.jsubschema.genschema.schema;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import net.exathunk.jsubschema.genschema.schema.declarations.stringarray.StringArray;
 import net.exathunk.jsubschema.genschema.schema.declarations.stringarray.StringArrayLike;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
+
+import java.util.List;
+import java.util.Map;
 
 @JsonDeserialize(as = Schema.class)
 public interface SchemaLike {
@@ -103,6 +101,25 @@ public interface SchemaLike {
 
     @JsonProperty("required")
     void setRequired(List<String> required);
+
+    boolean hasDependencies();
+
+    @JsonProperty("dependencies")
+    Map<String, StringArrayLike> getDependencies();
+
+    @JsonProperty("dependencies")
+    @JsonDeserialize(contentAs = StringArray.class)
+    void setDependencies(Map<String, StringArrayLike> dependencies);
+
+    boolean hasAllows();
+
+    @JsonProperty("allows")
+    Map<String, StringArrayLike> getAllows();
+
+    @JsonProperty("allows")
+    @JsonDeserialize(contentAs = StringArray.class)
+    void setAllows(Map<String, StringArrayLike> allows);
+
 
     boolean hasForbidsMap();
 

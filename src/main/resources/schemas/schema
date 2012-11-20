@@ -21,13 +21,9 @@
     "items" : ["properties"]
   },
 
-  /*"allowsMap" : {
+  "allows" : {
     "$ref" : []
   },
-
-  "dependenciesMap" : {
-
-  }, */
 
   "properties" : {
 
@@ -92,23 +88,23 @@
       "items" : {
         "type" : "string"
       }
-    }
+    },
 
-    /*, "dependenciesMap" : {
+    "dependencies" : {
       "type" : "object",
       "items" : {
           "$ref" : "#/declarations/stringArray"
       }
     },
 
-    "allowsMap" : {
+    "allows" : {
       "type" : "object",
       "items" : {
         "$ref" : "#/declarations/stringArray"
       }
-    },*/
+    },
 
-    , "forbidsMap" : {
+    "forbidsMap" : {
       "type" : "object",
       "items" : {
           "$ref" : "#/declarations/stringArray"
