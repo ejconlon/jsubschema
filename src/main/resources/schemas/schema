@@ -106,9 +106,9 @@
       "items" : {
         "$ref" : "#/declarations/stringArray"
       }
-    },
+    },*/
 
-    "forbidsMap" : {
+    /*, "forbidsMap" : {
       "type" : "object",
       "items" : {
           "$ref" : "#/declarations/stringArray"

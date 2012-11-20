@@ -2,6 +2,8 @@ package net.exathunk.jsubschema.gen;
 
 import net.exathunk.jsubschema.Util;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
+import net.exathunk.jsubschema.pointers.Part;
+import net.exathunk.jsubschema.pointers.Reference;
 
 import java.util.List;
 import java.util.Map;
@@ -13,26 +15,28 @@ import java.util.TreeSet;
  */
 public class SchemaRepper {
 
-    public static ClassRep makeClass(SchemaLike schema, String basePackageName) {
+    public static ClassRep makeClass(Reference reference, SchemaLike schema, String basePackageName) {
         final ClassRep c = new ClassRep();
         c.type = ClassRep.TYPE.CLASS;
-        c.name = parseClassName(schema.getId());
+        c.name = parseClassName(reference);
         c.packageName = basePackageName + "." + c.name.toLowerCase();
         c.imports.add("java.io.Serializable");
         c.implemented.add("Cloneable");
         c.implemented.add("Serializable");
         c.implemented.add(c.name+"Like");
-        for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
-            final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.name, basePackageName);
-            for (String impStr : field.imports) {
-                if (!c.imports.contains(impStr)) {
-                    c.imports.add(impStr);
+        if (schema.hasProperties()) {
+            for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
+                final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.name, basePackageName);
+                for (String impStr : field.imports) {
+                    if (!c.imports.contains(impStr)) {
+                        c.imports.add(impStr);
+                    }
                 }
+                c.fields.add(field);
+                c.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
+                c.methods.add(new GenUtil.GetAccessorGen().genAccessor(field));
+                c.methods.add(new GenUtil.SetAccessorGen().genAccessor(field));
             }
-            c.fields.add(field);
-            c.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
-            c.methods.add(new GenUtil.GetAccessorGen().genAccessor(field));
-            c.methods.add(new GenUtil.SetAccessorGen().genAccessor(field));
         }
         c.methods.add(new GenUtil.ToStringMethodGen().genMethod(c));
         c.methods.add(new GenUtil.EqualsMethodGen().genMethod(c));
@@ -44,8 +48,8 @@ public class SchemaRepper {
     }
 
 
-    public static ClassRep makeInterface(SchemaLike schema, String basePackage) {
-        ClassRep classRep = makeClass(schema, basePackage);
+    public static ClassRep makeInterface(Reference reference, SchemaLike schema, String basePackage) {
+        ClassRep classRep = makeClass(reference, schema, basePackage);
         ClassRep interfaceRep = new ClassRep();
         interfaceRep.type = ClassRep.TYPE.INTERFACE;
         interfaceRep.name = classRep.name+"Like";
@@ -62,10 +66,10 @@ public class SchemaRepper {
         return interfaceRep;
     }
 
-    public static ClassRep makeFactory(SchemaLike schema, String basePackageName) {
+    public static ClassRep makeFactory(Reference reference, SchemaLike schema, String basePackageName) {
         final ClassRep c = new ClassRep();
         c.type = ClassRep.TYPE.CLASS;
-        String baseName = parseClassName(schema.getId());
+        String baseName = parseClassName(reference);
         c.name = baseName+"Factory";
         c.packageName = basePackageName + "." + baseName.toLowerCase();
         c.imports.add("net.exathunk.jsubschema.gendeps.DomainFactory");
@@ -109,8 +113,14 @@ public class SchemaRepper {
         return method;
     }
 
-    private static String parseClassName(String url) {
-        return Util.upperFirst(Util.last(Util.split(url, "/")));
+    private static String parseClassName(Reference reference) {
+        if (reference.getPointer().isEmpty()) {
+            String[] parts = reference.getUrl().split("/");
+            final String last = parts[parts.length-1];
+            return Util.capitalize(last);
+        } else {
+            return Util.capitalize(reference.getPointer().getHead().getKey());
+        }
     }
 
     private static class TContext {
@@ -125,18 +135,18 @@ public class SchemaRepper {
             final String dr = schema.get__dollar__ref();
             if (dr.startsWith("#")) {
                 if (dr.equals("#")) {
-                    tContext.className = rootClassName;
+                    tContext.className = rootClassName+"Like";
                 } else if (dr.startsWith("#/declarations/")) {
-                    final String rawClassName = parseClassName(dr);
+                    final String rawClassName = parseClassName(Reference.fromReferenceString(dr).getFirst());
                     tContext.className = rawClassName+"Like";
                     tContext.declaredName = dr.substring("#/declarations/".length(), dr.length());
-                    tContext.imports.add(basePackageName+"."+rootClassName.toLowerCase()+".declarations."+tContext.className);
-                    tContext.imports.add(basePackageName+"."+rootClassName.toLowerCase()+".declarations."+rawClassName);
+                    tContext.imports.add(basePackageName+"."+rootClassName.toLowerCase()+".declarations."+rawClassName.toLowerCase()+"."+tContext.className);
+                    tContext.imports.add(basePackageName+"."+rootClassName.toLowerCase()+".declarations."+rawClassName.toLowerCase()+"."+rawClassName);
                 } else {
                     throw new IllegalArgumentException("Cannot type (reffed): "+schema);
                 }
             } else {
-                final String rawClassName = parseClassName(schema.get__dollar__ref());
+                final String rawClassName = parseClassName(Reference.fromReferenceString(schema.get__dollar__ref()).getFirst());
                 tContext.className  = rawClassName+"Like";
                 tContext.imports.add(basePackageName+"."+rawClassName.toLowerCase()+"."+tContext.className);
                 tContext.imports.add(basePackageName+"."+rawClassName.toLowerCase()+"."+rawClassName);
@@ -180,22 +190,23 @@ public class SchemaRepper {
         final FieldRep f = new FieldRep();
         f.visibility = Visibility.PRIVATE;
         f.name = Util.convert(key);
-        TContext tContext = typeOf(schema, rootClassName+"Like", packageName);
+        TContext tContext = typeOf(schema, rootClassName, packageName);
         f.className = tContext.className;
         f.declaredName = tContext.declaredName;
         f.imports.addAll(tContext.imports);
         return f;
     }
 
-    public static void makeAll(SchemaLike schema, String basePackage, Map<String, ClassRep> genned) {
-        final ClassRep classRep = SchemaRepper.makeClass(schema, basePackage);
+    public static void makeAll(Reference reference, SchemaLike schema, String basePackage, Map<String, ClassRep> genned) {
+        final ClassRep classRep = SchemaRepper.makeClass(reference, schema, basePackage);
         putGenned(classRep, genned);
-        putGenned(SchemaRepper.makeInterface(schema, basePackage), genned);
-        putGenned(SchemaRepper.makeFactory(schema, basePackage), genned);
+        putGenned(SchemaRepper.makeInterface(reference, schema, basePackage), genned);
+        putGenned(SchemaRepper.makeFactory(reference, schema, basePackage), genned);
 
         for (final FieldRep field : classRep.fields) {
             if (field.declaredName != null) {
-                makeAll(schema.getDeclarations().get(field.declaredName), classRep.packageName+".declarations", genned);
+                makeAll(reference.cons(Part.asKey("declarations")).cons(Part.asKey(field.declaredName)),
+                        schema.getDeclarations().get(field.declaredName), classRep.packageName + ".declarations", genned);
             }
         }
     }

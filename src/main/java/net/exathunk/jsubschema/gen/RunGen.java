@@ -4,6 +4,7 @@ import net.exathunk.jsubschema.Util;
 import net.exathunk.jsubschema.base.TypeException;
 import net.exathunk.jsubschema.genschema.schema.Schema;
 import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
+import net.exathunk.jsubschema.pointers.Reference;
 import org.codehaus.jackson.JsonNode;
 
 import java.io.*;
@@ -60,7 +61,7 @@ public class RunGen {
             final JsonNode node = Util.parse(contents.toString());
             final Schema schema = Util.quickBind(node, new SchemaFactory());
 
-            SchemaRepper.makeAll(schema, basePackage, genned);
+            SchemaRepper.makeAll(Reference.fromId(schema.getId()), schema, basePackage, genned);
         }
 
         for (Map.Entry<String, ClassRep> entry : genned.entrySet()) {

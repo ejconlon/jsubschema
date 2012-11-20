@@ -8,6 +8,7 @@ import net.exathunk.jsubschema.gen.SchemaRepper;
 import net.exathunk.jsubschema.genschema.schema.Schema;
 import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
+import net.exathunk.jsubschema.pointers.Reference;
 import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
@@ -67,11 +68,11 @@ public class TestNodes {
         final Session session = Session.loadDefaultSession();
         final SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
-        final ClassRep classRep = SchemaRepper.makeClass(schema, "net.exathunk.jsubschema.genschema");
+        final ClassRep classRep = SchemaRepper.makeClass(Reference.fromId(schema.getId()), schema, "net.exathunk.jsubschema.genschema");
         final String classString = Assembler.writeClass(classRep);
         assertNotNull(classString);
         //System.out.println(classString);
-        final ClassRep factoryRep = SchemaRepper.makeFactory(schema, "net.exathunk.jsubschema.genschema");
+        final ClassRep factoryRep = SchemaRepper.makeFactory(Reference.fromId(schema.getId()), schema, "net.exathunk.jsubschema.genschema");
         final String factoryString = Assembler.writeClass(factoryRep);
         //System.out.println(factoryString);
         assertNotNull(factoryString);
