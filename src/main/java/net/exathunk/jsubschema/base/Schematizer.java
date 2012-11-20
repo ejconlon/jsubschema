@@ -20,10 +20,6 @@ public class Schematizer {
         return schema;
     }
 
-    public SchemaLike normalize(SchemaLike schema, VContext context) {
-        return schema;
-    }
-
     private SchemaLike schematizeInner(String id, JsonNode node, VContext context) {
         SchemaLike schema = new Schema();
         if (node.isObject()) {
