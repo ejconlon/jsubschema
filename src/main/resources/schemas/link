@@ -4,6 +4,10 @@
 
     "required" : ["href", "rel"],
 
+    "dependencies" : {
+      "enctype" : ["method"]
+    },
+
 	"properties" : {
 		"href" : {
 			"type" : "string"
@@ -18,8 +22,7 @@
 		},
 
 		"enctype" : {
-			"type" : "string",
-			"requires" : ["method"]
+			"type" : "string"
 		}
 	}
 }

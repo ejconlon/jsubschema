@@ -68,13 +68,13 @@ public class TestGen {
 
     @Test
     public void testArrays() throws IOException, TypeException {
-        final String schemaStr = "{\"type\":\"object\", \"forbidsMap\": {\"a\": [\"b\"]}}, \"properties\" : {\"a\": {\"type\":\"integer\"}, \"b\": {\"type\":\"integer\"} }";
+        final String schemaStr = "{\"type\":\"object\", \"forbids\": {\"a\": [\"b\"]}}, \"properties\" : {\"a\": {\"type\":\"integer\"}, \"b\": {\"type\":\"integer\"} }";
         final JsonNode schemaNode = Util.parse(schemaStr);
         final Schema schema = Util.quickBind(schemaNode, new SchemaFactory());
-        assertEquals(1, schema.getForbidsMap().size());
-        assertEquals(true, schema.getForbidsMap().containsKey("a"));
-        assertEquals(1, schema.getForbidsMap().get("a").size());
-        assertEquals("b", schema.getForbidsMap().get("a").get(0));
+        assertEquals(1, schema.getForbids().size());
+        assertEquals(true, schema.getForbids().containsKey("a"));
+        assertEquals(1, schema.getForbids().get("a").size());
+        assertEquals("b", schema.getForbids().get("a").get(0));
     }
 
 }

@@ -26,17 +26,13 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
 
     private SchemaLike items;
 
-    private List<String> requires;
-
-    private List<String> forbids;
-
     private List<String> required;
 
     private Map<String, StringArrayLike> dependencies;
 
     private Map<String, StringArrayLike> allows;
 
-    private Map<String, StringArrayLike> forbidsMap;
+    private Map<String, StringArrayLike> forbids;
 
     @Override
     public boolean hasType() {
@@ -159,36 +155,6 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    public boolean hasRequires() {
-        return null != requires;
-    }
-
-    @Override
-    public List<String> getRequires() {
-        return requires;
-    }
-
-    @Override
-    public void setRequires(List<String> requires) {
-        this.requires = requires;
-    }
-
-    @Override
-    public boolean hasForbids() {
-        return null != forbids;
-    }
-
-    @Override
-    public List<String> getForbids() {
-        return forbids;
-    }
-
-    @Override
-    public void setForbids(List<String> forbids) {
-        this.forbids = forbids;
-    }
-
-    @Override
     public boolean hasRequired() {
         return null != required;
     }
@@ -234,18 +200,18 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    public boolean hasForbidsMap() {
-        return null != forbidsMap;
+    public boolean hasForbids() {
+        return null != forbids;
     }
 
     @Override
-    public Map<String, StringArrayLike> getForbidsMap() {
-        return forbidsMap;
+    public Map<String, StringArrayLike> getForbids() {
+        return forbids;
     }
 
     @Override
-    public void setForbidsMap(Map<String, StringArrayLike> forbidsMap) {
-        this.forbidsMap = forbidsMap;
+    public void setForbids(Map<String, StringArrayLike> forbids) {
+        this.forbids = forbids;
     }
 
     @Override
@@ -259,12 +225,10 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         if (id != null) sb.append("id='").append(id).append("', ");
         if (__dollar__ref != null) sb.append("__dollar__ref='").append(__dollar__ref).append("', ");
         if (items != null) sb.append("items='").append(items).append("', ");
-        if (requires != null) sb.append("requires='").append(requires).append("', ");
-        if (forbids != null) sb.append("forbids='").append(forbids).append("', ");
         if (required != null) sb.append("required='").append(required).append("', ");
         if (dependencies != null) sb.append("dependencies='").append(dependencies).append("', ");
         if (allows != null) sb.append("allows='").append(allows).append("', ");
-        if (forbidsMap != null) sb.append("forbidsMap='").append(forbidsMap).append("', ");
+        if (forbids != null) sb.append("forbids='").append(forbids).append("', ");
         return sb.append("}").toString();
     }
 
@@ -289,18 +253,14 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!__dollar__ref.equals(other.get__dollar__ref())) { return false; }
             if (items == null) { if (other.hasItems()) { return false; } }
             else if (!items.equals(other.getItems())) { return false; }
-            if (requires == null) { if (other.hasRequires()) { return false; } }
-            else if (!requires.equals(other.getRequires())) { return false; }
-            if (forbids == null) { if (other.hasForbids()) { return false; } }
-            else if (!forbids.equals(other.getForbids())) { return false; }
             if (required == null) { if (other.hasRequired()) { return false; } }
             else if (!required.equals(other.getRequired())) { return false; }
             if (dependencies == null) { if (other.hasDependencies()) { return false; } }
             else if (!dependencies.equals(other.getDependencies())) { return false; }
             if (allows == null) { if (other.hasAllows()) { return false; } }
             else if (!allows.equals(other.getAllows())) { return false; }
-            if (forbidsMap == null) { if (other.hasForbidsMap()) { return false; } }
-            else if (!forbidsMap.equals(other.getForbidsMap())) { return false; }
+            if (forbids == null) { if (other.hasForbids()) { return false; } }
+            else if (!forbids.equals(other.getForbids())) { return false; }
             return true;
         } else {
             return false;
@@ -318,12 +278,10 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         result = 31 * result + (id == null ? 0 : id.hashCode());
         result = 31 * result + (__dollar__ref == null ? 0 : __dollar__ref.hashCode());
         result = 31 * result + (items == null ? 0 : items.hashCode());
-        result = 31 * result + (requires == null ? 0 : requires.hashCode());
-        result = 31 * result + (forbids == null ? 0 : forbids.hashCode());
         result = 31 * result + (required == null ? 0 : required.hashCode());
         result = 31 * result + (dependencies == null ? 0 : dependencies.hashCode());
         result = 31 * result + (allows == null ? 0 : allows.hashCode());
-        result = 31 * result + (forbidsMap == null ? 0 : forbidsMap.hashCode());
+        result = 31 * result + (forbids == null ? 0 : forbids.hashCode());
         return result;
     }
 
@@ -345,18 +303,14 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!__dollar__ref.equals(other.get__dollar__ref())) { s.add("__dollar__ref"); }
             if (items == null) { if (other == null || other.hasItems()) { s.add("items"); } }
             else if (!items.equals(other.getItems())) { s.add("items"); }
-            if (requires == null) { if (other == null || other.hasRequires()) { s.add("requires"); } }
-            else if (!requires.equals(other.getRequires())) { s.add("requires"); }
-            if (forbids == null) { if (other == null || other.hasForbids()) { s.add("forbids"); } }
-            else if (!forbids.equals(other.getForbids())) { s.add("forbids"); }
             if (required == null) { if (other == null || other.hasRequired()) { s.add("required"); } }
             else if (!required.equals(other.getRequired())) { s.add("required"); }
             if (dependencies == null) { if (other == null || other.hasDependencies()) { s.add("dependencies"); } }
             else if (!dependencies.equals(other.getDependencies())) { s.add("dependencies"); }
             if (allows == null) { if (other == null || other.hasAllows()) { s.add("allows"); } }
             else if (!allows.equals(other.getAllows())) { s.add("allows"); }
-            if (forbidsMap == null) { if (other == null || other.hasForbidsMap()) { s.add("forbidsMap"); } }
-            else if (!forbidsMap.equals(other.getForbidsMap())) { s.add("forbidsMap"); }
+            if (forbids == null) { if (other == null || other.hasForbids()) { s.add("forbids"); } }
+            else if (!forbids.equals(other.getForbids())) { s.add("forbids"); }
             return s;
     }
 

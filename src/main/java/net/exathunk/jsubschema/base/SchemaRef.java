@@ -22,4 +22,32 @@ public class SchemaRef {
     public SchemaLike getSchema() {
         return schema;
     }
+
+    @Override
+    public String toString() {
+        return "SchemaRef{" +
+                "schema=" + schema +
+                ", reference=" + reference +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SchemaRef)) return false;
+
+        SchemaRef schemaRef = (SchemaRef) o;
+
+        if (reference != null ? !reference.equals(schemaRef.reference) : schemaRef.reference != null) return false;
+        if (schema != null ? !schema.equals(schemaRef.schema) : schemaRef.schema != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = schema != null ? schema.hashCode() : 0;
+        result = 31 * result + (reference != null ? reference.hashCode() : 0);
+        return result;
+    }
 }

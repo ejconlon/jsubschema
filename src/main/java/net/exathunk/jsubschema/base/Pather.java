@@ -17,7 +17,7 @@ public class Pather {
         final Pointer pointer = reference.getPointer();
         assert (Direction.DOWN.equals(pointer.getDirection()));
         assert (reference.getUrl().isEmpty() || reference.toReferenceString().startsWith(schema.getId()));
-        return pathSchemaInner(schema, schema, pointer.reversed(), false, Reference.fromId(schema.getId()));
+        return pathSchemaInner(schema, schema, pointer.reversed(), Reference.fromId(schema.getId()));
     }
 
     private static Either3<SchemaRef, String, Reference> unDollarRef(SchemaLike schema, Pointer pointer, Reference usedReference) {
@@ -48,24 +48,13 @@ public class Pather {
                  if (parsed.isSecond()) return Either.makeSecond(parsed.getSecond());
                  else sRef = parsed.getFirst().withDefaultId(schemaLike.getId()).withDefaultId(usedReference.getUrl());
              }
-             Pointer p = sRef.getPointer();
-             final int len = p.size();
-             final int usedLen = usedReference.getPointer().size();
-             int i = 0;
-             for (Part part : usedReference.getPointer().reversed()) {
-                 if (i >= len - usedLen) break;
-                 else {
-                     p = p.cons(part);
-                     ++i;
-                 }
-             }
-             return Either.makeFirst(new Reference(sRef.getUrl(), p));
+             return Either.makeFirst(sRef.consAll(nextParts.reversed()));
          } else {
              return Either.makeFirst(usedReference.consAll(nextParts.reversed()));
          }
     }
 
-    private static Either3<SchemaRef, String, Reference> pathSchemaInner(SchemaLike schema, SchemaLike root, Pointer pointer, boolean inProperties, Reference usedReference) {
+    private static Either3<SchemaRef, String, Reference> pathSchemaInner(SchemaLike schema, SchemaLike root, Pointer pointer, Reference usedReference) {
         assert (Direction.UP.equals(pointer.getDirection()));
         assert (Direction.DOWN.equals(usedReference.getPointer().getDirection()));
         if (pointer.isEmpty()) {
@@ -73,23 +62,18 @@ public class Pather {
         } else {
            final Part part = pointer.getHead();
             if (part.hasKey()) {
-                if (inProperties) {
-                    final SchemaLike nextSchema = root;
-                    final Either<Reference, String> eitherReference = rejigger(nextSchema, usedReference, new Pointer().cons(part));
-                    if (eitherReference.isSecond()) return Either3.makeSecond(eitherReference.getSecond());
-                    return pathSchemaInner(nextSchema, root, pointer.getTail(), false, eitherReference.getFirst());
-                } else if (root.getProperties().containsKey(part.getKey())) {
-                    final SchemaLike nextSchema = root.getProperties().get(part.getKey());
-                    final Either<Reference, String> eitherReference = rejigger(nextSchema, usedReference, new Pointer().cons(Part.asKey("properties")).cons(part));
-                    if (eitherReference.isSecond()) return Either3.makeSecond(eitherReference.getSecond());
-                    return pathSchemaInner(nextSchema, root, pointer.getTail(), !inProperties && "properties".equals(part.getKey()), eitherReference.getFirst());
-                } else if (schema.has__dollar__ref()) {
+                if (schema.has__dollar__ref()) {
                     return unDollarRef(schema, pointer, usedReference);
                 } else if (schema.hasItems()) {
                     final SchemaLike nextSchema = schema.getItems();
                     final Either<Reference, String> eitherReference = rejigger(nextSchema, usedReference, new Pointer().cons(Part.asKey("items")).cons(part));
                     if (eitherReference.isSecond()) return Either3.makeSecond(eitherReference.getSecond());
-                    return pathSchemaInner(nextSchema, root, pointer.getTail(), false, eitherReference.getFirst());
+                    return pathSchemaInner(nextSchema, root, pointer.getTail(), eitherReference.getFirst());
+                } else if (root.getProperties().containsKey(part.getKey())) {
+                    final SchemaLike nextSchema = root.getProperties().get(part.getKey());
+                    final Either<Reference, String> eitherReference = rejigger(nextSchema, usedReference, new Pointer().cons(Part.asKey("properties")).cons(part));
+                    if (eitherReference.isSecond()) return Either3.makeSecond(eitherReference.getSecond());
+                    return pathSchemaInner(nextSchema, root, pointer.getTail(), eitherReference.getFirst());
                 } else {
                     return Either3.makeSecond("Expected object: "+ pointer +" "+schema);
                 }
@@ -100,7 +84,7 @@ public class Pather {
                     final SchemaLike nextSchema = schema.getItems();
                     final Either<Reference, String> eitherReference = rejigger(nextSchema, usedReference, new Pointer().cons(Part.asKey("items")));
                     if (eitherReference.isSecond()) return Either3.makeSecond(eitherReference.getSecond());
-                    return pathSchemaInner(nextSchema, root, pointer.getTail(), false, eitherReference.getFirst());
+                    return pathSchemaInner(nextSchema, root, pointer.getTail(), eitherReference.getFirst());
                 }
             }
         }

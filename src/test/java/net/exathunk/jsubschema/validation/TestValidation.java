@@ -151,13 +151,13 @@ public class TestValidation {
     }
 
     @Test
-    public void testRequires() throws IOException, TypeException {
-        JsonNode schemaNode = Util.parse("{\"type\":\"object\", \"properties\": { \"a\": {\"type\":\"integer\", \"requires\":[\"b\"]}, \"b\": {\"type\":\"integer\", \"requires\":[\"b\"]} }}");
+    public void testDependencies() throws IOException, TypeException {
+        JsonNode schemaNode = Util.parse("{\"type\":\"object\", \"dependencies\": {\"a\":[\"b\"], \"b\":[\"b\"]}, \"properties\": { \"a\": {\"type\":\"integer\"}, \"b\": {\"type\":\"integer\"} }}");
         Schema schema = Util.quickBind(schemaNode, new SchemaFactory());
         assertNotNull(schema);
 
         FullRefResolver fullRefResolver = new MetaResolver(new SelfResolver(schema));
-        Validator validator = new RequiresValidator();
+        Validator validator = new DependenciesValidator();
 
         {
             JsonNode node = Util.parse("{ \"a\":\"1\" }");

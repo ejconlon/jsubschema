@@ -2,6 +2,7 @@ package net.exathunk.jsubschema.validation;
 
 import net.exathunk.jsubschema.base.SchemaTuple;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
+import net.exathunk.jsubschema.genschema.schema.declarations.stringarray.StringArrayLike;
 
 import java.util.List;
 import java.util.Set;
@@ -26,25 +27,27 @@ public class RequiredValidator implements Validator {
                             missingKeys.add(requiredKey);
                         }
                     }
-                    for (String missingKey : missingKeys) {
-                        boolean skip = false;
-                        final List<String> forbids = schema.getProperties().get(missingKey).getForbids();
-                        if (forbids != null) {
-                           for (String forbidden : forbids) {
-                               if (tuple.getRefTuple().getNode().has(forbidden) && requiredKeys.contains(forbidden)) {
-                                   final List<String> forbids2 = schema.getProperties().get(forbidden).getForbids();
-                                   if (forbids2 != null) {
-                                       if (forbids2.contains(missingKey)) {
-                                           skip = true;
-                                           break;
-                                       }
-                                   }
-                               }
-                           }
+                    if (!missingKeys.isEmpty() && schema.hasForbids()) {
+                        for (String missingKey : missingKeys) {
+                            final StringArrayLike forbids = schema.getForbids().get(missingKey);
+                            boolean skip = false;
+                            if (forbids != null) {
+                                for (String forbidden : forbids) {
+                                    if (tuple.getRefTuple().getNode().has(forbidden) && requiredKeys.contains(forbidden)) {
+                                        final StringArrayLike forbids2 = schema.getForbids().get(forbidden);
+                                        if (forbids2 != null) {
+                                            if (forbids2.contains(missingKey)) {
+                                                skip = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (!skip)
+                                context.errors.add(
+                                        new VError(tuple.getRefTuple().getReference(), "Missing required key: "+missingKey));
                         }
-                        if (!skip)
-                            context.errors.add(
-                                new VError(tuple.getRefTuple().getReference(), "Missing required key: "+missingKey));
                     }
                 }
             }

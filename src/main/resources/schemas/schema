@@ -15,21 +15,19 @@
 
   "required": ["type", "$ref"],
 
-  "forbidsMap" : {
+  "forbids" : {
     "type" : ["$ref"],
+    "id" : ["$ref"],
     "properties" : ["items"],
-    "items" : ["properties"]
-  },
-
-  "allows" : {
-    "$ref" : []
+    "items" : ["properties"],
+    "$ref" : ["id", "description", "format", "properties", "declarations", "items",
+              "type", "required", "allows", "forbidsMap", "dependencies"]
   },
 
   "properties" : {
 
     "type" : {
-      "type" : "string",
-      "forbids" : ["$ref"]
+      "type" : "string"
     },
 
     "description" : {
@@ -55,32 +53,15 @@
     },
 
     "id" : {
-      "type" : "string",
-      "forbids" : ["$ref"]
+      "type" : "string"
     },
 
     "$ref" : {
-      "type" : "string",
-      "forbids" : ["id", "description", "format", "properties", "declarations", "items", "type"]
+      "type" : "string"
     },
 
     "items" : {
-      "$ref" : "#",
-      "forbids" : ["properties"]
-    },
-
-    "requires" : {
-      "type" : "array",
-      "items" : {
-          "type": "string"
-      }
-    },
-
-    "forbids" : {
-      "type" : "array",
-      "items" : {
-          "type": "string"
-      }
+      "$ref" : "#"
     },
 
     "required" : {
@@ -104,7 +85,7 @@
       }
     },
 
-    "forbidsMap" : {
+    "forbids" : {
       "type" : "object",
       "items" : {
           "$ref" : "#/declarations/stringArray"

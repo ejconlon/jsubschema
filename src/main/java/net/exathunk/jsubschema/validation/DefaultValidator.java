@@ -1,7 +1,5 @@
 package net.exathunk.jsubschema.validation;
 
-import net.exathunk.jsubschema.validation.*;
-
 import java.util.Arrays;
 
 /**
@@ -12,7 +10,7 @@ public class DefaultValidator extends MetaValidator {
         super(Arrays.asList(
                 new TypeValidator(),
                 new RequiredValidator(),
-                new RequiresValidator(),
+                new DependenciesValidator(),
                 new ForbidsValidator()
         ));
     }

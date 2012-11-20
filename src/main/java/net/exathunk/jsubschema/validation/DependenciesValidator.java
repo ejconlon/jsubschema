@@ -10,19 +10,19 @@ import java.util.Map;
 /**
  * charolastra 11/16/12 1:06 PM
  */
-public class ForbidsValidator implements Validator {
+public class DependenciesValidator implements Validator {
     @Override
     public void validate(SchemaTuple tuple, VContext context) {
         final JsonNode node = tuple.getRefTuple().getNode();
         if (node.isObject()) {
             final SchemaLike schema = tuple.getEitherSchema().getFirst().getSchema();
-            final Map<String, StringArrayLike> forbids = schema.getForbids();
-            if (forbids != null) {
-                for (Map.Entry<String, StringArrayLike> entry : forbids.entrySet()) {
+            final Map<String, StringArrayLike> dependencies = schema.getDependencies();
+            if (dependencies != null) {
+                for (Map.Entry<String, StringArrayLike> entry : dependencies.entrySet()) {
                     if (node.has(entry.getKey())) {
                         for (String dep : entry.getValue()) {
-                            if (node.has(dep)) {
-                                context.errors.add(new VError(tuple.getRefTuple().getReference(), "Has forbidden: "+entry.getKey()+" "+dep));
+                            if (!node.has(dep)) {
+                                context.errors.add(new VError(tuple.getRefTuple().getReference(), "Missing dependency: "+entry.getKey()+" "+dep));
                             }
                         }
                     }

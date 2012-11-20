@@ -2,14 +2,12 @@ package net.exathunk.jsubschema.base;
 
 import net.exathunk.jsubschema.Util;
 import net.exathunk.jsubschema.functional.Either;
-import net.exathunk.jsubschema.functional.Either3;
 import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.genschema.event.Event;
 import net.exathunk.jsubschema.genschema.geo.Geo;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.pointers.Part;
 import net.exathunk.jsubschema.pointers.Pointer;
-import net.exathunk.jsubschema.pointers.Reference;
 import net.exathunk.jsubschema.validation.DefaultValidator;
 import net.exathunk.jsubschema.validation.VContext;
 import net.exathunk.jsubschema.validation.VError;
@@ -29,25 +27,6 @@ import static org.junit.Assert.assertNotNull;
 public class TestPaths {
 
     @Test
-    public void testPathSchema() throws IOException, TypeException, PathException {
-        Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
-        assertNotNull(schema);
-
-        Either3<SchemaRef, String, Reference> reqSchema = Pather.pathSchema(schema, new Reference("", new Pointer().cons(Part.asKey("type"))));
-        assertNotNull(reqSchema);
-        assertEquals("string", reqSchema.getFirst().getSchema().getType());
-
-        Either3<SchemaRef, String, Reference> idForbidSchema = Pather.pathSchema(schema, new Reference("", new Pointer().cons(Part.asKey("id")).cons(Part.asKey("forbids"))));
-        assertNotNull(idForbidSchema);
-        assertEquals("array", idForbidSchema.getFirst().getSchema().getType());
-
-        Either3<SchemaRef, String, Reference> idForbid0Schema = Pather.pathSchema(schema, new Reference("", new Pointer().cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0))));
-        assertNotNull(idForbid0Schema);
-        assertEquals("string", idForbid0Schema.getFirst().getSchema().getType());
-    }
-
-    @Test
     public void testPathNode() throws IOException, TypeException, PathException {
         JsonNode node = Loader.loadSchemaNode("schema");
 
@@ -55,11 +34,11 @@ public class TestPaths {
         assertNotNull(reqNode);
         assertEquals("object", reqNode.asText());
 
-        JsonNode idForbidNode = Pather.pathNode(node, new Pointer().cons(Part.asKey("properties")).cons(Part.asKey("id")).cons(Part.asKey("forbids")));
+        JsonNode idForbidNode = Pather.pathNode(node, new Pointer().cons(Part.asKey("forbids")).cons(Part.asKey("id")));
         assertNotNull(idForbidNode);
         assertEquals(1, idForbidNode.size());
 
-        JsonNode idForbid0Node = Pather.pathNode(node, new Pointer().cons(Part.asKey("properties")).cons(Part.asKey("id")).cons(Part.asKey("forbids")).cons(Part.asIndex(0)));
+        JsonNode idForbid0Node = Pather.pathNode(node, new Pointer().cons(Part.asKey("forbids")).cons(Part.asKey("id")).cons(Part.asIndex(0)));
         assertNotNull(idForbid0Node);
         assertEquals("$ref", idForbid0Node.asText());
     }
