@@ -120,7 +120,6 @@ public interface SchemaLike {
     @JsonDeserialize(contentAs = StringArray.class)
     void setAllows(Map<String, StringArrayLike> allows);
 
-
     boolean hasForbidsMap();
 
     @JsonProperty("forbidsMap")
