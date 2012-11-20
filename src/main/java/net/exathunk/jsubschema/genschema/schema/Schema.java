@@ -30,8 +30,6 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
 
     private Map<String, StringArrayLike> dependencies;
 
-    private Map<String, StringArrayLike> allows;
-
     private Map<String, StringArrayLike> forbids;
 
     @Override
@@ -185,21 +183,6 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    public boolean hasAllows() {
-        return null != allows;
-    }
-
-    @Override
-    public Map<String, StringArrayLike> getAllows() {
-        return allows;
-    }
-
-    @Override
-    public void setAllows(Map<String, StringArrayLike> allows) {
-        this.allows = allows;
-    }
-
-    @Override
     public boolean hasForbids() {
         return null != forbids;
     }
@@ -227,7 +210,6 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         if (items != null) sb.append("items='").append(items).append("', ");
         if (required != null) sb.append("required='").append(required).append("', ");
         if (dependencies != null) sb.append("dependencies='").append(dependencies).append("', ");
-        if (allows != null) sb.append("allows='").append(allows).append("', ");
         if (forbids != null) sb.append("forbids='").append(forbids).append("', ");
         return sb.append("}").toString();
     }
@@ -257,8 +239,6 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!required.equals(other.getRequired())) { return false; }
             if (dependencies == null) { if (other.hasDependencies()) { return false; } }
             else if (!dependencies.equals(other.getDependencies())) { return false; }
-            if (allows == null) { if (other.hasAllows()) { return false; } }
-            else if (!allows.equals(other.getAllows())) { return false; }
             if (forbids == null) { if (other.hasForbids()) { return false; } }
             else if (!forbids.equals(other.getForbids())) { return false; }
             return true;
@@ -280,7 +260,6 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         result = 31 * result + (items == null ? 0 : items.hashCode());
         result = 31 * result + (required == null ? 0 : required.hashCode());
         result = 31 * result + (dependencies == null ? 0 : dependencies.hashCode());
-        result = 31 * result + (allows == null ? 0 : allows.hashCode());
         result = 31 * result + (forbids == null ? 0 : forbids.hashCode());
         return result;
     }
@@ -307,8 +286,6 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!required.equals(other.getRequired())) { s.add("required"); }
             if (dependencies == null) { if (other == null || other.hasDependencies()) { s.add("dependencies"); } }
             else if (!dependencies.equals(other.getDependencies())) { s.add("dependencies"); }
-            if (allows == null) { if (other == null || other.hasAllows()) { s.add("allows"); } }
-            else if (!allows.equals(other.getAllows())) { s.add("allows"); }
             if (forbids == null) { if (other == null || other.hasForbids()) { s.add("forbids"); } }
             else if (!forbids.equals(other.getForbids())) { s.add("forbids"); }
             return s;

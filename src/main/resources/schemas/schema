@@ -78,13 +78,6 @@
       }
     },
 
-    "allows" : {
-      "type" : "object",
-      "items" : {
-        "$ref" : "#/declarations/stringArray"
-      }
-    },
-
     "forbids" : {
       "type" : "object",
       "items" : {

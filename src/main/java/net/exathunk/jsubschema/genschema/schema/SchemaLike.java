@@ -97,15 +97,6 @@ public interface SchemaLike {
     @JsonDeserialize(contentAs = StringArray.class)
     void setDependencies(Map<String, StringArrayLike> dependencies);
 
-    boolean hasAllows();
-
-    @JsonProperty("allows")
-    Map<String, StringArrayLike> getAllows();
-
-    @JsonProperty("allows")
-    @JsonDeserialize(contentAs = StringArray.class)
-    void setAllows(Map<String, StringArrayLike> allows);
-
     boolean hasForbids();
 
     @JsonProperty("forbids")
