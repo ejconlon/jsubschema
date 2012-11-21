@@ -20,21 +20,22 @@ public class TestCrustache {
 
     private String makeTemplate() {
         return "{{yawn}}{{burp}} Hello, {{person}}! My name is {{me}}. "+
-                "{{#secret}}Nice hat, {{dude}}.{{/secret}} {{#secret2}}Just kidding, {{bro}}{{/secret2}} {{{html}}} And some more {{&more}} {{^bollocks}} Mind them!{{/bollocks}}...";
+                "{{#secret}}Nice hat, {{dude}}.{{>next}}{{/secret}} {{#secret2}}{{>next2}}{{/secret2}} {{{html}}} And some more {{&more}} {{^bollocks}} Mind them!{{/bollocks}}...";
     }
 
     @Test
     public void testMatch() {
         List<String> matches = Crustache.contained(makeTemplate());
         assertEquals(Arrays.asList("{{yawn}}", "{{burp}}", "{{person}}", "{{me}}",
-                "{{#secret}}", "{{dude}}", "{{/secret}}", "{{#secret2}}", "{{bro}}", "{{/secret2}}", "{{{html}}}", "{{&more}}", "{{^bollocks}}", "{{/bollocks}}"), matches);
+                "{{#secret}}", "{{dude}}", "{{>next}}", "{{/secret}}",
+                "{{#secret2}}", "{{>next2}}", "{{/secret2}}", "{{{html}}}", "{{&more}}", "{{^bollocks}}", "{{/bollocks}}"), matches);
     }
 
     @Test
     public void testInline() throws TypeException {
         List<String> parts = Crustache.inline(makeTemplate());
         assertEquals(Arrays.asList("{{yawn}}", "{{burp}}", " Hello, ", "{{person}}", "! My name is ", "{{me}}", ". ",
-                "{{#secret}}", "Nice hat, ", "{{dude}}", ".", "{{/secret}}", " ", "{{#secret2}}", "Just kidding, ", "{{bro}}", "{{/secret2}}", " ", "{{{html}}}", " And some more ", "{{&more}}",
+                "{{#secret}}", "Nice hat, ", "{{dude}}", ".", "{{>next}}", "{{/secret}}", " ", "{{#secret2}}", "{{>next2}}", "{{/secret2}}", " ", "{{{html}}}", " And some more ", "{{&more}}",
                 " ", "{{^bollocks}}", " Mind them!", "{{/bollocks}}", "..."), parts);
         String s = "";
         for (String part : parts) {
@@ -54,11 +55,11 @@ public class TestCrustache {
                 Either.<Tag, String>makeSecond("Nice hat, "),
                 Either.<Tag, String>makeFirst(new Tag("dude", Tag.Type.NORMAL)),
                 Either.<Tag, String>makeSecond("."),
+                Either.<Tag, String>makeFirst(new Tag("next", Tag.Type.PARTIAL)),
                 Either.<Tag, String>makeFirst(new Tag("secret", Tag.Type.SECTION_END)),
                 Either.<Tag, String>makeSecond(" "),
                 Either.<Tag, String>makeFirst(new Tag("secret2", Tag.Type.SECTION_START)),
-                Either.<Tag, String>makeSecond("Just kidding, "),
-                Either.<Tag, String>makeFirst(new Tag("bro", Tag.Type.NORMAL)),
+                Either.<Tag, String>makeFirst(new Tag("next2", Tag.Type.PARTIAL)),
                 Either.<Tag, String>makeFirst(new Tag("secret2", Tag.Type.SECTION_END)),
                 Either.<Tag, String>makeSecond(" "),
                 Either.<Tag, String>makeFirst(new Tag("html", Tag.Type.ESCAPE)),
@@ -86,6 +87,7 @@ public class TestCrustache {
             sub.getElements().add(Either3.<Tag, String, Section>makeSecond("Nice hat, "));
             sub.getElements().add(Either3.<Tag, String, Section>makeFirst(new Tag("dude", Tag.Type.NORMAL)));
             sub.getElements().add(Either3.<Tag, String, Section>makeSecond("."));
+            sub.getElements().add(Either3.<Tag, String, Section>makeFirst(new Tag("next", Tag.Type.PARTIAL)));
             treed.getElements().add(Either3.<Tag, String, Section>makeThird(sub));
         }
 
@@ -93,8 +95,7 @@ public class TestCrustache {
 
         {
             Section sub = new Section(new Tag("secret2", Tag.Type.SECTION_START));
-            sub.getElements().add(Either3.<Tag, String, Section>makeSecond("Just kidding, "));
-            sub.getElements().add(Either3.<Tag, String, Section>makeFirst(new Tag("bro", Tag.Type.NORMAL)));
+            sub.getElements().add(Either3.<Tag, String, Section>makeFirst(new Tag("next2", Tag.Type.PARTIAL)));
             treed.getElements().add(Either3.<Tag, String, Section>makeThird(sub));
         }
 
@@ -121,9 +122,10 @@ public class TestCrustache {
                 (new Tag("me", Tag.Type.NORMAL)),
                 (new Tag("secret", Tag.Type.SECTION_START)),
                 (new Tag("dude", Tag.Type.NORMAL)),
+                (new Tag("next", Tag.Type.PARTIAL)),
                 (new Tag("secret", Tag.Type.SECTION_END)),
                 (new Tag("secret2", Tag.Type.SECTION_START)),
-                (new Tag("bro", Tag.Type.NORMAL)),
+                (new Tag("next2", Tag.Type.PARTIAL)),
                 (new Tag("secret2", Tag.Type.SECTION_END)),
                 (new Tag("html", Tag.Type.ESCAPE)),
                 (new Tag("more", Tag.Type.ESCAPE)),
@@ -141,10 +143,11 @@ public class TestCrustache {
 
         TagTree sub1 = new TagTree(new Tag("secret", Tag.Type.SECTION_START));
         sub1.getChildren().add(new TagTree(new Tag("dude", Tag.Type.NORMAL)));
+        sub1.getChildren().add(new TagTree(new Tag("next", Tag.Type.PARTIAL)));
         tagTree.getChildren().add(sub1);
 
         TagTree sub2 = new TagTree(new Tag("secret2", Tag.Type.SECTION_START));
-        sub2.getChildren().add(new TagTree(new Tag("bro", Tag.Type.NORMAL)));
+        sub2.getChildren().add(new TagTree(new Tag("next2", Tag.Type.PARTIAL)));
         tagTree.getChildren().add(sub2);
 
         tagTree.getChildren().add(new TagTree(new Tag("html", Tag.Type.ESCAPE)));
@@ -155,8 +158,11 @@ public class TestCrustache {
 
         assertEquals(tagTree, treed.tagTree());
 
-        SchemaLike schema = TagTyper.makeTreeSchema(tagTree);
+        NameResolver resolver = new NameResolverImpl("http://example.com/whee");
 
+        SchemaLike schema = TagTyper.makeTreeSchema("woo", tagTree, resolver);
+
+        assertEquals("http://example.com/whee/woo", schema.getId());
         assertEquals("object", schema.getType());
         assertEquals(true, schema.hasProperties());
         assertEquals(false, schema.hasItems());
@@ -169,16 +175,17 @@ public class TestCrustache {
             assertEquals(k, "object", schema.getProperties().get(k).getItems().getType());
         }
         assertEquals("string", schema.getProperties().get("secret").getItems().getProperties().get("dude").getType());
-        System.out.println(Util.quickUnbind(schema));
+        //System.out.println(Util.quickUnbind(schema));
     }
 
     @Test
-    public void testSite() {
+    public void testTagParse() {
         assertEquals(Either.makeFirst(new Tag("yawn", Tag.Type.NORMAL)), Tag.parse("{{yawn}}"));
         assertEquals(Either.makeFirst(new Tag("secret", Tag.Type.SECTION_START)), Tag.parse("{{#secret}}"));
         assertEquals(Either.makeFirst(new Tag("secret", Tag.Type.SECTION_END)), Tag.parse("{{/secret}}"));
         assertEquals(Either.makeFirst(new Tag("html", Tag.Type.ESCAPE)), Tag.parse("{{{html}}}"));
         assertEquals(Either.makeFirst(new Tag("more", Tag.Type.ESCAPE)), Tag.parse("{{&more}}"));
+        assertEquals(Either.makeFirst(new Tag("next", Tag.Type.PARTIAL)), Tag.parse("{{>next}}"));
     }
 
     @Test

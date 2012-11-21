@@ -1,11 +1,10 @@
 package net.exathunk.jsubschema.crustache;
 
+import net.exathunk.jsubschema.Util;
 import net.exathunk.jsubschema.functional.Either;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 
 /**
@@ -13,7 +12,7 @@ import java.util.regex.Matcher;
  */
 public class Tag {
 
-    public static enum Type { NORMAL, SECTION_START, SECTION_END, INVERTED_START, ESCAPE }
+    public static enum Type { NORMAL, SECTION_START, SECTION_END, INVERTED_START, ESCAPE, PARTIAL }
 
     private final String label;
     private final Type type;
@@ -81,6 +80,7 @@ public class Tag {
         final boolean isOpen;
         final boolean isClose;
         final boolean isInverted;
+        final boolean isPartial;
         Matcher doubleMatches = Crustache.DOUBLE_COMPILED.matcher(tag);
         Matcher tripleMatches = Crustache.TRIPLE_COMPILED.matcher(tag);
         if (doubleMatches.find()) {
@@ -90,7 +90,8 @@ public class Tag {
               isOpen = (t.charAt(0) == '#');
               isClose = (t.charAt(0) == '/');
               isInverted = (t.charAt(0) == '^');
-              if (isEscape || isOpen || isClose || isInverted) {
+              isPartial = (t.charAt(0) == '>');
+              if (isEscape || isOpen || isClose || isInverted || isPartial) {
                   inner = t.substring(1);
               } else {
                   inner = t;
@@ -102,7 +103,10 @@ public class Tag {
             if (tripleMatches.start() == 0 && tripleMatches.end() == tag.length()) {
                 inner = tag.substring(3, tag.length()-3);
                 isEscape = true;
-                isOpen = isClose = isInverted = false;
+                if (Util.asSet('&', '#', '/', '^', '>').contains(inner.charAt(0))) {
+                    throw new IllegalArgumentException("Bad tag: "+tag);
+                }
+                isOpen = isClose = isInverted = isPartial = false;
             } else {
                 return Either.makeSecond(tag);
             }
@@ -114,6 +118,7 @@ public class Tag {
         else if (isOpen) type = Type.SECTION_START;
         else if (isClose) type = Type.SECTION_END;
         else if (isInverted) type = Type.INVERTED_START;
+        else if (isPartial) type = Type.PARTIAL;
         else type = Type.NORMAL;
 
         final String label;

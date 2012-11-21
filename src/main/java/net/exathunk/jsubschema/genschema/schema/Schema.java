@@ -1,12 +1,12 @@
 package net.exathunk.jsubschema.genschema.schema;
 
+import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyListLike;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import net.exathunk.jsubschema.genschema.schema.declarations.stringarray.StringArray;
-import net.exathunk.jsubschema.genschema.schema.declarations.stringarray.StringArrayLike;
 
 public class Schema implements Cloneable, Serializable, SchemaLike {
 
@@ -26,11 +26,15 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
 
     private SchemaLike items;
 
-    private List<String> required;
+    private KeyListLike required;
 
-    private Map<String, StringArrayLike> dependencies;
+    private Map<String, KeyListLike> dependencies;
 
-    private Map<String, StringArrayLike> forbids;
+    private Map<String, KeyListLike> forbids;
+
+    private String __dollar__schema;
+
+    private List<String> extensions;
 
     @Override
     public boolean hasType() {
@@ -158,12 +162,12 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    public List<String> getRequired() {
+    public KeyListLike getRequired() {
         return required;
     }
 
     @Override
-    public void setRequired(List<String> required) {
+    public void setRequired(KeyListLike required) {
         this.required = required;
     }
 
@@ -173,12 +177,12 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    public Map<String, StringArrayLike> getDependencies() {
+    public Map<String, KeyListLike> getDependencies() {
         return dependencies;
     }
 
     @Override
-    public void setDependencies(Map<String, StringArrayLike> dependencies) {
+    public void setDependencies(Map<String, KeyListLike> dependencies) {
         this.dependencies = dependencies;
     }
 
@@ -188,13 +192,43 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
-    public Map<String, StringArrayLike> getForbids() {
+    public Map<String, KeyListLike> getForbids() {
         return forbids;
     }
 
     @Override
-    public void setForbids(Map<String, StringArrayLike> forbids) {
+    public void setForbids(Map<String, KeyListLike> forbids) {
         this.forbids = forbids;
+    }
+
+    @Override
+    public boolean has__dollar__schema() {
+        return null != __dollar__schema;
+    }
+
+    @Override
+    public String get__dollar__schema() {
+        return __dollar__schema;
+    }
+
+    @Override
+    public void set__dollar__schema(String __dollar__schema) {
+        this.__dollar__schema = __dollar__schema;
+    }
+
+    @Override
+    public boolean hasExtensions() {
+        return null != extensions;
+    }
+
+    @Override
+    public List<String> getExtensions() {
+        return extensions;
+    }
+
+    @Override
+    public void setExtensions(List<String> extensions) {
+        this.extensions = extensions;
     }
 
     @Override
@@ -211,6 +245,8 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         if (required != null) sb.append("required='").append(required).append("', ");
         if (dependencies != null) sb.append("dependencies='").append(dependencies).append("', ");
         if (forbids != null) sb.append("forbids='").append(forbids).append("', ");
+        if (__dollar__schema != null) sb.append("__dollar__schema='").append(__dollar__schema).append("', ");
+        if (extensions != null) sb.append("extensions='").append(extensions).append("', ");
         return sb.append("}").toString();
     }
 
@@ -241,6 +277,10 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!dependencies.equals(other.getDependencies())) { return false; }
             if (forbids == null) { if (other.hasForbids()) { return false; } }
             else if (!forbids.equals(other.getForbids())) { return false; }
+            if (__dollar__schema == null) { if (other.has__dollar__schema()) { return false; } }
+            else if (!__dollar__schema.equals(other.get__dollar__schema())) { return false; }
+            if (extensions == null) { if (other.hasExtensions()) { return false; } }
+            else if (!extensions.equals(other.getExtensions())) { return false; }
             return true;
         } else {
             return false;
@@ -261,6 +301,8 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         result = 31 * result + (required == null ? 0 : required.hashCode());
         result = 31 * result + (dependencies == null ? 0 : dependencies.hashCode());
         result = 31 * result + (forbids == null ? 0 : forbids.hashCode());
+        result = 31 * result + (__dollar__schema == null ? 0 : __dollar__schema.hashCode());
+        result = 31 * result + (extensions == null ? 0 : extensions.hashCode());
         return result;
     }
 
@@ -288,6 +330,10 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!dependencies.equals(other.getDependencies())) { s.add("dependencies"); }
             if (forbids == null) { if (other == null || other.hasForbids()) { s.add("forbids"); } }
             else if (!forbids.equals(other.getForbids())) { s.add("forbids"); }
+            if (__dollar__schema == null) { if (other == null || other.has__dollar__schema()) { s.add("__dollar__schema"); } }
+            else if (!__dollar__schema.equals(other.get__dollar__schema())) { s.add("__dollar__schema"); }
+            if (extensions == null) { if (other == null || other.hasExtensions()) { s.add("extensions"); } }
+            else if (!extensions.equals(other.getExtensions())) { s.add("extensions"); }
             return s;
     }
 

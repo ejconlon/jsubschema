@@ -1,14 +1,18 @@
 {
+  "id" : "http://exathunk.net/schemas/schema",
+
+  //"$schema" : "http://exathunk.net/schemas/schema",
 
   "type" : "object",
 
-  "id" : "http://exathunk.net/schemas/schema",
+  "description" : "Core schema",
 
   "declarations" : {
-    "stringArray" : {
+    "keyList" : {
       "type" : "array",
       "items" : {
-        "type": "string"
+        "type" : "string",
+        "format" : "key"
       }
     }
   },
@@ -27,25 +31,31 @@
   "properties" : {
 
     "type" : {
+      "description" : "Type of the item: string/array/boolean/object/number/integer",
       "type" : "string"
     },
 
     "description" : {
+      "description" : "Textual description of the item",
       "type" : "string"
     },
 
     "format" : {
+      "description" : "A user-defined subtype of the type, e.g. html, url, key",
       "type" : "string"
     },
 
     "properties" : {
+      "description" : "The properties of an object",
       "type" : "object",
+      "format" : "keyMap",
       "items" : {
         "$ref" : "#"
       }
     },
 
     "declarations" : {
+      "description" : "Convenient place to declare schemas for internal reference",
       "type" : "object",
       "items" : {
         "$ref" : "#"
@@ -53,35 +63,57 @@
     },
 
     "id" : {
-      "type" : "string"
+      "description" : "The canonical URL for this schema",
+      "type" : "string",
+      "format" : "url"
     },
 
     "$ref" : {
-      "type" : "string"
+      "description" : "A singleton prop to load remote schemas",
+      "type" : "string",
+      "format" : "reference"
     },
 
     "items" : {
+      "description" : "An alternative to properties for objects and arrays",
       "$ref" : "#"
     },
 
     "required" : {
-      "type" : "array",
-      "items" : {
-        "type" : "string"
-      }
+      "description" : "A list of required properties",
+      "$ref" : "#/declarations/keyList"
     },
 
     "dependencies" : {
+      "description" : "A map of conditionally-required properties",
       "type" : "object",
+      "format" : "keyMap",
       "items" : {
-          "$ref" : "#/declarations/stringArray"
+          "$ref" : "#/declarations/keyList"
       }
     },
 
     "forbids" : {
+      "description" : "A map of conditionally-forbidden properties",
       "type" : "object",
+      "format" : "keyMap",
       "items" : {
-          "$ref" : "#/declarations/stringArray"
+          "$ref" : "#/declarations/keyList"
+      }
+    },
+
+    "$schema" : {
+      "description" : "A ref to the schema that validates this as an instance",
+      "type" : "string",
+      "format": "reference"
+    },
+
+    "extensions" : {
+      "description" : "A list of schemas that should also validate the an instance",
+      "type" : "array",
+      "items" : {
+          "type": "string",
+          "format": "reference"
       }
     }
 

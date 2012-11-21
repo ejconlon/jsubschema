@@ -3,8 +3,8 @@ package net.exathunk.jsubschema.crustache;
 import net.exathunk.jsubschema.functional.Pair;
 import net.exathunk.jsubschema.genschema.schema.Schema;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
+import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyList;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -76,17 +76,19 @@ public class TagTyper {
         return new Pair<SchemaLike, Boolean>(schema, required);
     }
 
-    public static SchemaLike makeTreeSchema(TagTree tree) {
+    public static SchemaLike makeTreeSchema(String name, TagTree tree, NameResolver resolver) {
         SchemaLike schema = new Schema();
         schema.setType("object");
         schema.setProperties(new TreeMap<String, SchemaLike>());
-        return makeTreeSchemaInner(tree, schema);
+        schema.setId(resolver.resolveName(name));
+        return makeTreeSchemaInner(name, tree, schema, resolver);
     }
 
-    private static SchemaLike makeTreeSchemaInner(TagTree tree, SchemaLike schema) {
+    private static SchemaLike makeTreeSchemaInner(String rootName, TagTree tree, SchemaLike schema, NameResolver resolver) {
         boolean addedChildren = false;
         if (tree.getParent().isJust()) {
             Tag parent = tree.getParent().getJust();
+
             Pair<SchemaLike, Boolean> pair = makeTagSchema(parent);
             final SchemaLike parentSchema = pair.getKey();
             addProperty(schema, parent.getLabel(), parentSchema);
@@ -98,7 +100,7 @@ public class TagTyper {
             if (t.equals("object")) {
                 addedChildren = true;
                 for (TagTree child : tree.getChildren()) {
-                    makeTreeSchemaInner(child, parentSchema);
+                    makeTreeSchemaInner(rootName, child, parentSchema, resolver);
                 }
             } else if (t.equals("array")) {
                 addedChildren = true;
@@ -106,7 +108,7 @@ public class TagTyper {
                 itemSchema.setType("object");
                 itemSchema.setProperties(new TreeMap<String, SchemaLike>());
                 for (TagTree child : tree.getChildren()) {
-                    makeTreeSchemaInner(child, itemSchema);
+                    makeTreeSchemaInner(rootName, child, itemSchema, resolver);
                 }
                 parentSchema.setItems(itemSchema);
             }
@@ -114,7 +116,7 @@ public class TagTyper {
 
         if (!addedChildren) {
             for (TagTree child : tree.getChildren()) {
-                makeTreeSchemaInner(child, schema);
+                makeTreeSchemaInner(rootName, child, schema, resolver);
             }
         }
 
@@ -123,7 +125,7 @@ public class TagTyper {
 
     private static void addRequired(SchemaLike schema, String label) {
         if (!schema.hasRequired()) {
-            schema.setRequired(new ArrayList<String>());
+            schema.setRequired(new KeyList());
         }
         if (!schema.getRequired().contains(label)) {
             schema.getRequired().add(label);

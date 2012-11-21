@@ -2,7 +2,7 @@ package net.exathunk.jsubschema.validation;
 
 import net.exathunk.jsubschema.base.SchemaTuple;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
-import net.exathunk.jsubschema.genschema.schema.declarations.stringarray.StringArrayLike;
+import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyListLike;
 
 import java.util.List;
 import java.util.Set;
@@ -29,12 +29,12 @@ public class RequiredValidator implements Validator {
                     }
                     if (!missingKeys.isEmpty() && schema.hasForbids()) {
                         for (String missingKey : missingKeys) {
-                            final StringArrayLike forbids = schema.getForbids().get(missingKey);
+                            final KeyListLike forbids = schema.getForbids().get(missingKey);
                             boolean skip = false;
                             if (forbids != null) {
                                 for (String forbidden : forbids) {
                                     if (tuple.getRefTuple().getNode().has(forbidden) && requiredKeys.contains(forbidden)) {
-                                        final StringArrayLike forbids2 = schema.getForbids().get(forbidden);
+                                        final KeyListLike forbids2 = schema.getForbids().get(forbidden);
                                         if (forbids2 != null) {
                                             if (forbids2.contains(missingKey)) {
                                                 skip = true;

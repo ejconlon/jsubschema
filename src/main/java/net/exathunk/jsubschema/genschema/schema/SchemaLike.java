@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import net.exathunk.jsubschema.genschema.schema.declarations.stringarray.StringArray;
-import net.exathunk.jsubschema.genschema.schema.declarations.stringarray.StringArrayLike;
+import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyList;
+import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyListLike;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
@@ -83,27 +83,44 @@ public interface SchemaLike {
     boolean hasRequired();
 
     @JsonProperty("required")
-    List<String> getRequired();
+    KeyListLike getRequired();
 
     @JsonProperty("required")
-    void setRequired(List<String> required);
+    @JsonDeserialize(as = KeyList.class)
+    void setRequired(KeyListLike required);
 
     boolean hasDependencies();
 
     @JsonProperty("dependencies")
-    Map<String, StringArrayLike> getDependencies();
+    Map<String, KeyListLike> getDependencies();
 
     @JsonProperty("dependencies")
-    @JsonDeserialize(contentAs = StringArray.class)
-    void setDependencies(Map<String, StringArrayLike> dependencies);
+    @JsonDeserialize(contentAs = KeyList.class)
+    void setDependencies(Map<String, KeyListLike> dependencies);
 
     boolean hasForbids();
 
     @JsonProperty("forbids")
-    Map<String, StringArrayLike> getForbids();
+    Map<String, KeyListLike> getForbids();
 
     @JsonProperty("forbids")
-    @JsonDeserialize(contentAs = StringArray.class)
-    void setForbids(Map<String, StringArrayLike> forbids);
+    @JsonDeserialize(contentAs = KeyList.class)
+    void setForbids(Map<String, KeyListLike> forbids);
+
+    boolean has__dollar__schema();
+
+    @JsonProperty("$schema")
+    String get__dollar__schema();
+
+    @JsonProperty("$schema")
+    void set__dollar__schema(String __dollar__schema);
+
+    boolean hasExtensions();
+
+    @JsonProperty("extensions")
+    List<String> getExtensions();
+
+    @JsonProperty("extensions")
+    void setExtensions(List<String> extensions);
 
 }

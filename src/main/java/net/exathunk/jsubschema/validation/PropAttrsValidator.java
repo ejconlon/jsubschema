@@ -3,7 +3,7 @@ package net.exathunk.jsubschema.validation;
 import net.exathunk.jsubschema.Util;
 import net.exathunk.jsubschema.base.SchemaTuple;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
-import net.exathunk.jsubschema.genschema.schema.declarations.stringarray.StringArrayLike;
+import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyListLike;
 import net.exathunk.jsubschema.pointers.Part;
 import net.exathunk.jsubschema.pointers.Reference;
 
@@ -30,13 +30,13 @@ public class PropAttrsValidator implements Validator {
                 }
                 if (schema.hasDependencies()) {
                     subCheck(props, schema.getDependencies().keySet(), ref.cons(Part.asKey("dependencies")), context);
-                    for (Map.Entry<String, StringArrayLike> entry : schema.getDependencies().entrySet()) {
+                    for (Map.Entry<String, KeyListLike> entry : schema.getDependencies().entrySet()) {
                         subCheck(props, Util.asSet(entry.getValue()), ref.cons(Part.asKey("dependencies")), context);
                     }
                 }
                 if (schema.hasForbids()) {
                     subCheck(props, schema.getForbids().keySet(), ref.cons(Part.asKey("forbids")), context);
-                    for (Map.Entry<String, StringArrayLike> entry : schema.getForbids().entrySet()) {
+                    for (Map.Entry<String, KeyListLike> entry : schema.getForbids().entrySet()) {
                         subCheck(props, Util.asSet(entry.getValue()), ref.cons(Part.asKey("forbids")), context);
                     }
                 }

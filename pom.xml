@@ -65,13 +65,13 @@
                                             <arg value="net.exathunk.jsubschema.genschema"/>
                                         </exec>
                                         <delete>
-                                            <fileset dir="src/main/java/net/exathunk/jsubschema/genschema" includes="**/*"/>
+                                            <fileset dir="src/main/java/net/exathunk/jsubschema/genschema"/>
                                         </delete>
                                         <copy todir="src/main/java/net/exathunk/jsubschema/genschema">
                                             <fileset dir="target/generated-sources/gen-javabean/net/exathunk/jsubschema/genschema"/>
                                         </copy>
                                         <delete>
-                                            <fileset dir="target/generated-sources/gen-javabean/net/exathunk/jsubschema/genschema" includes="**/*"/>
+                                            <fileset dir="target/generated-sources/gen-javabean/net/exathunk/jsubschema/genschema"/>
                                         </delete>
                                     </tasks>
                                 </configuration>
