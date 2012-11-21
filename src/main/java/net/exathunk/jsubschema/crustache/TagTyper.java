@@ -5,6 +5,7 @@ import net.exathunk.jsubschema.genschema.schema.Schema;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyList;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -40,6 +41,8 @@ public class TagTyper {
                 required = false;
             } else if (tag.getType().equals(Tag.Type.SECTION_END)) {
                 throw new IllegalArgumentException("SECTION END CANNOT BE TYPED");
+            } else if (tag.getType().equals(Tag.Type.PARTIAL)) {
+                throw new IllegalArgumentException("PARTIAL CANNOT BE TYPED");
             } else {
                 required = true;
             }
@@ -54,6 +57,8 @@ public class TagTyper {
                 stype = "array";
             } else if (tag.getType().equals(Tag.Type.SECTION_END)) {
                 throw new IllegalArgumentException("SECTION END CANNOT BE TYPED");
+            } else if (tag.getType().equals(Tag.Type.PARTIAL)) {
+                throw new IllegalArgumentException("PARTIAL CANNOT BE TYPED");
             } else {
                 stype = "string";
             }
@@ -81,42 +86,50 @@ public class TagTyper {
         schema.setType("object");
         schema.setProperties(new TreeMap<String, SchemaLike>());
         schema.setId(resolver.resolveName(name));
-        return makeTreeSchemaInner(name, tree, schema, resolver);
+        return makeTreeSchemaInner(schema, resolver, tree, true);
     }
 
-    private static SchemaLike makeTreeSchemaInner(String rootName, TagTree tree, SchemaLike schema, NameResolver resolver) {
+    private static SchemaLike makeTreeSchemaInner(SchemaLike schema, NameResolver resolver, TagTree tree, boolean isOnlyChild) {
         boolean addedChildren = false;
         if (tree.getParent().isJust()) {
-            Tag parent = tree.getParent().getJust();
-
-            Pair<SchemaLike, Boolean> pair = makeTagSchema(parent);
-            final SchemaLike parentSchema = pair.getKey();
-            addProperty(schema, parent.getLabel(), parentSchema);
-            if (Boolean.TRUE.equals(pair.getValue())) {
-                addRequired(schema, parent.getLabel());
-            }
-
-            final String t = parentSchema.getType();
-            if (t.equals("object")) {
-                addedChildren = true;
-                for (TagTree child : tree.getChildren()) {
-                    makeTreeSchemaInner(rootName, child, parentSchema, resolver);
+            Tag parentJust = tree.getParent().getJust();
+            if (parentJust.getType().equals(Tag.Type.PARTIAL)) {
+                final String extId = resolver.resolveName(parentJust.getLabel());
+                if (isOnlyChild) {
+                    schema.set__dollar__ref(extId);
+                } else {
+                    addExtension(schema, extId);
                 }
-            } else if (t.equals("array")) {
-                addedChildren = true;
-                SchemaLike itemSchema = new Schema();
-                itemSchema.setType("object");
-                itemSchema.setProperties(new TreeMap<String, SchemaLike>());
-                for (TagTree child : tree.getChildren()) {
-                    makeTreeSchemaInner(rootName, child, itemSchema, resolver);
+            } else {
+                Pair<SchemaLike, Boolean> pair = makeTagSchema(parentJust);
+                final SchemaLike parentSchema = pair.getKey();
+                addProperty(schema, parentJust.getLabel(), parentSchema);
+                if (Boolean.TRUE.equals(pair.getValue())) {
+                    addRequired(schema, parentJust.getLabel());
                 }
-                parentSchema.setItems(itemSchema);
+
+                final String t = parentSchema.getType();
+                if (t.equals("object")) {
+                    addedChildren = true;
+                    for (TagTree child : tree.getChildren()) {
+                        makeTreeSchemaInner(parentSchema, resolver, child, tree.getChildren().size() == 1);
+                    }
+                } else if (t.equals("array")) {
+                    addedChildren = true;
+                    SchemaLike itemSchema = new Schema();
+                    itemSchema.setType("object");
+                    itemSchema.setProperties(new TreeMap<String, SchemaLike>());
+                    for (TagTree child : tree.getChildren()) {
+                        makeTreeSchemaInner(itemSchema, resolver, child, tree.getChildren().size() == 1);
+                    }
+                    parentSchema.setItems(itemSchema);
+                }
             }
         }
 
         if (!addedChildren) {
             for (TagTree child : tree.getChildren()) {
-                makeTreeSchemaInner(rootName, child, schema, resolver);
+                makeTreeSchemaInner(schema, resolver, child, tree.getChildren().size() == 1);
             }
         }
 
@@ -129,6 +142,15 @@ public class TagTyper {
         }
         if (!schema.getRequired().contains(label)) {
             schema.getRequired().add(label);
+        }
+    }
+
+    private static void addExtension(SchemaLike schema, String extId) {
+        if (!schema.hasExtensions()) {
+            schema.setExtensions(new ArrayList<String>());
+        }
+        if (!schema.getExtensions().contains(extId)) {
+            schema.getExtensions().add(extId);
         }
     }
 

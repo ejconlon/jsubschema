@@ -175,6 +175,10 @@ public class TestCrustache {
             assertEquals(k, "object", schema.getProperties().get(k).getItems().getType());
         }
         assertEquals("string", schema.getProperties().get("secret").getItems().getProperties().get("dude").getType());
+        assertEquals(Util.asList("http://example.com/whee/next"), schema.getProperties().get("secret").getItems().getExtensions());
+        assertEquals(false, schema.getProperties().get("secret").getItems().has__dollar__ref());
+        assertEquals("http://example.com/whee/next2", schema.getProperties().get("secret2").getItems().get__dollar__ref());
+        assertEquals(false, schema.getProperties().get("secret2").getItems().hasExtensions());
         //System.out.println(Util.quickUnbind(schema));
     }
 
