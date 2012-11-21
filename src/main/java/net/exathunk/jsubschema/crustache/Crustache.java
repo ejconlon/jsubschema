@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  */
 public class Crustache {
 
-    public static final String INNER_STRING = "(\\w|[#&^/])?(\\w|[?!\\/.-])*";
+    public static final String INNER_STRING = "(\\w|[#&^/])?(\\w|[?!\\/.-|])*";
     public static final String DOUBLE_STRING = "(?<!\\{)\\{\\{"+INNER_STRING+"\\}\\}(?!\\})";
     public static final String TRIPLE_STRING = "\\{\\{\\{"+INNER_STRING+"\\}\\}\\}";
     public static final String EITHER_STRING = "("+DOUBLE_STRING+")|("+TRIPLE_STRING+")";

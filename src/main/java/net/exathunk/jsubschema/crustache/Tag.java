@@ -2,6 +2,10 @@ package net.exathunk.jsubschema.crustache;
 
 import net.exathunk.jsubschema.functional.Either;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 
 /**
@@ -13,12 +17,19 @@ public class Tag {
 
     private final String label;
     private final Type type;
+    private final List<String> filters;
 
     public Tag(String label, Type type) {
+        this(label, type, new ArrayList<String>());
+    }
+
+    public Tag(String label, Type type, List<String> filters) {
         this.label = label;
         this.type = type;
+        this.filters = filters;
         assert label != null;
         assert type != null;
+        assert filters != null;
     }
 
     public final String getLabel() {
@@ -29,11 +40,16 @@ public class Tag {
         return type;
     }
 
+    public List<String> getFilters() {
+        return filters;
+    }
+
     @Override
     public String toString() {
-        return "Site{" +
+        return "Tag{" +
                 "label='" + label + '\'' +
                 ", type=" + type +
+                ", filters='" + filters + '\'' +
                 '}';
     }
 
@@ -44,6 +60,7 @@ public class Tag {
 
         Tag tag = (Tag) o;
 
+        if (!filters.equals(tag.filters)) return false;
         if (!label.equals(tag.label)) return false;
         if (type != tag.type) return false;
 
@@ -54,6 +71,7 @@ public class Tag {
     public int hashCode() {
         int result = label.hashCode();
         result = 31 * result + type.hashCode();
+        result = 31 * result + filters.hashCode();
         return result;
     }
 
@@ -97,6 +115,12 @@ public class Tag {
         else if (isClose) type = Type.SECTION_END;
         else if (isInverted) type = Type.INVERTED_START;
         else type = Type.NORMAL;
-        return Either.makeFirst(new Tag(inner, type));
+
+        final String label;
+        final List<String> filters = new ArrayList<String>();
+        String[] parts = inner.split("\\|");
+        label = parts[0];
+        for (int i = 1; i < parts.length; ++i) filters.add(parts[i]);
+        return Either.makeFirst(new Tag(label, type, filters));
     }
 }
