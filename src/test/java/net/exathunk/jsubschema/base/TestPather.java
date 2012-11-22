@@ -18,7 +18,6 @@ import static org.junit.Assert.assertNotNull;
  */
 public class TestPather {
 
-
     @Test
     public void testPathSchema() throws IOException, TypeException {
         final Session session = Session.loadDefaultSession();
@@ -38,19 +37,6 @@ public class TestPather {
         Either3<SchemaRef, String, PointedRef> goldItemsRef = Either3.makeFirst(new SchemaRef(schema.getDeclarations().get("stringArray").getItems(), baseRef.cons(Part.asKey("declarations")).cons(Part.asKey("stringArray")).cons(Part.asKey("items"))));
         Either3<SchemaRef, String, PointedRef> testItemsRef = Pather.pathSchema(new SchemaRef(schema), new Pointer().reversed().cons(Part.asKey("items")).cons(Part.asKey("stringArray")).cons(Part.asKey("declarations")));
         assertEquals(goldItemsRef, testItemsRef);
-
-        //assertEquals(saSchemaRef, resolve(fullRefResolver, "http://exathunk.net/schemas/stringmultimap#/declarations/stringArray"));
-
-
-        //assertEquals(rootSchemaRef, resolve(fullRefResolver, "#"));
-        //assertEquals(rootSchemaRef, resolve(fullRefResolver, "http://exathunk.net/schemas/stringmultimap#"));
-
-        // DOESN'T WORK: resolve + Pather work from domain paths -> Schema.  Need another function to work from schema paths -> schema.
-        //Either<SchemaRef, String> saSchemaRef = Either.<SchemaRef, String>makeFirst(new SchemaRef(schema.getDeclarations().get("stringArray"), baseRef.cons(Part.asKey("declarations")).cons(Part.asKey("stringArray"))));
-        //assertEquals(saSchemaRef, resolve(fullRefResolver, "http://exathunk.net/schemas/stringmultimap#/declarations/stringArray"));
-        //assertEquals(saSchemaRef, resolve(fullRefResolver, schema.getItems().get__dollar__ref()));
-
-        //assertEquals(schema.getItems(), resolve(fullRefResolver, "#/items"));
     }
 
 }
