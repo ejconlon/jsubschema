@@ -20,7 +20,7 @@ public class SessionResolver implements RefResolver {
         Reference otherReference = pointedRef.getReference();
         SchemaLike maybeSchema = session.schemas.get(otherReference.getUrl());
         if (maybeSchema != null) {
-            return Pather.pathSchema(new SchemaRef(maybeSchema, Reference.fromId(maybeSchema.getId())), pointedRef.getPointer());
+            return Pather.pathDomain(new SchemaRef(maybeSchema, Reference.fromId(maybeSchema.getId())), pointedRef.getPointer());
         } else {
             return Either3.makeThird(pointedRef);
         }
