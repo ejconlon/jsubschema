@@ -10,9 +10,14 @@ public class SchemaRef {
     private final SchemaLike schema;
     private final Reference reference;
 
+    public SchemaRef(SchemaLike schema) {
+        this(schema, Reference.fromId(schema.getId()));
+    }
+
     public SchemaRef(SchemaLike schema, Reference reference) {
         this.schema = schema;
         this.reference = reference;
+        assert reference != null;
     }
 
     public Reference getReference() {

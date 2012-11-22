@@ -1,6 +1,6 @@
 package net.exathunk.jsubschema.validation;
 
-import net.exathunk.jsubschema.base.SchemaTuple;
+import net.exathunk.jsubschema.base.SchemaNode;
 import net.exathunk.jsubschema.Util;
 
 /**
@@ -8,13 +8,13 @@ import net.exathunk.jsubschema.Util;
  */
 public class TypeValidator implements Validator {
     @Override
-    public void validate(SchemaTuple tuple, VContext context) {
-        final String schemaType = tuple.getEitherSchema().getFirst().getSchema().getType();
+    public void validate(SchemaNode node, VContext context) {
+        final String schemaType = node.getEitherSchema().getFirst().getSchema().getType();
         if (schemaType == null) {
-            context.errors.add(new VError(tuple.getRefTuple().getReference(), "no schema type"));
+            context.errors.add(new VError(node, "no schema type"));
         }
-        if (!Util.matchesType(tuple.getRefTuple().getNode(), schemaType)) {
-            context.errors.add(new VError(tuple.getRefTuple().getReference(), "node/schema mismatch: "+tuple+" "+schemaType));
+        if (!Util.matchesType(node.getPointedNode().getNode(), schemaType)) {
+            context.errors.add(new VError(node, "node/schema mismatch: "+ node +" "+schemaType));
         }
     }
 }

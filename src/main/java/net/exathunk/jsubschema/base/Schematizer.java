@@ -3,6 +3,7 @@ package net.exathunk.jsubschema.base;
 import net.exathunk.jsubschema.Util;
 import net.exathunk.jsubschema.genschema.schema.Schema;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
+import net.exathunk.jsubschema.pointers.Part;
 import net.exathunk.jsubschema.pointers.Reference;
 import net.exathunk.jsubschema.validation.VContext;
 import net.exathunk.jsubschema.validation.VError;
@@ -15,18 +16,18 @@ import java.util.TreeMap;
  */
 public class Schematizer {
     public SchemaLike schematize(String id, JsonNode node, VContext context) {
-        SchemaLike schema = schematizeInner(id + "#", node, context);
+        SchemaLike schema = schematizeInner(new Reference(), node, context);
         schema.setId(id);
         return schema;
     }
 
-    private SchemaLike schematizeInner(String id, JsonNode node, VContext context) {
+    private SchemaLike schematizeInner(Reference reference, JsonNode node, VContext context) {
         SchemaLike schema = new Schema();
         if (node.isObject()) {
             schema.setType("object");
             for (final String key : Util.onceIterable(node.getFieldNames())) {
                 final JsonNode child = node.get(key);
-                final SchemaLike childSchema = schematizeInner(id + "/" + key, child, context);
+                final SchemaLike childSchema = schematizeInner(reference.cons(Part.asKey("properties")).cons(Part.asKey(key)), child, context);
                 if (!schema.hasProperties()) schema.setProperties(new TreeMap<String, SchemaLike>());
                 schema.getProperties().put(key, childSchema);
             }
@@ -34,7 +35,7 @@ public class Schematizer {
             schema.setType("array");
             if (node.size() > 0) {
                 final JsonNode child = node.get(0);
-                final SchemaLike childSchema = schematizeInner(id + "/" + 0, child, context);
+                final SchemaLike childSchema = schematizeInner(reference.cons(Part.asKey("items")), child, context);
                 schema.setItems(childSchema);
             }
         } else if (node.isTextual()) {
@@ -46,7 +47,7 @@ public class Schematizer {
         } else if (node.isNumber()) {
             schema.setType("number");
         } else {
-            context.errors.add(new VError(Reference.fromReferenceString(id), "Cannot type: "+node));
+            context.errors.add(new VError(reference.toReferenceString(), "Cannot type node"));
         }
         return schema;
     }

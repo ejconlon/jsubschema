@@ -1,6 +1,9 @@
 package net.exathunk.jsubschema.crustache;
 
 import net.exathunk.jsubschema.Util;
+import net.exathunk.jsubschema.base.FullRefResolver;
+import net.exathunk.jsubschema.base.MetaResolver;
+import net.exathunk.jsubschema.base.SelfResolver;
 import net.exathunk.jsubschema.base.TypeException;
 import net.exathunk.jsubschema.functional.Either;
 import net.exathunk.jsubschema.functional.Either3;
@@ -252,6 +255,11 @@ public class TestCrustache {
         return Util.quickBind(Util.parse(s), new SchemaFactory());
     }
 
+    private static List<String> satisfyErrors(SchemaLike schema, TagTree tagTree) {
+        FullRefResolver refResolver = new MetaResolver(new SelfResolver(schema));
+        return TagTyper.satisfyErrors(schema, tagTree, refResolver);
+    }
+
     @Test
     public void testSatisfies() throws IOException, TypeException {
         TagTree tagTree = Crustache.treed(Crustache.parsed(Crustache.inline(makeTemplate()))).tagTree();
@@ -273,58 +281,69 @@ public class TestCrustache {
         final List<String> empty = new ArrayList<String>();
 
         // NORMAL node accepts scalar types
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"string\" }"), yawnTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), yawnTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), yawnTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"number\" }"), yawnTagTree));
-        assertEquals(Util.asList("yawn: expected schema with scalar type, found: object"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\" }"), yawnTagTree));
-        assertEquals(Util.asList("yawn: expected schema with scalar type, found: array"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\" }"), yawnTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"string\" }"), yawnTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), yawnTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), yawnTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"number\" }"), yawnTagTree));
+        assertEquals(Util.asList("yawn: expected schema with scalar type, found: object"), satisfyErrors(makeSchema("{ \"type\": \"object\" }"), yawnTagTree));
+        assertEquals(Util.asList("yawn: expected schema with scalar type, found: array"), satisfyErrors(makeSchema("{ \"type\": \"array\" }"), yawnTagTree));
+
+        // with ref!
+        //assertEquals(empty, satisfyErrors(makeSchema("{ \"declarations\" : {\"strDecl\" : { \"type\": \"string\" }}, \"$ref\":\"#/declarations/strDecl\" }"), yawnTagTree));
 
         // ESCAPE node accepts scalar types
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"string\" }"), moreTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), moreTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), moreTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"number\" }"), moreTagTree));
-        assertEquals(Util.asList("more: expected schema with scalar type, found: object"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\" }"), moreTagTree));
-        assertEquals(Util.asList("more: expected schema with scalar type, found: array"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\" }"), moreTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"string\" }"), moreTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), moreTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), moreTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"number\" }"), moreTagTree));
+        assertEquals(Util.asList("more: expected schema with scalar type, found: object"), satisfyErrors(makeSchema("{ \"type\": \"object\" }"), moreTagTree));
+        assertEquals(Util.asList("more: expected schema with scalar type, found: array"), satisfyErrors(makeSchema("{ \"type\": \"array\" }"), moreTagTree));
         
         // INVERTED_START node accepts all types
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"string\" }"), bollocksTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), bollocksTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), bollocksTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"number\" }"), bollocksTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\" }"), bollocksTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\" }"), bollocksTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"string\" }"), bollocksTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), bollocksTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), bollocksTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"number\" }"), bollocksTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"object\" }"), bollocksTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"array\" }"), bollocksTagTree));
 
         // SECTION_START accepts object or array, unless empty!
         // empty
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"string\" }"), emptyTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), emptyTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), emptyTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"number\" }"), emptyTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\" }"), emptyTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\" }"), emptyTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"string\" }"), emptyTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), emptyTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), emptyTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"number\" }"), emptyTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"object\" }"), emptyTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"array\" }"), emptyTagTree));
 
         // single, valid obj schema
-        assertEquals(Util.asList("single: expected container type, found: string"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"string\" }"), singleTagTree));
-        assertEquals(Util.asList("single: expected container type, found: boolean"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), singleTagTree));
-        assertEquals(Util.asList("single: expected container type, found: integer"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), singleTagTree));
-        assertEquals(Util.asList("single: expected container type, found: number"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"number\" }"), singleTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"string\" } } }"), singleTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"string\"} } } }"), singleTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"boolean\" } } }"), singleTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"boolean\"} } } }"), singleTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"integer\" } } }"), singleTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"integer\"} } } }"), singleTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"number\" } } }"), singleTagTree));
-        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"number\"} } } }"), singleTagTree));
+        assertEquals(Util.asList("single: expected container type, found: string"), satisfyErrors(makeSchema("{ \"type\": \"string\" }"), singleTagTree));
+        assertEquals(Util.asList("single: expected container type, found: boolean"), satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), singleTagTree));
+        assertEquals(Util.asList("single: expected container type, found: integer"), satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), singleTagTree));
+        assertEquals(Util.asList("single: expected container type, found: number"), satisfyErrors(makeSchema("{ \"type\": \"number\" }"), singleTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"string\" } } }"), singleTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"string\"} } } }"), singleTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"boolean\" } } }"), singleTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"boolean\"} } } }"), singleTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"integer\" } } }"), singleTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"integer\"} } } }"), singleTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"number\" } } }"), singleTagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"number\"} } } }"), singleTagTree));
 
-        // invalid object schema
-        assertEquals(Util.asList("single: missing key: subSingle"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"NOT_IT\" : { \"type\" : \"string\" } } }"), singleTagTree));
-        assertEquals(Util.asList("single: missing key: subSingle"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"NOT_IT\" : {\"type\" : \"string\"} } } }"), singleTagTree));
-        assertEquals(Util.asList("subSingle: expected schema with scalar type, found: object"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"object\" } } }"), singleTagTree));
-        assertEquals(Util.asList("subSingle: expected schema with scalar type, found: array"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"array\" } } }"), singleTagTree));
-        assertEquals(Util.asList("subSingle: expected schema with scalar type, found: object"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"object\"} } } }"), singleTagTree));
-        assertEquals(Util.asList("subSingle: expected schema with scalar type, found: array"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"array\"} } } }"), singleTagTree));
+        // invalid object schema or invalid type
+        assertEquals(Util.asList("single: missing key: subSingle"), satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"NOT_IT\" : { \"type\" : \"string\" } } }"), singleTagTree));
+        assertEquals(Util.asList("single: missing key: subSingle"), satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"NOT_IT\" : {\"type\" : \"string\"} } } }"), singleTagTree));
+        assertEquals(Util.asList("subSingle: expected schema with scalar type, found: object"), satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"object\" } } }"), singleTagTree));
+        assertEquals(Util.asList("subSingle: expected schema with scalar type, found: array"), satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"array\" } } }"), singleTagTree));
+        assertEquals(Util.asList("subSingle: expected schema with scalar type, found: object"), satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"object\"} } } }"), singleTagTree));
+        assertEquals(Util.asList("subSingle: expected schema with scalar type, found: array"), satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"array\"} } } }"), singleTagTree));
+
+        // partials
+        //assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{\"type\":\"object\", \"extensions\":[\"http://example.com/whee/next\"]}"), secretTagTree));
+        //assertEquals(empty, satisfyErrors(makeSchema("{\"$ref\":\"http://example.com/whee/next2\"}"), secret2TagTree));
+
+        //NameResolver resolver = new NameResolverImpl("http://example.com/whee");
+        //SchemaLike schema = TagTyper.makeTreeSchema("woo", tagTree, resolver);
+        //assertEquals(empty, TagTyper.satisfyErrors(schema, tagTree));
     }
 }

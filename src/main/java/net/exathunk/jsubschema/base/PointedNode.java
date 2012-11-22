@@ -1,7 +1,6 @@
 package net.exathunk.jsubschema.base;
 
-import net.exathunk.jsubschema.pointers.Part;
-import net.exathunk.jsubschema.pointers.Reference;
+import net.exathunk.jsubschema.pointers.*;
 import org.codehaus.jackson.JsonNode;
 
 import java.util.Iterator;
@@ -10,23 +9,25 @@ import java.util.NoSuchElementException;
 /**
  * charolastra 11/15/12 12:48 PM
  */
-public class RefTuple implements Iterable<RefTuple> {
+public class PointedNode implements Iterable<PointedNode> {
     private final JsonNode node;
-    private final Reference reference;
+    private final Pointer pointer;
 
-    public RefTuple(JsonNode node) {
-        this(node, new Reference());
+    // TODO add pointer too
+    public PointedNode(JsonNode node) {
+        this(node, new Pointer());
     }
 
-    private RefTuple(JsonNode node, Reference reference) {
+    private PointedNode(JsonNode node, Pointer pointer) {
         this.node = node;
-        this.reference = reference;
+        this.pointer = pointer;
         assert node != null;
-        assert reference != null;
+        assert pointer != null;
+        assert Direction.DOWN.equals(pointer.getDirection());
     }
 
     @Override
-    public Iterator<RefTuple> iterator() {
+    public Iterator<PointedNode> iterator() {
         return new PathTupleIterator(this);
     }
 
@@ -34,17 +35,17 @@ public class RefTuple implements Iterable<RefTuple> {
         return node;
     }
 
-    public Reference getReference() {
-        return reference;
+    public Pointer getPointer() {
+        return pointer;
     }
 
-    private static class PathTupleIterator implements Iterator<RefTuple> {
-        private final RefTuple root;
+    private static class PathTupleIterator implements Iterator<PointedNode> {
+        private final PointedNode root;
         private final Iterator<String> nextFields;
         private final int size;
         private int pos;
 
-        public PathTupleIterator(RefTuple root) {
+        public PathTupleIterator(PointedNode root) {
             this.root = root;
             pos = 0;
             if (root.node.isObject()) {
@@ -71,17 +72,17 @@ public class RefTuple implements Iterable<RefTuple> {
         }
 
         @Override
-        public RefTuple next() {
+        public PointedNode next() {
             if (nextFields != null) {
                 final String nextField = nextFields.next();
                 final JsonNode node = root.node.get(nextField);
-                final Reference reference = root.reference.cons(Part.asKey(nextField));
-                return new RefTuple(node, reference);
+                final Pointer pointer = root.pointer.cons(Part.asKey(nextField));
+                return new PointedNode(node, pointer);
             } else if (size >= 0) {
                 final JsonNode node = root.node.get(pos);
-                final Reference reference = root.reference.cons(Part.asIndex(pos));
+                final Pointer pointer = root.pointer.cons(Part.asIndex(pos));
                 ++pos;
-                return new RefTuple(node, reference);
+                return new PointedNode(node, pointer);
             } else {
                 throw new NoSuchElementException();
             }

@@ -1,10 +1,9 @@
 package net.exathunk.jsubschema.validation;
 
 import net.exathunk.jsubschema.Util;
-import net.exathunk.jsubschema.base.SchemaTuple;
+import net.exathunk.jsubschema.base.SchemaNode;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyListLike;
-import net.exathunk.jsubschema.pointers.Part;
 import net.exathunk.jsubschema.pointers.Reference;
 
 import java.util.Map;
@@ -15,41 +14,41 @@ import java.util.Set;
  */
 public class PropAttrsValidator implements Validator {
     @Override
-    public void validate(SchemaTuple tuple, VContext context) {
-        if (tuple.getRefTuple().getNode().isObject()) {
-            final Reference ref = tuple.getRefTuple().getReference();
-            final SchemaLike schema = tuple.getEitherSchema().getFirst().getSchema();
+    public void validate(SchemaNode node, VContext context) {
+        if (node.getPointedNode().getNode().isObject()) {
+            final Reference ref = node.getEitherSchema().getFirst().getReference();
+            final SchemaLike schema = node.getEitherSchema().getFirst().getSchema();
             if (schema.hasProperties()) {
                 final Set<String> props = schema.getProperties().keySet();
                 if (schema.hasRequired()) {
                     final Set<String> x = Util.asSet(schema.getRequired());
                     if (x.size() != schema.getRequired().size()) {
-                        context.errors.add(new VError(ref.cons(Part.asKey("required")), "Duplicate key"));
+                        context.errors.add(new VError(node, "required: duplicate key"));
                     }
-                    subCheck(props, x, ref.cons(Part.asKey("required")), context);
+                    subCheck(node, props, x, "required", context);
                 }
                 if (schema.hasDependencies()) {
-                    subCheck(props, schema.getDependencies().keySet(), ref.cons(Part.asKey("dependencies")), context);
+                    subCheck(node, props, schema.getDependencies().keySet(), "dependencies", context);
                     for (Map.Entry<String, KeyListLike> entry : schema.getDependencies().entrySet()) {
-                        subCheck(props, Util.asSet(entry.getValue()), ref.cons(Part.asKey("dependencies")), context);
+                        subCheck(node, props, Util.asSet(entry.getValue()), "dependencies", context);
                     }
                 }
                 if (schema.hasForbids()) {
-                    subCheck(props, schema.getForbids().keySet(), ref.cons(Part.asKey("forbids")), context);
+                    subCheck(node, props, schema.getForbids().keySet(), "forbids", context);
                     for (Map.Entry<String, KeyListLike> entry : schema.getForbids().entrySet()) {
-                        subCheck(props, Util.asSet(entry.getValue()), ref.cons(Part.asKey("forbids")), context);
+                        subCheck(node, props, Util.asSet(entry.getValue()), "forbids", context);
                     }
                 }
             } else if (schema.hasRequired() || schema.hasDependencies() || schema.hasForbids()) {
-                context.errors.add(new VError(ref, "Need properties to specify required/dependencies/forbids"));
+                context.errors.add(new VError(node, "Need properties to specify required/dependencies/forbids"));
             }
         }
     }
 
-    private static void subCheck(Set<String> props, Set<String> xs, Reference ref, VContext context) {
+    private static void subCheck(SchemaNode node, Set<String> props, Set<String> xs, String key, VContext context) {
         for (String x : xs) {
             if (!props.contains(x)) {
-                context.errors.add(new VError(ref, "Unknown prop: "+x));
+                context.errors.add(new VError(node, key+": unknown prop: "+x));
             }
         }
     }

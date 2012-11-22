@@ -1,10 +1,15 @@
 package net.exathunk.jsubschema.crustache;
 
+import net.exathunk.jsubschema.base.FullRefResolver;
+import net.exathunk.jsubschema.base.SchemaRef;
+import net.exathunk.jsubschema.functional.Either;
 import net.exathunk.jsubschema.functional.Maybe;
 import net.exathunk.jsubschema.functional.Pair;
 import net.exathunk.jsubschema.genschema.schema.Schema;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyList;
+import net.exathunk.jsubschema.pointers.PointedSchemaRef;
+import net.exathunk.jsubschema.pointers.Reference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -161,80 +166,94 @@ public class TagTyper {
     }
 
     // Returns list of errors.  Empty list == ok.
-    public static List<String> satisfyErrors(SchemaLike schema, TagTree tagTree) {
+    public static List<String> satisfyErrors(SchemaLike schema, TagTree tagTree, FullRefResolver refResolver) {
         List<String> errors = new ArrayList<String>();
-        satisfyErrorsInner(schema, tagTree, errors);
+        satisfyErrorsInner(schema, tagTree, errors, refResolver);
         return errors;
     }
 
-    private static void satisfyErrorsInner(SchemaLike schema, TagTree tagTree, List<String> errors) {
-        if (schema == null || !schema.hasType()) {
-            errors.add("Invalid schema: "+schema);
+    private static void satisfyErrorsInner(SchemaLike schema, TagTree tagTree, List<String> errors, FullRefResolver refResolver) {
+        if (schema == null || (!schema.hasType() && !schema.has__dollar__ref())) {
+            errors.add("Invalid schema: null or null type and ref"+schema);
             return;
-        }
-        final String schemaType = schema.getType();
-        if (tagTree.getParent().isJust()) {
-            final Tag parent = tagTree.getParent().getJust();
-            final String label = parent.getLabel();
-            final Tag.Type parentType = parent.getType();
-            if (parentType.equals(Tag.Type.NORMAL) || parentType.equals(Tag.Type.ESCAPE)) {
-                // These nodes can be any scalar:
-                if (schemaType.equals("string") || schemaType.equals("boolean") ||
-                    schemaType.equals("integer") || schemaType.equals("number")) {
-                   // OK
-                } else {
-                    errors.add(label+": expected schema with scalar type, found: "+schemaType);
-                    return;
-                }
-            } else if (parentType.equals(Tag.Type.SECTION_START) || parentType.equals(Tag.Type.INVERTED_START)) {
-                boolean hasChildren = tagTree.getChildren().size() > 0;
-                if (schemaType.equals("object")) {
-                    if (hasChildren) {
-                        if (!schema.hasProperties()) {
-                            errors.add(label+": missing properties");
-                            return;
-                        } else {
-                            for (TagTree childTree : tagTree.getChildren()) {
-                                final Maybe<Tag> child = childTree.getParent();
-                                if (child.isNothing()) {
-                                    errors.add(label+": null child");
-                                } else {
-                                    final String childLabel = child.getJust().getLabel();
-                                    if (!schema.getProperties().containsKey(childLabel)) {
-                                        errors.add(label+": missing key: "+childLabel);
-                                    } else {
-                                        satisfyErrorsInner(schema.getProperties().get(childLabel), childTree, errors);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else if (schemaType.equals("array")) {
-                    if (hasChildren) {
-                        if (!schema.hasItems()) {
-                            errors.add(label+": missing items");
-                            return;
-                        } else {
-                            satisfyErrorsInner(schema.getItems(), tagTree, errors);
-                        }
-                    }
-                } else if (!hasChildren) {
-                    // OK - functions as an "is defined?" operator
-                } else {
-                    errors.add(label+": expected container type, found: "+schemaType);
-                    return;
-                }
-            }
-        } else {
-            // Root of tree - must be object.
-            if (!schemaType.equals("object")) {
-                errors.add("Root type must be object.");
+        } else if (schema.has__dollar__ref()) {
+            Either<Reference, String> eitherRef = Reference.fromReferenceString(schema.get__dollar__ref());
+            if (eitherRef.isSecond()) {
+                errors.add("Invalid schema: "+eitherRef.getSecond());
                 return;
             }
-            for (TagTree child : tagTree.getChildren()) {
-                satisfyErrorsInner(schema, child, errors);
+            Either<SchemaRef, String> eitherSchema = refResolver.fullyResolveRef(new PointedSchemaRef(new SchemaRef(null, eitherRef.getFirst()), eitherRef.getFirst().getPointer()));
+            if (eitherSchema.isSecond()) {
+                errors.add("Invalid reference: "+eitherSchema.getSecond());
+                return;
+            }
+            satisfyErrorsInner(eitherSchema.getFirst().getSchema(), tagTree, errors, refResolver);
+        } else {
+            final String schemaType = schema.getType();
+            if (tagTree.getParent().isJust()) {
+                final Tag parent = tagTree.getParent().getJust();
+                final String label = parent.getLabel();
+                final Tag.Type parentType = parent.getType();
+                if (parentType.equals(Tag.Type.NORMAL) || parentType.equals(Tag.Type.ESCAPE)) {
+                    // These nodes can be any scalar:
+                    if (schemaType.equals("string") || schemaType.equals("boolean") ||
+                            schemaType.equals("integer") || schemaType.equals("number")) {
+                        // OK
+                    } else {
+                        errors.add(label+": expected schema with scalar type, found: "+schemaType);
+                        return;
+                    }
+                } else if (parentType.equals(Tag.Type.SECTION_START) || parentType.equals(Tag.Type.INVERTED_START)) {
+                    boolean hasChildren = tagTree.getChildren().size() > 0;
+                    if (schemaType.equals("object")) {
+                        checkObject(schema, tagTree, errors, refResolver, label);
+                    } else if (schemaType.equals("array")) {
+                        if (hasChildren) {
+                            if (!schema.hasItems()) {
+                                errors.add(label+": missing items");
+                                return;
+                            } else {
+                                satisfyErrorsInner(schema.getItems(), tagTree, errors, refResolver);
+                            }
+                        }
+                    } else if (!hasChildren) {
+                        // OK - functions as an "is defined?" operator
+                    } else {
+                        errors.add(label+": expected container type, found: "+schemaType);
+                        return;
+                    }
+                }
+            } else {
+                // Root of tree - must be object.
+                if (!schemaType.equals("object")) {
+                    errors.add("ROOT: expected object type, found: "+schemaType);
+                    return;
+                }
+                checkObject(schema, tagTree, errors, refResolver, "ROOT");
             }
         }
+    }
 
+    private static void checkObject(SchemaLike schema, TagTree tagTree, List<String> errors, FullRefResolver refResolver, String label) {
+        if (!tagTree.getChildren().isEmpty()) {
+            if (!schema.hasProperties()) {
+                errors.add(label+": missing properties");
+                return;
+            } else {
+                for (TagTree childTree : tagTree.getChildren()) {
+                    final Maybe<Tag> child = childTree.getParent();
+                    if (child.isNothing()) {
+                        errors.add(label+": null child");
+                    } else {
+                        final String childLabel = child.getJust().getLabel();
+                        if (!schema.getProperties().containsKey(childLabel)) {
+                            errors.add(label+": missing key: "+childLabel);
+                        } else {
+                            satisfyErrorsInner(schema.getProperties().get(childLabel), childTree, errors, refResolver);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

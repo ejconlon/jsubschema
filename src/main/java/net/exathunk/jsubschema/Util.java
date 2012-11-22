@@ -1,7 +1,7 @@
 package net.exathunk.jsubschema;
 
+import net.exathunk.jsubschema.base.SchemaNode;
 import net.exathunk.jsubschema.base.JacksonBinder;
-import net.exathunk.jsubschema.base.SchemaTuple;
 import net.exathunk.jsubschema.base.TypeException;
 import net.exathunk.jsubschema.gendeps.DomainFactory;
 import net.exathunk.jsubschema.validation.VContext;
@@ -140,20 +140,20 @@ public class Util {
         return name;
     }
 
-    private static void runValidator(Validator validator, SchemaTuple rootTuple, VContext context) {
-        if (rootTuple.getEitherSchema().isFirst()) {
-            validator.validate(rootTuple, context);
-            for (SchemaTuple childTuple : rootTuple) {
-                runValidator(validator, childTuple, context);
+    private static void runValidator(Validator validator, SchemaNode rootNode, VContext context) {
+        if (rootNode.getEitherSchema().isFirst()) {
+            validator.validate(rootNode, context);
+            for (SchemaNode childNode : rootNode) {
+                runValidator(validator, childNode, context);
             }
         } else {
-            context.errors.add(new VError(rootTuple.getRefTuple().getReference(), rootTuple.getEitherSchema().getSecond()));
+            context.errors.add(new VError(rootNode, rootNode.getEitherSchema().getSecond()));
         }
     }
 
-    public static VContext runValidator(Validator validator, SchemaTuple rootTuple) {
+    public static VContext runValidator(Validator validator, SchemaNode rootNode) {
         VContext context = new VContext();
-        runValidator(validator, rootTuple, context);
+        runValidator(validator, rootNode, context);
         return context;
     }
 

@@ -1,7 +1,6 @@
 package net.exathunk.jsubschema.validation;
 
-import net.exathunk.jsubschema.functional.Either;
-import net.exathunk.jsubschema.pointers.Reference;
+import net.exathunk.jsubschema.base.SchemaNode;
 import net.exathunk.jsubschema.base.TypeException;
 
 import java.util.List;
@@ -10,21 +9,21 @@ import java.util.List;
  * charolastra 11/15/12 11:41 AM
  */
 public class VError {
-    public final Either<Reference, String> eitherReference;
+    public final String path;
     public final String message;
 
-    public VError(Either<Reference, String> eitherReference, String message) {
-        this.eitherReference = eitherReference;
+    public VError(String path, String message) {
+        this.path = path;
         this.message = message;
     }
 
-    public VError(Reference reference, String message) {
-        this(Either.<Reference, String>makeFirst(reference), message);
+    public VError(SchemaNode schemaNode, String message) {
+        this(schemaNode.toPathString(), message);
     }
 
     @Override
     public String toString() {
-        return "VError: "+eitherReference+" "+message+"\n";
+        return "VError: "+path+": "+message+"\n";
     }
 
     public void throwThis(VError ve) throws TypeException {

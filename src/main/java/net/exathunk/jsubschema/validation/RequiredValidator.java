@@ -1,6 +1,6 @@
 package net.exathunk.jsubschema.validation;
 
-import net.exathunk.jsubschema.base.SchemaTuple;
+import net.exathunk.jsubschema.base.SchemaNode;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyListLike;
 
@@ -13,17 +13,17 @@ import java.util.TreeSet;
  */
 public class RequiredValidator implements Validator {
     @Override
-    public void validate(SchemaTuple tuple, VContext context) {
-        if (tuple.getRefTuple().getNode().isObject()) {
-            final SchemaLike schema = tuple.getEitherSchema().getFirst().getSchema();
+    public void validate(SchemaNode node, VContext context) {
+        if (node.getPointedNode().getNode().isObject()) {
+            final SchemaLike schema = node.getEitherSchema().getFirst().getSchema();
             final List<String> requiredKeys = schema.getRequired();
             if (requiredKeys != null) {
                 if (schema.getProperties() == null) {
-                    context.errors.add(new VError(tuple.getRefTuple().getReference(), "No properties"));
+                    context.errors.add(new VError(node, "No properties"));
                 } else {
                     final Set<String> missingKeys = new TreeSet<String>();
                     for (String requiredKey : requiredKeys) {
-                        if (!tuple.getRefTuple().getNode().has(requiredKey)) {
+                        if (!node.getPointedNode().getNode().has(requiredKey)) {
                             missingKeys.add(requiredKey);
                         }
                     }
@@ -33,7 +33,7 @@ public class RequiredValidator implements Validator {
                             boolean skip = false;
                             if (forbids != null) {
                                 for (String forbidden : forbids) {
-                                    if (tuple.getRefTuple().getNode().has(forbidden) && requiredKeys.contains(forbidden)) {
+                                    if (node.getPointedNode().getNode().has(forbidden) && requiredKeys.contains(forbidden)) {
                                         final KeyListLike forbids2 = schema.getForbids().get(forbidden);
                                         if (forbids2 != null) {
                                             if (forbids2.contains(missingKey)) {
@@ -45,8 +45,7 @@ public class RequiredValidator implements Validator {
                                 }
                             }
                             if (!skip)
-                                context.errors.add(
-                                        new VError(tuple.getRefTuple().getReference(), "Missing required key: "+missingKey));
+                                context.errors.add(new VError(node, "Missing required key: "+missingKey));
                         }
                     }
                 }

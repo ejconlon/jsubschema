@@ -24,7 +24,7 @@ public class TestSchematize {
     private static List<VError> validate(SchemaLike schema, JsonNode node) {
         Validator validator = new DefaultValidator();
         FullRefResolver fullRefResolver = new MetaResolver(new SelfResolver(schema));
-        VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
+        VContext context = Util.runValidator(validator, new SchemaNode(new SchemaRef(schema), new PointedNode(node), fullRefResolver));
         return context.errors;
     }
 

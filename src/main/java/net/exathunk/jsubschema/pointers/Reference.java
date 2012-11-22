@@ -21,10 +21,6 @@ public class Reference implements Comparable<Reference>, Consable<Part, Referenc
         assert Direction.DOWN.equals(pointer.getDirection());
     }
 
-    public Reference withoutPointer() {
-        return new Reference(url, new Pointer());
-    }
-
     @Override
     public Reference cons(Part part) {
         return new Reference(url, pointer.cons(part));
@@ -56,18 +52,15 @@ public class Reference implements Comparable<Reference>, Consable<Part, Referenc
             final String url;
             final String pathString;
             final int poundIndex = ref.indexOf('#');
-            final int slashIndex = ref.indexOf('/');
             if (poundIndex < 0) {
-                if (slashIndex == 0) {
-                    url = "";
-                    pathString = ref;
-                } else {
-                    url = ref;
-                    pathString = "";
-                }
+                url = ref;
+                pathString = "";
             } else if (poundIndex == 0) {
                 url = "";
                 pathString = ref.substring(1);
+            } else if (poundIndex == ref.length()-1) {
+                url = ref.substring(0, ref.length()-1);
+                pathString = "";
             } else {
                 String[] parts = ref.split("#");
                 if (parts.length != 2) {
@@ -92,35 +85,8 @@ public class Reference implements Comparable<Reference>, Consable<Part, Referenc
 
     public static Reference fromId(String id) {
         if (id == null) id = "";
+        assert !id.contains("#");
         return new Reference(id, new Pointer());
-    }
-
-    @Override
-    public String toString() {
-        return "Reference{" +
-                "url='" + url + '\'' +
-                ", pointer=" + pointer +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Reference)) return false;
-
-        Reference reference = (Reference) o;
-
-        if (!pointer.equals(reference.pointer)) return false;
-        if (!url.equals(reference.url)) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = url.hashCode();
-        result = 31 * result + pointer.hashCode();
-        return result;
     }
 
     @Override
@@ -145,5 +111,34 @@ public class Reference implements Comparable<Reference>, Consable<Part, Referenc
     public Reference withDefaultId(String id) {
         if (id == null || url.length() > 0) return this;
         else return new Reference(id, getPointer());
+    }
+
+    @Override
+    public String toString() {
+        return "Reference{" +
+                " url='" + url + '\'' +
+                ", pointer=" + pointer +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Reference)) return false;
+
+        Reference reference = (Reference) o;
+
+        if (!pointer.equals(reference.pointer)) return false;
+        if (!url.equals(reference.url)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 0;
+        result = 31 * result + url.hashCode();
+        result = 31 * result + pointer.hashCode();
+        return result;
     }
 }

@@ -1,6 +1,6 @@
 package net.exathunk.jsubschema.validation;
 
-import net.exathunk.jsubschema.base.SchemaTuple;
+import net.exathunk.jsubschema.base.SchemaNode;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 
 /**
@@ -8,10 +8,10 @@ import net.exathunk.jsubschema.genschema.schema.SchemaLike;
  */
 public class ExtensionsValidator implements Validator {
     @Override
-    public void validate(SchemaTuple tuple, VContext context) {
-        final SchemaLike schema = tuple.getEitherSchema().getFirst().getSchema();
+    public void validate(SchemaNode node, VContext context) {
+        final SchemaLike schema = node.getEitherSchema().getFirst().getSchema();
         if (schema.hasExtensions() && !schema.getExtensions().isEmpty()) {
-            context.errors.add(new VError(tuple.getRefTuple().getReference(), "TODO Extensions not yet supported."));
+            context.errors.add(new VError(node, "TODO Extensions not yet supported."));
         }
     }
 }

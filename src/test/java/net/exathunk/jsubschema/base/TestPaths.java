@@ -7,7 +7,9 @@ import net.exathunk.jsubschema.genschema.event.Event;
 import net.exathunk.jsubschema.genschema.geo.Geo;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.pointers.Part;
+import net.exathunk.jsubschema.pointers.PointedSchemaRef;
 import net.exathunk.jsubschema.pointers.Pointer;
+import net.exathunk.jsubschema.pointers.Reference;
 import net.exathunk.jsubschema.validation.DefaultValidator;
 import net.exathunk.jsubschema.validation.VContext;
 import net.exathunk.jsubschema.validation.VError;
@@ -43,18 +45,18 @@ public class TestPaths {
         assertEquals("$ref", idForbid0Node.asText());
     }
 
-    private static final Util.Func<RefTuple, String> refTupleRefStrings = new Util.Func<RefTuple, String>() {
+    private static final Util.Func<PointedNode, String> refTupleRefStrings = new Util.Func<PointedNode, String>() {
         @Override
-        public String runFunc(RefTuple refTuple) {
-            return refTuple.getReference().toReferenceString();
+        public String runFunc(PointedNode pointedNode) {
+            return "#"+pointedNode.getPointer().toPointerString();
         }
     };
 
-    private static final Util.Func<RefTuple, String> refTupleStringVals = new Util.Func<RefTuple, String>() {
+    private static final Util.Func<PointedNode, String> refTupleStringVals = new Util.Func<PointedNode, String>() {
         @Override
-        public String runFunc(RefTuple refTuple) {
-            if (refTuple.getNode().isTextual()) {
-                return refTuple.getNode().asText();
+        public String runFunc(PointedNode pointedNode) {
+            if (pointedNode.getNode().isTextual()) {
+                return pointedNode.getNode().asText();
             } else {
                 return null;
             }
@@ -65,7 +67,7 @@ public class TestPaths {
     public void testTupling() throws IOException {
         JsonNode node = Loader.loadSchemaNode("geo");
 
-        List<RefTuple> flattened = Util.asList(Util.withSelfDepthFirst(new RefTuple(node)));
+        List<PointedNode> flattened = Util.asList(Util.withSelfDepthFirst(new PointedNode(node)));
 
         List<String> goldRefStrings = Arrays.asList(
                 "#", "#/id", "#/description", "#/type", "#/properties",
@@ -80,12 +82,12 @@ public class TestPaths {
     @Test
     public void testTupling2() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/proptree");
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/proptree");
         assertNotNull(schema);
 
         JsonNode node = Loader.loadNode("/test/testproptree");
         //List<RefTuple> flattened = Util.asList(Util.withSelfDepthFirst(new RefTuple(node)));
-        List<SchemaTuple> flattened = flatten(schema, node, new MetaResolver(new SelfResolver(schema)));
+        List<SchemaNode> flattened = flatten(schema, node, new MetaResolver(new SelfResolver(schema)));
 
         List<String> goldRefStrings = Arrays.asList(
                 "#", "#/props", "#/props/name", "#/props/food", "#/children",
@@ -129,18 +131,18 @@ public class TestPaths {
 
         FullRefResolver fullRefResolver = new MetaResolver(new SelfResolver(schema));
         Validator validator = new DefaultValidator();
-        VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
+        VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
         assertEquals(new ArrayList<VError>(), context.errors);
     }
 
     @Test
     public void testTupling3() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/proptree");
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/proptree");
         assertNotNull(schema);
 
         JsonNode node = Loader.loadNode("/test/testproptree2");
-        List<SchemaTuple> flattened = flatten(schema, node, new MetaResolver(new SelfResolver(schema)));
+        List<SchemaNode> flattened = flatten(schema, node, new MetaResolver(new SelfResolver(schema)));
 
         List<String> goldRefStrings = Arrays.asList(
                 "#", "#/props", "#/props/name", "#/children",
@@ -177,18 +179,18 @@ public class TestPaths {
 
         FullRefResolver fullRefResolver = new MetaResolver(new SelfResolver(schema));
         Validator validator = new DefaultValidator();
-        VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
+        VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
         assertEquals(new ArrayList<VError>(), context.errors);
     }
 
     @Test
     public void testTupling4() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/stringmultimap");
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/stringmultimap");
         assertNotNull(schema);
 
         JsonNode node = Loader.loadNode("/test/teststringmultimap");
-        List<RefTuple> flattened = Util.asList(Util.withSelfDepthFirst(new RefTuple(node)));
+        List<PointedNode> flattened = Util.asList(Util.withSelfDepthFirst(new PointedNode(node)));
 
         List<String> goldRefStrings = Arrays.asList(
                 "#", "#/a", "#/a/0", "#/a/1", "#/b", "#/b/0", "#/c");
@@ -198,14 +200,42 @@ public class TestPaths {
         assertEquals(goldRefStrings, actualRefStrings);
     }
 
+    private static Either<SchemaRef, String> resolve(FullRefResolver fullRefResolver, String ref) {
+        Either<Reference, String> eitherRef = Reference.fromReferenceString(ref);
+        if (eitherRef.isSecond()) return Either.makeSecond(eitherRef.getSecond());
+        PointedSchemaRef pointedSchemaRef = new PointedSchemaRef(new SchemaRef(null, Reference.fromId(eitherRef.getFirst().getUrl())), eitherRef.getFirst().getPointer().reversed());
+        return fullRefResolver.fullyResolveRef(pointedSchemaRef);
+    }
+
+    /*@Test
+    public void testPather() throws IOException, TypeException {
+        final Session session = Session.loadDefaultSession();
+        final SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/stringmultimap");
+        assertNotNull(schema);
+
+        final FullRefResolver fullRefResolver = new MetaResolver(new SelfResolver(schema));
+
+        final Reference baseRef = Reference.fromId(schema.getId());
+
+        //Either<SchemaRef, String> rootSchemaRef = Either.makeFirst(new SchemaRef(schema, new Reference("http://exathunk.net/schemas/stringmultimap", new Pointer())));
+        //assertEquals(rootSchemaRef, resolve(fullRefResolver, "#"));
+        //assertEquals(rootSchemaRef, resolve(fullRefResolver, "http://exathunk.net/schemas/stringmultimap#"));
+
+        Either<SchemaRef, String> saSchemaRef = Either.<SchemaRef, String>makeFirst(new SchemaRef(schema.getDeclarations().get("stringArray"), baseRef.cons(Part.asKey("declarations")).cons(Part.asKey("stringArray"))));
+        //assertEquals(saSchemaRef, resolve(fullRefResolver, "http://exathunk.net/schemas/stringmultimap#/declarations/stringArray"));
+        assertEquals(saSchemaRef, resolve(fullRefResolver, schema.getItems().get__dollar__ref()));
+
+        //assertEquals(schema.getItems(), resolve(fullRefResolver, "#/items"));
+    }*/
+
     @Test
     public void testTupling5() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/stringmultimap");
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/stringmultimap");
         assertNotNull(schema);
 
         JsonNode node = Loader.loadNode("/test/teststringmultimap");
-        List<SchemaTuple> flattened = flatten(schema, node, new MetaResolver(new SelfResolver(schema)));
+        List<SchemaNode> flattened = flatten(schema, node, new MetaResolver(new SelfResolver(schema)));
 
         List<String> goldRefStrings = Arrays.asList(
                 "#", "#/a", "#/a/0", "#/a/1", "#/b", "#/b/0", "#/c");
@@ -239,59 +269,59 @@ public class TestPaths {
 
         FullRefResolver fullRefResolver = new MetaResolver(new SelfResolver(schema));
         Validator validator = new DefaultValidator();
-        VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
+        VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
         assertEquals(new ArrayList<VError>(), context.errors);
     }
 
-    private static final Util.Func<SchemaTuple, String> schemaTupleRefStrings = new Util.Func<SchemaTuple, String>() {
+    private static final Util.Func<SchemaNode, String> schemaTupleRefStrings = new Util.Func<SchemaNode, String>() {
         @Override
-        public String runFunc(SchemaTuple schemaTuple) {
-            return refTupleRefStrings.runFunc(schemaTuple.getRefTuple());
+        public String runFunc(SchemaNode schemaNode) {
+            return refTupleRefStrings.runFunc(schemaNode.getPointedNode());
         }
     };
 
-    private static final Util.Func<SchemaTuple, String> schemaTupleTypes = new Util.Func<SchemaTuple, String>() {
+    private static final Util.Func<SchemaNode, String> schemaTupleTypes = new Util.Func<SchemaNode, String>() {
         @Override
-        public String runFunc(SchemaTuple schemaTuple) {
-            if (schemaTuple.getEitherSchema().isFirst()) {
-                return schemaTuple.getEitherSchema().getFirst().getSchema().getType();
+        public String runFunc(SchemaNode schemaNode) {
+            if (schemaNode.getEitherSchema().isFirst()) {
+                return schemaNode.getEitherSchema().getFirst().getSchema().getType();
             } else {
-                return "ERROR: "+schemaTuple.getEitherSchema().getSecond();
+                return "ERROR: "+ schemaNode.getEitherSchema().getSecond();
             }
         }
     };
 
-    private static final Util.Func<SchemaTuple, String> schemaTupleSchemaRefs = new Util.Func<SchemaTuple, String>() {
+    private static final Util.Func<SchemaNode, String> schemaTupleSchemaRefs = new Util.Func<SchemaNode, String>() {
         @Override
-        public String runFunc(SchemaTuple schemaTuple) {
-            if (schemaTuple.getEitherSchema().isFirst()) {
-                return schemaTuple.getEitherSchema().getFirst().getReference().toReferenceString();
+        public String runFunc(SchemaNode schemaNode) {
+            if (schemaNode.getEitherSchema().isFirst()) {
+                return schemaNode.getEitherSchema().getFirst().getReference().toReferenceString();
             } else {
-                return "ERROR: "+schemaTuple.getEitherSchema().getSecond();
+                return "ERROR: "+ schemaNode.getEitherSchema().getSecond();
             }
         }
     };
 
-    private static final Util.Func<SchemaTuple, String> schemaTupleStringVals = new Util.Func<SchemaTuple, String>() {
+    private static final Util.Func<SchemaNode, String> schemaTupleStringVals = new Util.Func<SchemaNode, String>() {
         @Override
-        public String runFunc(SchemaTuple schemaTuple) {
-            return refTupleStringVals.runFunc(schemaTuple.getRefTuple());
+        public String runFunc(SchemaNode schemaNode) {
+            return refTupleStringVals.runFunc(schemaNode.getPointedNode());
         }
     };
 
-    private static List<SchemaTuple> flatten(SchemaLike schema, JsonNode node, FullRefResolver fullRefResolver) {
-        return Util.asList(Util.withSelfDepthFirst(new SchemaTuple(schema, new RefTuple(node), fullRefResolver)));
+    private static List<SchemaNode> flatten(SchemaLike schema, JsonNode node, FullRefResolver fullRefResolver) {
+        return Util.asList(Util.withSelfDepthFirst(new SchemaNode(schema, new PointedNode(node), fullRefResolver)));
     }
 
     @Test
     public void testScheming() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
 
         JsonNode node = Loader.loadSchemaNode("geo");
 
-        List<SchemaTuple> flattened = flatten(schema, node, new MetaResolver(new SelfResolver(schema)));
+        List<SchemaNode> flattened = flatten(schema, node, new MetaResolver(new SelfResolver(schema)));
 
         List<String> goldRefStrings = Arrays.asList(
                 "#", "#/id", "#/description", "#/type", "#/properties",
@@ -314,7 +344,7 @@ public class TestPaths {
     @Test
     public void testEventGeoRef() throws TypeException, IOException {
         Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/event");
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/event");
         assertNotNull(schema);
         FullRefResolver fullRefResolver = new MetaResolver(new SessionResolver(session), new SelfResolver(schema));
 
@@ -336,7 +366,7 @@ public class TestPaths {
 
         JsonNode node = Util.quickUnbind(event);
 
-        List<SchemaTuple> flattened = flatten(schema, node, fullRefResolver);
+        List<SchemaNode> flattened = flatten(schema, node, fullRefResolver);
 
         List<String> goldRefStrings = Arrays.asList(
              "#", "#/dtstart", "#/dtend", "#/summary", "#/location",
@@ -358,21 +388,21 @@ public class TestPaths {
         assertEquals(goldTypes, actualTypes);
 
         Validator validator = new DefaultValidator();
-        VContext context = Util.runValidator(validator, new SchemaTuple(schema, new RefTuple(node), fullRefResolver));
+        VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
         assertEquals(new ArrayList<VError>(), context.errors);
     }
 
     @Test
     public void testSelfResolver() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
         RefResolver resolver = new SelfResolver(schema);
 
         for (Map.Entry<String, SchemaLike> entry : makeSelfCases(schema).entrySet()) {
             final String refString = entry.getKey();
             final SchemaLike subSchema = entry.getValue();
-            final Either<SchemaRef, String> actual = MetaResolver.resolveRefString(refString, new MetaResolver(Util.asList(resolver)));
+            final Either<SchemaRef, String> actual = resolve(new MetaResolver(Util.asList(resolver)), refString);
             assertEquals(refString, actual.getFirst().getSchema(), subSchema);
         }
     }
@@ -397,8 +427,8 @@ public class TestPaths {
     @Test
     public void testSessionResolver() throws IOException, TypeException {
         Session session = Session.loadDefaultSession();
-        SchemaLike eventSchema = session.getSchema("http://exathunk.net/schemas/event");
-        SchemaLike geoSchema = session.getSchema("http://exathunk.net/schemas/geo");
+        SchemaLike eventSchema = session.schemas.get("http://exathunk.net/schemas/event");
+        SchemaLike geoSchema = session.schemas.get("http://exathunk.net/schemas/geo");
         assertNotNull(eventSchema);
         assertNotNull(geoSchema);
         RefResolver resolver = new SessionResolver(session);
@@ -408,7 +438,7 @@ public class TestPaths {
             final String refString = entry.getKey();
             final SchemaLike subSchema = entry.getValue();
             // The second resolver captures relative references
-            final Either<SchemaRef, String> actual = MetaResolver.resolveRefString(refString, new MetaResolver(Util.asList(resolver, resolver2)));
+            final Either<SchemaRef, String> actual = resolve(new MetaResolver(Util.asList(resolver, resolver2)), refString);
             assertEquals(refString, actual.getFirst().getSchema(), subSchema);
         }
     }

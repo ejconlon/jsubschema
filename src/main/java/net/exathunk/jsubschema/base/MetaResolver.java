@@ -3,7 +3,7 @@ package net.exathunk.jsubschema.base;
 import net.exathunk.jsubschema.Util;
 import net.exathunk.jsubschema.functional.Either;
 import net.exathunk.jsubschema.functional.Either3;
-import net.exathunk.jsubschema.pointers.Reference;
+import net.exathunk.jsubschema.pointers.PointedSchemaRef;
 
 import java.util.Iterator;
 
@@ -23,45 +23,41 @@ public class MetaResolver implements RefResolver, FullRefResolver {
     }
 
     @Override
-    public Either3<SchemaRef, String, Reference> resolveRef(Reference ref) {
+    public Either3<SchemaRef, String, PointedSchemaRef> resolveRef(PointedSchemaRef pointedSchemaRef) {
         Iterator<RefResolver> it = resolvers.iterator();
         while (it.hasNext()) {
             final RefResolver resolver = it.next();
-            Either3<SchemaRef, String, Reference> either = resolver.resolveRef(ref);
+            Either3<SchemaRef, String, PointedSchemaRef> either = resolver.resolveRef(pointedSchemaRef);
             if (either.isFirst()) {
                 return Either3.makeFirst(either.getFirst());
             } else if (either.isSecond()) {
                 return Either3.makeSecond(either.getSecond());
             } else {
-                if (ref.equals(either.getThird())) {
+                if (pointedSchemaRef.equals(either.getThird())) {
                     continue;
                 } else {
-                    ref = either.getThird();
+                    pointedSchemaRef = either.getThird();
                     it = resolvers.iterator();
                 }
             }
         }
-        return Either3.makeSecond("Unresolved ref: "+ref);
-    }
-
-    public static Either<SchemaRef, String> resolveRefString(String refString, FullRefResolver fullRefResolver) {
-        Either<Reference, String> eitherReference = Reference.fromReferenceString(refString);
-        if (eitherReference.isSecond()) return Either.makeSecond(eitherReference.getSecond());
-        return recursiveResolve(eitherReference.getFirst(), fullRefResolver);
-    }
-
-    public static Either<SchemaRef, String> recursiveResolve(Reference reference, FullRefResolver fullRefResolver) {
-        return fullRefResolver.fullyResolveRef(Either3.<SchemaRef, String, Reference>makeThird(reference));
+        return Either3.makeSecond("Unresolved ref: "+pointedSchemaRef.toPointedString());
     }
 
     @Override
-    public Either<SchemaRef, String> fullyResolveRef(Either3<SchemaRef, String, Reference> either3) {
-        if (either3.isFirst()) {
-            return Either.makeFirst(either3.getFirst());
-        } else if (either3.isSecond()) {
-            return Either.makeSecond(either3.getSecond());
+    public Either<SchemaRef, String> fullyResolveRef(PointedSchemaRef pointedSchemaRef) {
+        // TODO unfuck nullness
+        if (pointedSchemaRef.getPointer().isEmpty() && pointedSchemaRef.getSchemaRef().getSchema() != null) {
+            return Either.makeFirst(pointedSchemaRef.getSchemaRef());
         } else {
-            return fullyResolveRef(resolveRef(either3.getThird()));
+            Either3<SchemaRef, String, PointedSchemaRef> either3 = resolveRef(pointedSchemaRef);
+            if (either3.isFirst()) {
+                return Either.makeFirst(either3.getFirst());
+            } else if (either3.isSecond()) {
+                return Either.makeSecond(either3.getSecond());
+            } else {
+                return fullyResolveRef(either3.getThird());
+            }
         }
     }
 }

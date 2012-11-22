@@ -66,7 +66,7 @@ public class TestNodes {
     @Test
     public void testGenSchema() throws IOException, TypeException {
         final Session session = Session.loadDefaultSession();
-        final SchemaLike schema = session.getSchema("http://exathunk.net/schemas/schema");
+        final SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
         final ClassRep classRep = SchemaRepper.makeClass(Reference.fromId(schema.getId()), schema, "net.exathunk.jsubschema.genschema");
         final String classString = Assembler.writeClass(classRep);
