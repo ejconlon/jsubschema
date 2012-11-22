@@ -1,5 +1,6 @@
 package net.exathunk.jsubschema.crustache;
 
+import net.exathunk.jsubschema.functional.Maybe;
 import net.exathunk.jsubschema.functional.Pair;
 import net.exathunk.jsubschema.genschema.schema.Schema;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
@@ -84,13 +85,12 @@ public class TagTyper {
     public static SchemaLike makeTreeSchema(String name, TagTree tree, NameResolver resolver) {
         SchemaLike schema = new Schema();
         schema.setType("object");
-        schema.setProperties(new TreeMap<String, SchemaLike>());
         schema.setId(resolver.resolveName(name));
-        return makeTreeSchemaInner(schema, resolver, tree, true);
+        makeTreeSchemaInner(schema, resolver, tree, true);
+        return schema;
     }
 
-    private static SchemaLike makeTreeSchemaInner(SchemaLike schema, NameResolver resolver, TagTree tree, boolean isOnlyChild) {
-        boolean addedChildren = false;
+    private static void makeTreeSchemaInner(SchemaLike schema, NameResolver resolver, TagTree tree, boolean isOnlyChild) {
         if (tree.getParent().isJust()) {
             Tag parentJust = tree.getParent().getJust();
             if (parentJust.getType().equals(Tag.Type.PARTIAL)) {
@@ -100,6 +100,7 @@ public class TagTyper {
                 } else {
                     addExtension(schema, extId);
                 }
+                assert tree.getChildren().isEmpty();
             } else {
                 Pair<SchemaLike, Boolean> pair = makeTagSchema(parentJust);
                 final SchemaLike parentSchema = pair.getKey();
@@ -110,30 +111,29 @@ public class TagTyper {
 
                 final String t = parentSchema.getType();
                 if (t.equals("object")) {
-                    addedChildren = true;
                     for (TagTree child : tree.getChildren()) {
                         makeTreeSchemaInner(parentSchema, resolver, child, tree.getChildren().size() == 1);
                     }
+                    return;
                 } else if (t.equals("array")) {
-                    addedChildren = true;
-                    SchemaLike itemSchema = new Schema();
-                    itemSchema.setType("object");
-                    itemSchema.setProperties(new TreeMap<String, SchemaLike>());
-                    for (TagTree child : tree.getChildren()) {
-                        makeTreeSchemaInner(itemSchema, resolver, child, tree.getChildren().size() == 1);
+                    if (!tree.getChildren().isEmpty()) {
+                        SchemaLike itemSchema = new Schema();
+                        itemSchema.setType("object");
+                        for (TagTree child : tree.getChildren()) {
+                            makeTreeSchemaInner(itemSchema, resolver, child, tree.getChildren().size() == 1);
+                        }
+                        parentSchema.setItems(itemSchema);
                     }
-                    parentSchema.setItems(itemSchema);
+                    return;
+                } else {
+                    assert tree.getChildren().isEmpty();
                 }
             }
-        }
-
-        if (!addedChildren) {
+        } else {
             for (TagTree child : tree.getChildren()) {
                 makeTreeSchemaInner(schema, resolver, child, tree.getChildren().size() == 1);
             }
         }
-
-        return schema;
     }
 
     private static void addRequired(SchemaLike schema, String label) {
@@ -155,9 +155,86 @@ public class TagTyper {
     }
 
     private static void addProperty(SchemaLike schema, String label, SchemaLike prop) {
-        assert schema.hasProperties();
+        if (!schema.hasProperties()) schema.setProperties(new TreeMap<String, SchemaLike>());
         assert !schema.getProperties().containsKey(label);
         schema.getProperties().put(label, prop);
     }
 
+    // Returns list of errors.  Empty list == ok.
+    public static List<String> satisfyErrors(SchemaLike schema, TagTree tagTree) {
+        List<String> errors = new ArrayList<String>();
+        satisfyErrorsInner(schema, tagTree, errors);
+        return errors;
+    }
+
+    private static void satisfyErrorsInner(SchemaLike schema, TagTree tagTree, List<String> errors) {
+        if (schema == null || !schema.hasType()) {
+            errors.add("Invalid schema: "+schema);
+            return;
+        }
+        final String schemaType = schema.getType();
+        if (tagTree.getParent().isJust()) {
+            final Tag parent = tagTree.getParent().getJust();
+            final String label = parent.getLabel();
+            final Tag.Type parentType = parent.getType();
+            if (parentType.equals(Tag.Type.NORMAL) || parentType.equals(Tag.Type.ESCAPE)) {
+                // These nodes can be any scalar:
+                if (schemaType.equals("string") || schemaType.equals("boolean") ||
+                    schemaType.equals("integer") || schemaType.equals("number")) {
+                   // OK
+                } else {
+                    errors.add(label+": expected schema with scalar type, found: "+schemaType);
+                    return;
+                }
+            } else if (parentType.equals(Tag.Type.SECTION_START) || parentType.equals(Tag.Type.INVERTED_START)) {
+                boolean hasChildren = tagTree.getChildren().size() > 0;
+                if (schemaType.equals("object")) {
+                    if (hasChildren) {
+                        if (!schema.hasProperties()) {
+                            errors.add(label+": missing properties");
+                            return;
+                        } else {
+                            for (TagTree childTree : tagTree.getChildren()) {
+                                final Maybe<Tag> child = childTree.getParent();
+                                if (child.isNothing()) {
+                                    errors.add(label+": null child");
+                                } else {
+                                    final String childLabel = child.getJust().getLabel();
+                                    if (!schema.getProperties().containsKey(childLabel)) {
+                                        errors.add(label+": missing key: "+childLabel);
+                                    } else {
+                                        satisfyErrorsInner(schema.getProperties().get(childLabel), childTree, errors);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (schemaType.equals("array")) {
+                    if (hasChildren) {
+                        if (!schema.hasItems()) {
+                            errors.add(label+": missing items");
+                            return;
+                        } else {
+                            satisfyErrorsInner(schema.getItems(), tagTree, errors);
+                        }
+                    }
+                } else if (!hasChildren) {
+                    // OK - functions as an "is defined?" operator
+                } else {
+                    errors.add(label+": expected container type, found: "+schemaType);
+                    return;
+                }
+            }
+        } else {
+            // Root of tree - must be object.
+            if (!schemaType.equals("object")) {
+                errors.add("Root type must be object.");
+                return;
+            }
+            for (TagTree child : tagTree.getChildren()) {
+                satisfyErrorsInner(schema, child, errors);
+            }
+        }
+
+    }
 }

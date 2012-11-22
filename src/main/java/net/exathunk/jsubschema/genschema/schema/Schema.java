@@ -1,12 +1,12 @@
 package net.exathunk.jsubschema.genschema.schema;
 
-import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyListLike;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyList;
+import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyListLike;
 
 public class Schema implements Cloneable, Serializable, SchemaLike {
 

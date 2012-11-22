@@ -12,7 +12,8 @@ public class DefaultValidator extends MetaValidator {
                 new PropAttrsValidator(),
                 new RequiredValidator(),
                 new DependenciesValidator(),
-                new ForbidsValidator()
+                new ForbidsValidator(),
+                new ExtensionsValidator()
         ));
     }
 }

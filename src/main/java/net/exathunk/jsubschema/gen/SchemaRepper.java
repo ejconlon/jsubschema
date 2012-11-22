@@ -60,6 +60,9 @@ public class SchemaRepper {
         } else {
             throw new IllegalArgumentException("Invalid root type: "+schema.getType());
         }
+        if (schema.hasExtensions()) {
+            throw new IllegalArgumentException("TODO extensions not yet supported.");
+        }
         return c;
     }
 

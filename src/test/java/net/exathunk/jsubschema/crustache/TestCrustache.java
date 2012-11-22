@@ -4,9 +4,12 @@ import net.exathunk.jsubschema.Util;
 import net.exathunk.jsubschema.base.TypeException;
 import net.exathunk.jsubschema.functional.Either;
 import net.exathunk.jsubschema.functional.Either3;
+import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +23,9 @@ public class TestCrustache {
 
     private String makeTemplate() {
         return "{{yawn}}{{burp}} Hello, {{person}}! My name is {{me}}. "+
-                "{{#secret}}Nice hat, {{dude}}.{{>next}}{{/secret}} {{#secret2}}{{>next2}}{{/secret2}} {{{html}}} And some more {{&more}} {{^bollocks}} Mind them!{{/bollocks}}...";
+                "{{#secret}}Nice hat, {{dude}}.{{>next}}{{/secret}} {{#secret2}}{{>next2}}{{/secret2}} "+
+                "{{{html}}} And some more {{&more}} {{^bollocks}} Mind them!{{/bollocks}}..."+
+                "{{#empty}}{{/empty}}{{#single}}{{subSingle}}{{/single}}";
     }
 
     @Test
@@ -28,7 +33,8 @@ public class TestCrustache {
         List<String> matches = Crustache.contained(makeTemplate());
         assertEquals(Arrays.asList("{{yawn}}", "{{burp}}", "{{person}}", "{{me}}",
                 "{{#secret}}", "{{dude}}", "{{>next}}", "{{/secret}}",
-                "{{#secret2}}", "{{>next2}}", "{{/secret2}}", "{{{html}}}", "{{&more}}", "{{^bollocks}}", "{{/bollocks}}"), matches);
+                "{{#secret2}}", "{{>next2}}", "{{/secret2}}", "{{{html}}}", "{{&more}}", "{{^bollocks}}", "{{/bollocks}}",
+                "{{#empty}}", "{{/empty}}", "{{#single}}", "{{subSingle}}", "{{/single}}"), matches);
     }
 
     @Test
@@ -36,7 +42,8 @@ public class TestCrustache {
         List<String> parts = Crustache.inline(makeTemplate());
         assertEquals(Arrays.asList("{{yawn}}", "{{burp}}", " Hello, ", "{{person}}", "! My name is ", "{{me}}", ". ",
                 "{{#secret}}", "Nice hat, ", "{{dude}}", ".", "{{>next}}", "{{/secret}}", " ", "{{#secret2}}", "{{>next2}}", "{{/secret2}}", " ", "{{{html}}}", " And some more ", "{{&more}}",
-                " ", "{{^bollocks}}", " Mind them!", "{{/bollocks}}", "..."), parts);
+                " ", "{{^bollocks}}", " Mind them!", "{{/bollocks}}", "...",
+                "{{#empty}}", "{{/empty}}", "{{#single}}", "{{subSingle}}", "{{/single}}"), parts);
         String s = "";
         for (String part : parts) {
             s += part;
@@ -69,7 +76,12 @@ public class TestCrustache {
                 Either.<Tag, String>makeFirst(new Tag("bollocks", Tag.Type.INVERTED_START)),
                 Either.<Tag, String>makeSecond(" Mind them!"),
                 Either.<Tag, String>makeFirst(new Tag("bollocks", Tag.Type.SECTION_END)),
-                Either.<Tag, String>makeSecond("...")
+                Either.<Tag, String>makeSecond("..."),
+                Either.<Tag, String>makeFirst(new Tag("empty", Tag.Type.SECTION_START)),
+                Either.<Tag, String>makeFirst(new Tag("empty", Tag.Type.SECTION_END)),
+                Either.<Tag, String>makeFirst(new Tag("single", Tag.Type.SECTION_START)),
+                Either.<Tag, String>makeFirst(new Tag("subSingle", Tag.Type.NORMAL)),
+                Either.<Tag, String>makeFirst(new Tag("single", Tag.Type.SECTION_END))
         );
         assertEquals(parsed, Crustache.parsed(parts));
 
@@ -112,6 +124,17 @@ public class TestCrustache {
         }
 
         treed.getElements().add(Either3.<Tag, String, Section>makeSecond("..."));
+
+        {
+            Section sub = new Section(new Tag("empty", Tag.Type.SECTION_START));
+            treed.getElements().add(Either3.<Tag, String, Section>makeThird(sub));
+        }
+
+        {
+            Section sub = new Section(new Tag("single", Tag.Type.SECTION_START));
+            sub.getElements().add(Either3.<Tag, String, Section>makeFirst(new Tag("subSingle", Tag.Type.NORMAL)));
+            treed.getElements().add(Either3.<Tag, String, Section>makeThird(sub));
+        }
         
         assertEquals(treed, Crustache.treed(parsed));
 
@@ -130,7 +153,12 @@ public class TestCrustache {
                 (new Tag("html", Tag.Type.ESCAPE)),
                 (new Tag("more", Tag.Type.ESCAPE)),
                 (new Tag("bollocks", Tag.Type.INVERTED_START)),
-                (new Tag("bollocks", Tag.Type.SECTION_END))
+                (new Tag("bollocks", Tag.Type.SECTION_END)),
+                (new Tag("empty", Tag.Type.SECTION_START)),
+                (new Tag("empty", Tag.Type.SECTION_END)),
+                (new Tag("single", Tag.Type.SECTION_START)),
+                (new Tag("subSingle", Tag.Type.NORMAL)),
+                (new Tag("single", Tag.Type.SECTION_END))
         );
 
         assertEquals(iterated, Util.asList(treed.tagIterator()));
@@ -156,30 +184,46 @@ public class TestCrustache {
         TagTree sub3 = new TagTree(new Tag("bollocks", Tag.Type.INVERTED_START));
         tagTree.getChildren().add(sub3);
 
+        TagTree sub4 = new TagTree(new Tag("empty", Tag.Type.SECTION_START));
+        tagTree.getChildren().add(sub4);
+
+        TagTree sub5 = new TagTree(new Tag("single", Tag.Type.SECTION_START));
+        sub5.getChildren().add(new TagTree(new Tag("subSingle", Tag.Type.NORMAL)));
+        tagTree.getChildren().add(sub5);
+
         assertEquals(tagTree, treed.tagTree());
 
         NameResolver resolver = new NameResolverImpl("http://example.com/whee");
 
         SchemaLike schema = TagTyper.makeTreeSchema("woo", tagTree, resolver);
+        //System.out.println(Util.quickUnbind(schema));
 
         assertEquals("http://example.com/whee/woo", schema.getId());
         assertEquals("object", schema.getType());
         assertEquals(true, schema.hasProperties());
         assertEquals(false, schema.hasItems());
-        assertEquals(Util.asSet("yawn", "burp", "person", "me", "secret", "secret2", "html", "more", "bollocks"), schema.getProperties().keySet());
+        assertEquals(Util.asSet("yawn", "burp", "person", "me", "secret", "secret2", "html", "more", "bollocks", "empty", "single"), schema.getProperties().keySet());
         for (String k : new String[] {"yawn", "burp", "person", "me", "html", "more"}) {
             assertEquals(k, "string", schema.getProperties().get(k).getType());
         }
-        for (String k : new String[] {"secret", "secret2", "bollocks"}) {
+        for (String k : new String[] {"secret", "secret2", "single"}) {
             assertEquals(k, "array", schema.getProperties().get(k).getType());
             assertEquals(k, "object", schema.getProperties().get(k).getItems().getType());
+        }
+        for (String k : new String[] {"empty", "bollocks"}) {
+            assertEquals(k, "array", schema.getProperties().get(k).getType());
+            assertEquals(k, false, schema.getProperties().get(k).hasItems());
+            assertEquals(k, false, schema.getProperties().get(k).hasProperties());
         }
         assertEquals("string", schema.getProperties().get("secret").getItems().getProperties().get("dude").getType());
         assertEquals(Util.asList("http://example.com/whee/next"), schema.getProperties().get("secret").getItems().getExtensions());
         assertEquals(false, schema.getProperties().get("secret").getItems().has__dollar__ref());
         assertEquals("http://example.com/whee/next2", schema.getProperties().get("secret2").getItems().get__dollar__ref());
         assertEquals(false, schema.getProperties().get("secret2").getItems().hasExtensions());
-        //System.out.println(Util.quickUnbind(schema));
+        assertEquals(false, schema.getProperties().get("single").getItems().has__dollar__ref());
+        assertEquals(false, schema.getProperties().get("single").getItems().hasExtensions());
+
+        assertEquals(Util.asSet("subSingle"), schema.getProperties().get("single").getItems().getProperties().keySet());
     }
 
     @Test
@@ -202,5 +246,85 @@ public class TestCrustache {
         assertEquals("1", m.get("a"));
         assertEquals("2", m.get("b"));
         assertEquals(2, m.size());
+    }
+
+    private static SchemaLike makeSchema(String s) throws IOException, TypeException {
+        return Util.quickBind(Util.parse(s), new SchemaFactory());
+    }
+
+    @Test
+    public void testSatisfies() throws IOException, TypeException {
+        TagTree tagTree = Crustache.treed(Crustache.parsed(Crustache.inline(makeTemplate()))).tagTree();
+        TagTree yawnTagTree = tagTree.getChildren().get(0);
+        assertEquals("yawn", yawnTagTree.getParent().getJust().getLabel());
+        TagTree secretTagTree = tagTree.getChildren().get(4);
+        assertEquals("secret", secretTagTree.getParent().getJust().getLabel());
+        TagTree secret2TagTree = tagTree.getChildren().get(5);
+        assertEquals("secret2", secret2TagTree.getParent().getJust().getLabel());
+        TagTree moreTagTree = tagTree.getChildren().get(7);
+        assertEquals("more", moreTagTree.getParent().getJust().getLabel());
+        TagTree bollocksTagTree = tagTree.getChildren().get(8);
+        assertEquals("bollocks", bollocksTagTree.getParent().getJust().getLabel());
+        TagTree emptyTagTree = tagTree.getChildren().get(9);
+        assertEquals("empty", emptyTagTree.getParent().getJust().getLabel());
+        TagTree singleTagTree = tagTree.getChildren().get(10);
+        assertEquals("single", singleTagTree.getParent().getJust().getLabel());
+
+        final List<String> empty = new ArrayList<String>();
+
+        // NORMAL node accepts scalar types
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"string\" }"), yawnTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), yawnTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), yawnTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"number\" }"), yawnTagTree));
+        assertEquals(Util.asList("yawn: expected schema with scalar type, found: object"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\" }"), yawnTagTree));
+        assertEquals(Util.asList("yawn: expected schema with scalar type, found: array"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\" }"), yawnTagTree));
+
+        // ESCAPE node accepts scalar types
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"string\" }"), moreTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), moreTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), moreTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"number\" }"), moreTagTree));
+        assertEquals(Util.asList("more: expected schema with scalar type, found: object"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\" }"), moreTagTree));
+        assertEquals(Util.asList("more: expected schema with scalar type, found: array"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\" }"), moreTagTree));
+        
+        // INVERTED_START node accepts all types
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"string\" }"), bollocksTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), bollocksTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), bollocksTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"number\" }"), bollocksTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\" }"), bollocksTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\" }"), bollocksTagTree));
+
+        // SECTION_START accepts object or array, unless empty!
+        // empty
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"string\" }"), emptyTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), emptyTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), emptyTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"number\" }"), emptyTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\" }"), emptyTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\" }"), emptyTagTree));
+
+        // single, valid obj schema
+        assertEquals(Util.asList("single: expected container type, found: string"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"string\" }"), singleTagTree));
+        assertEquals(Util.asList("single: expected container type, found: boolean"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), singleTagTree));
+        assertEquals(Util.asList("single: expected container type, found: integer"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"integer\" }"), singleTagTree));
+        assertEquals(Util.asList("single: expected container type, found: number"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"number\" }"), singleTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"string\" } } }"), singleTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"string\"} } } }"), singleTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"boolean\" } } }"), singleTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"boolean\"} } } }"), singleTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"integer\" } } }"), singleTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"integer\"} } } }"), singleTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"number\" } } }"), singleTagTree));
+        assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"number\"} } } }"), singleTagTree));
+
+        // invalid object schema
+        assertEquals(Util.asList("single: missing key: subSingle"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"NOT_IT\" : { \"type\" : \"string\" } } }"), singleTagTree));
+        assertEquals(Util.asList("single: missing key: subSingle"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"NOT_IT\" : {\"type\" : \"string\"} } } }"), singleTagTree));
+        assertEquals(Util.asList("subSingle: expected schema with scalar type, found: object"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"object\" } } }"), singleTagTree));
+        assertEquals(Util.asList("subSingle: expected schema with scalar type, found: array"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"object\", \"properties\" : { \"subSingle\" : { \"type\" : \"array\" } } }"), singleTagTree));
+        assertEquals(Util.asList("subSingle: expected schema with scalar type, found: object"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"object\"} } } }"), singleTagTree));
+        assertEquals(Util.asList("subSingle: expected schema with scalar type, found: array"), TagTyper.satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"array\"} } } }"), singleTagTree));
     }
 }
