@@ -2,7 +2,7 @@ package net.exathunk.jsubschema.base;
 
 import net.exathunk.jsubschema.functional.Either;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
-import net.exathunk.jsubschema.pointers.PointedSchemaRef;
+import net.exathunk.jsubschema.pointers.PointedRef;
 import net.exathunk.jsubschema.pointers.Reference;
 
 import java.util.Iterator;
@@ -21,10 +21,10 @@ public class SchemaNode implements Iterable<SchemaNode> {
     }
 
     public SchemaNode(SchemaRef schemaRef, PointedNode pointedNode, FullRefResolver fullRefResolver) {
-        this(Either.<SchemaRef, String>makeFirst(schemaRef), schemaRef, pointedNode, fullRefResolver);
+        this(Either.<SchemaRef, String>makeFirst(schemaRef), pointedNode, fullRefResolver, schemaRef);
     }
 
-    private SchemaNode(Either<SchemaRef, String> eitherSchema, SchemaRef superRootSchema, PointedNode pointedNode, FullRefResolver fullRefResolver) {
+    private SchemaNode(Either<SchemaRef, String> eitherSchema, PointedNode pointedNode, FullRefResolver fullRefResolver, SchemaRef superRootSchema) {
         this.superRootSchema = superRootSchema;
         this.eitherSchema = eitherSchema;
         this.pointedNode = pointedNode;
@@ -75,11 +75,11 @@ public class SchemaNode implements Iterable<SchemaNode> {
             final PointedNode next = it.next();
             if (root.eitherSchema.isFirst()) {
                 final Either<SchemaRef, String> eitherSchema = root.fullRefResolver.fullyResolveRef(
-                        new PointedSchemaRef(root.superRootSchema,
+                        new PointedRef(root.superRootSchema.getReference(),
                                 next.getPointer().reversed()));
-                return new SchemaNode(eitherSchema, root.superRootSchema, next, root.fullRefResolver);
+                return new SchemaNode(eitherSchema, next, root.fullRefResolver, root.superRootSchema);
             } else {
-                return new SchemaNode(root.eitherSchema, root.superRootSchema, next, root.fullRefResolver);
+                return new SchemaNode(root.eitherSchema, next, root.fullRefResolver, root.superRootSchema);
             }
         }
 

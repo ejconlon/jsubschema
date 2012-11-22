@@ -2,7 +2,7 @@ package net.exathunk.jsubschema.base;
 
 import net.exathunk.jsubschema.functional.Either3;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
-import net.exathunk.jsubschema.pointers.PointedSchemaRef;
+import net.exathunk.jsubschema.pointers.PointedRef;
 import net.exathunk.jsubschema.pointers.Reference;
 
 /**
@@ -16,16 +16,19 @@ public class SelfResolver implements RefResolver {
     public SelfResolver(SchemaLike self) {
         this.self = self;
         this.selfRef = Reference.fromId(self.getId());
+        assert selfRef.getPointer().isEmpty();
     }
 
     @Override
-    public Either3<SchemaRef, String, PointedSchemaRef> resolveRef(PointedSchemaRef pointedSchemaRef) {
-        final Reference otherReference = pointedSchemaRef.getSchemaRef().getReference();
-        if (otherReference.getUrl().isEmpty() || selfRef.getUrl().equals(otherReference.getUrl())) {
-            // TODO account for offset
-            return Pather.pathSchema(new PointedSchemaRef(new SchemaRef(self, selfRef), pointedSchemaRef.getPointer()));
+    public Either3<SchemaRef, String, PointedRef> resolveRef(PointedRef pointedRef) {
+        Reference otherReference = pointedRef.getReference();
+        if (otherReference.getUrl().isEmpty()) {
+            otherReference = new Reference(selfRef.getUrl(), otherReference.getPointer());
+        }
+        if (selfRef.getUrl().equals(otherReference.getUrl())) {
+            return Pather.pathSchema(new SchemaRef(self, otherReference), pointedRef.getPointer());
         } else {
-            return Either3.makeThird(pointedSchemaRef);
+            return Either3.makeThird(pointedRef);
         }
     }
 }

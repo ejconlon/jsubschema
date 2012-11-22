@@ -10,12 +10,12 @@ import org.codehaus.jackson.JsonNode;
  * charolastra 11/15/12 12:44 PM
  */
 public class Pather {
-    public static Either3<SchemaRef, String, PointedSchemaRef> pathSchema(PointedSchemaRef pointedSchemaRef) {
-        assert (Direction.UP.equals(pointedSchemaRef.getPointer().getDirection()));
-        return unDollarRef(pointedSchemaRef.getSchemaRef(), pointedSchemaRef.getSchemaRef(), pointedSchemaRef.getPointer());
+    public static Either3<SchemaRef, String, PointedRef> pathSchema(SchemaRef schemaRef, Pointer pointer) {
+        assert (Direction.UP.equals(pointer.getDirection()));
+        return unDollarRef(schemaRef, schemaRef, pointer);
     }
 
-    private static Either3<SchemaRef, String, PointedSchemaRef> unDollarRef(SchemaRef schemaRef, SchemaRef rootRef, Pointer pointer) {
+    private static Either3<SchemaRef, String, PointedRef> unDollarRef(SchemaRef schemaRef, SchemaRef rootRef, Pointer pointer) {
         assert Direction.UP.equals(pointer.getDirection());
         if (schemaRef.getSchema().has__dollar__ref()) {
             Either<Reference, String> eitherReference = Reference.fromReferenceString(schemaRef.getSchema().get__dollar__ref());
@@ -42,7 +42,7 @@ public class Pather {
                 }
             } else {
                 // non-local ref - return so resolvers can pick up
-                return Either3.makeThird(new PointedSchemaRef(new SchemaRef(null, reference), pointer));
+                return Either3.makeThird(new PointedRef(reference, pointer));
             }
         } else if (pointer.isEmpty()) {
             return Either3.makeFirst(schemaRef);

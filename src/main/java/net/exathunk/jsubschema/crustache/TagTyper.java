@@ -8,7 +8,7 @@ import net.exathunk.jsubschema.functional.Pair;
 import net.exathunk.jsubschema.genschema.schema.Schema;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyList;
-import net.exathunk.jsubschema.pointers.PointedSchemaRef;
+import net.exathunk.jsubschema.pointers.PointedRef;
 import net.exathunk.jsubschema.pointers.Reference;
 
 import java.util.ArrayList;
@@ -182,7 +182,7 @@ public class TagTyper {
                 errors.add("Invalid schema: "+eitherRef.getSecond());
                 return;
             }
-            Either<SchemaRef, String> eitherSchema = refResolver.fullyResolveRef(new PointedSchemaRef(new SchemaRef(null, eitherRef.getFirst()), eitherRef.getFirst().getPointer()));
+            Either<SchemaRef, String> eitherSchema = refResolver.fullyResolveRef(new PointedRef(eitherRef.getFirst(), eitherRef.getFirst().getPointer().reversed()));
             if (eitherSchema.isSecond()) {
                 errors.add("Invalid reference: "+eitherSchema.getSecond());
                 return;

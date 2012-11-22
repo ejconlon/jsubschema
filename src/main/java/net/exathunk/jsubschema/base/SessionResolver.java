@@ -2,7 +2,7 @@ package net.exathunk.jsubschema.base;
 
 import net.exathunk.jsubschema.functional.Either3;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
-import net.exathunk.jsubschema.pointers.PointedSchemaRef;
+import net.exathunk.jsubschema.pointers.PointedRef;
 import net.exathunk.jsubschema.pointers.Reference;
 
 /**
@@ -16,13 +16,13 @@ public class SessionResolver implements RefResolver {
     }
 
     @Override
-    public Either3<SchemaRef, String, PointedSchemaRef> resolveRef(PointedSchemaRef pointedSchemaRef) {
-        SchemaLike maybeSchema = session.schemas.get(pointedSchemaRef.getSchemaRef().getReference().getUrl());
+    public Either3<SchemaRef, String, PointedRef> resolveRef(PointedRef pointedRef) {
+        Reference otherReference = pointedRef.getReference();
+        SchemaLike maybeSchema = session.schemas.get(otherReference.getUrl());
         if (maybeSchema != null) {
-            // TODO actually shuffle shit from schema space to domain space
-            return Pather.pathSchema(new PointedSchemaRef(new SchemaRef(maybeSchema, Reference.fromId(maybeSchema.getId())), pointedSchemaRef.getPointer()));
+            return Pather.pathSchema(new SchemaRef(maybeSchema, Reference.fromId(maybeSchema.getId())), pointedRef.getPointer());
         } else {
-            return Either3.makeThird(pointedSchemaRef);
+            return Either3.makeThird(pointedRef);
         }
     }
 }

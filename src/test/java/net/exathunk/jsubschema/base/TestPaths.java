@@ -6,10 +6,7 @@ import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.genschema.event.Event;
 import net.exathunk.jsubschema.genschema.geo.Geo;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
-import net.exathunk.jsubschema.pointers.Part;
-import net.exathunk.jsubschema.pointers.PointedSchemaRef;
-import net.exathunk.jsubschema.pointers.Pointer;
-import net.exathunk.jsubschema.pointers.Reference;
+import net.exathunk.jsubschema.pointers.*;
 import net.exathunk.jsubschema.validation.DefaultValidator;
 import net.exathunk.jsubschema.validation.VContext;
 import net.exathunk.jsubschema.validation.VError;
@@ -203,30 +200,9 @@ public class TestPaths {
     private static Either<SchemaRef, String> resolve(FullRefResolver fullRefResolver, String ref) {
         Either<Reference, String> eitherRef = Reference.fromReferenceString(ref);
         if (eitherRef.isSecond()) return Either.makeSecond(eitherRef.getSecond());
-        PointedSchemaRef pointedSchemaRef = new PointedSchemaRef(new SchemaRef(null, Reference.fromId(eitherRef.getFirst().getUrl())), eitherRef.getFirst().getPointer().reversed());
-        return fullRefResolver.fullyResolveRef(pointedSchemaRef);
+        PointedRef pointedRef = new PointedRef(Reference.fromId(eitherRef.getFirst().getUrl()), eitherRef.getFirst().getPointer().reversed());
+        return fullRefResolver.fullyResolveRef(pointedRef);
     }
-
-    /*@Test
-    public void testPather() throws IOException, TypeException {
-        final Session session = Session.loadDefaultSession();
-        final SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/stringmultimap");
-        assertNotNull(schema);
-
-        final FullRefResolver fullRefResolver = new MetaResolver(new SelfResolver(schema));
-
-        final Reference baseRef = Reference.fromId(schema.getId());
-
-        //Either<SchemaRef, String> rootSchemaRef = Either.makeFirst(new SchemaRef(schema, new Reference("http://exathunk.net/schemas/stringmultimap", new Pointer())));
-        //assertEquals(rootSchemaRef, resolve(fullRefResolver, "#"));
-        //assertEquals(rootSchemaRef, resolve(fullRefResolver, "http://exathunk.net/schemas/stringmultimap#"));
-
-        Either<SchemaRef, String> saSchemaRef = Either.<SchemaRef, String>makeFirst(new SchemaRef(schema.getDeclarations().get("stringArray"), baseRef.cons(Part.asKey("declarations")).cons(Part.asKey("stringArray"))));
-        //assertEquals(saSchemaRef, resolve(fullRefResolver, "http://exathunk.net/schemas/stringmultimap#/declarations/stringArray"));
-        assertEquals(saSchemaRef, resolve(fullRefResolver, schema.getItems().get__dollar__ref()));
-
-        //assertEquals(schema.getItems(), resolve(fullRefResolver, "#/items"));
-    }*/
 
     @Test
     public void testTupling5() throws IOException, TypeException {
