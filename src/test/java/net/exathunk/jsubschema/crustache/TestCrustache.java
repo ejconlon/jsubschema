@@ -257,7 +257,7 @@ public class TestCrustache {
 
     private static List<String> satisfyErrors(SchemaLike schema, TagTree tagTree) {
         FullRefResolver refResolver = new MetaResolver(new SelfResolver(schema));
-        return TagTyper.satisfyErrors(schema, tagTree, refResolver);
+        return TagTyper.satisfyErrors(schema, tagTree, new NameResolverImpl("http://example.com/whee"), refResolver);
     }
 
     @Test
@@ -339,8 +339,9 @@ public class TestCrustache {
         assertEquals(Util.asList("subSingle: expected schema with scalar type, found: array"), satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"array\"} } } }"), singleTagTree));
 
         // partials
-        //assertEquals(empty, TagTyper.satisfyErrors(makeSchema("{\"type\":\"object\", \"extensions\":[\"http://example.com/whee/next\"]}"), secretTagTree));
         //assertEquals(empty, satisfyErrors(makeSchema("{\"$ref\":\"http://example.com/whee/next2\"}"), secret2TagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{\"type\":\"object\", \"extensions\":[\"http://example.com/whee/next2\"]}"), secret2TagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{\"id\":\"http://example.com/whee/next2\", \"type\":\"object\"}}"), secret2TagTree));
 
         //NameResolver resolver = new NameResolverImpl("http://example.com/whee");
         //SchemaLike schema = TagTyper.makeTreeSchema("woo", tagTree, resolver);

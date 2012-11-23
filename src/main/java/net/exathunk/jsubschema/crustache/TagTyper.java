@@ -166,29 +166,37 @@ public class TagTyper {
     }
 
     // Returns list of errors.  Empty list == ok.
-    public static List<String> satisfyErrors(SchemaLike schema, TagTree tagTree, FullRefResolver refResolver) {
+    public static List<String> satisfyErrors(SchemaLike schema, TagTree tagTree, NameResolver nameResolver, FullRefResolver refResolver) {
         List<String> errors = new ArrayList<String>();
-        satisfyErrorsInner(schema, tagTree, errors, refResolver);
+        satisfyErrorsInner(schema, tagTree, errors, nameResolver, refResolver);
         return errors;
     }
 
-    private static void satisfyErrorsInner(SchemaLike schema, TagTree tagTree, List<String> errors, FullRefResolver refResolver) {
+    private static void satisfyErrorsInner(SchemaLike schema, TagTree tagTree, List<String> errors, NameResolver nameResolver, FullRefResolver refResolver) {
         if (schema == null || (!schema.hasType() && !schema.has__dollar__ref())) {
             errors.add("Invalid schema: null or null type and ref"+schema);
             return;
         } else if (schema.has__dollar__ref()) {
             Either<Reference, String> eitherRef = Reference.fromReferenceString(schema.get__dollar__ref());
             if (eitherRef.isSecond()) {
-                errors.add("Invalid schema: "+eitherRef.getSecond());
+                errors.add("Invalid reference string: "+eitherRef.getSecond());
                 return;
             }
             PointedRef pointedRef = new PointedRef(eitherRef.getFirst());
             Either<SchemaRef, String> eitherSchema = refResolver.fullyResolveRef(pointedRef);
             if (eitherSchema.isSecond()) {
+                // Fuuuu sometimes these can have refs to partials and stuff TODO
+
+                if (tagTree.getParent().isJust() && Tag.Type.PARTIAL.equals(tagTree.getParent().getJust().getType())) {
+                    String url = nameResolver.resolveName(tagTree.getParent().getJust().getLabel());
+                    if (satisfies(url, schema)) {
+                        return;
+                    }
+                }
                 errors.add("Invalid reference: "+eitherSchema.getSecond());
                 return;
             } else if (eitherRef.getFirst().getPointer().isEmpty()) {
-                satisfyErrorsInner(eitherSchema.getFirst().getSchema(), tagTree, errors, refResolver);
+                satisfyErrorsInner(eitherSchema.getFirst().getSchema(), tagTree, errors, nameResolver, refResolver);
                 return;
             }
         } else {
@@ -209,14 +217,14 @@ public class TagTyper {
                 } else if (parentType.equals(Tag.Type.SECTION_START) || parentType.equals(Tag.Type.INVERTED_START)) {
                     boolean hasChildren = tagTree.getChildren().size() > 0;
                     if (schemaType.equals("object")) {
-                        checkObject(schema, tagTree, errors, refResolver, label);
+                        checkObject(schema, tagTree, errors, nameResolver, refResolver, label);
                     } else if (schemaType.equals("array")) {
                         if (hasChildren) {
                             if (!schema.hasItems()) {
                                 errors.add(label+": missing items");
                                 return;
                             } else {
-                                satisfyErrorsInner(schema.getItems(), tagTree, errors, refResolver);
+                                satisfyErrorsInner(schema.getItems(), tagTree, errors, nameResolver, refResolver);
                             }
                         }
                     } else if (!hasChildren) {
@@ -225,6 +233,12 @@ public class TagTyper {
                         errors.add(label+": expected container type, found: "+schemaType);
                         return;
                     }
+                } else if (parentType.equals(Tag.Type.PARTIAL)) {
+                    throw new IllegalStateException("Should not hit: "+parentType);
+                } else if (parentType.equals(Tag.Type.SECTION_END)) {
+                    // pass
+                } else {
+                    throw new IllegalStateException("Unhandled case: "+parentType);
                 }
             } else {
                 // Root of tree - must be object.
@@ -232,29 +246,51 @@ public class TagTyper {
                     errors.add("ROOT: expected object type, found: "+schemaType);
                     return;
                 }
-                checkObject(schema, tagTree, errors, refResolver, "ROOT");
+                checkObject(schema, tagTree, errors, nameResolver, refResolver, "ROOT");
             }
         }
     }
 
-    private static void checkObject(SchemaLike schema, TagTree tagTree, List<String> errors, FullRefResolver refResolver, String label) {
-        if (!tagTree.getChildren().isEmpty()) {
-            if (!schema.hasProperties()) {
-                errors.add(label+": missing properties");
-                return;
+    private static boolean satisfies(String url, SchemaLike schema) {
+        if (url.equals(schema.getId())) {
+            // if this schema has the url as id
+            // TODO make more robust, allow for relative refs?
+            return true;
+        } else if (schema.has__dollar__ref() && schema.get__dollar__ref().equals(url)) {
+            return true;
+        } else if (schema.hasExtensions() && schema.getExtensions().contains(url)) {
+            // if this schema extends the reffed schema
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static void checkObject(SchemaLike schema, TagTree tagTree, List<String> errors, NameResolver nameResolver, FullRefResolver refResolver, String label) {
+        for (TagTree childTree : tagTree.getChildren()) {
+            final Maybe<Tag> child = childTree.getParent();
+            if (child.isNothing()) {
+                errors.add(label+": null child");
             } else {
-                for (TagTree childTree : tagTree.getChildren()) {
-                    final Maybe<Tag> child = childTree.getParent();
-                    if (child.isNothing()) {
-                        errors.add(label+": null child");
-                    } else {
-                        final String childLabel = child.getJust().getLabel();
-                        if (!schema.getProperties().containsKey(childLabel)) {
-                            errors.add(label+": missing key: "+childLabel);
-                        } else {
-                            satisfyErrorsInner(schema.getProperties().get(childLabel), childTree, errors, refResolver);
-                        }
+                final String childLabel = child.getJust().getLabel();
+                final Tag.Type childType = child.getJust().getType();
+                if (childType.equals(Tag.Type.SECTION_END)) {
+                    continue;
+                } else if (Tag.Type.PARTIAL.equals(childType)) {
+                    // We could load the referenced schema and validate it, but that's TODO
+                    // This schema satisfies this tag...
+                    String url = nameResolver.resolveName(childLabel);
+                    if (!satisfies(url, schema)) {
+                        errors.add(childLabel+": could not satisfy partial: "+url);
                     }
+                    continue;
+                }
+                if (!schema.hasProperties()) {
+                    errors.add(label+": missing properties");
+                } else if (!schema.getProperties().containsKey(childLabel)) {
+                    errors.add(label+": missing key: "+childLabel);
+                } else {
+                    satisfyErrorsInner(schema.getProperties().get(childLabel), childTree, errors, nameResolver, refResolver);
                 }
             }
         }
