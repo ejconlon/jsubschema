@@ -182,12 +182,15 @@ public class TagTyper {
                 errors.add("Invalid schema: "+eitherRef.getSecond());
                 return;
             }
-            Either<SchemaRef, String> eitherSchema = refResolver.fullyResolveRef(new PointedRef(eitherRef.getFirst(), eitherRef.getFirst().getPointer().reversed()));
+            PointedRef pointedRef = new PointedRef(eitherRef.getFirst());
+            Either<SchemaRef, String> eitherSchema = refResolver.fullyResolveRef(pointedRef);
             if (eitherSchema.isSecond()) {
                 errors.add("Invalid reference: "+eitherSchema.getSecond());
                 return;
+            } else if (eitherRef.getFirst().getPointer().isEmpty()) {
+                satisfyErrorsInner(eitherSchema.getFirst().getSchema(), tagTree, errors, refResolver);
+                return;
             }
-            satisfyErrorsInner(eitherSchema.getFirst().getSchema(), tagTree, errors, refResolver);
         } else {
             final String schemaType = schema.getType();
             if (tagTree.getParent().isJust()) {

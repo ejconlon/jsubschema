@@ -14,12 +14,12 @@ import java.util.Map;
 public class Pather {
 
     public static Either3<SchemaRef, String, PointedRef> pathSchema(SchemaRef schemaRef, Pointer pointer) {
-        return pathSchemaInner(schemaRef, schemaRef, pointer);
+        return pathSchemaInner(schemaRef, schemaRef, pointer, false);
     }
 
-    private static Either3<SchemaRef, String, PointedRef> pathSchemaInner(SchemaRef schemaRef, SchemaRef rootRef, Pointer pointer) {
+    private static Either3<SchemaRef, String, PointedRef> pathSchemaInner(SchemaRef schemaRef, SchemaRef rootRef, Pointer pointer, boolean skipUnDollar) {
         assert Direction.UP.equals(pointer.getDirection());
-        if (schemaRef.getSchema().has__dollar__ref()) {
+        if (!skipUnDollar && schemaRef.getSchema().has__dollar__ref()) {
             Either<Reference, String> eitherReference = Reference.fromReferenceString(schemaRef.getSchema().get__dollar__ref());
             if (eitherReference.isSecond()) return Either3.makeSecond(eitherReference.getSecond());
             Reference reference = eitherReference.getFirst();
@@ -28,7 +28,7 @@ public class Pather {
                 reference = new Reference(schemaRef.getReference().getUrl(), reference.getPointer());
             }
             if (reference.getUrl().equals(schemaRef.getReference().getUrl())) {
-                return pathSchemaInner(rootRef, rootRef, pointer);
+                return pathSchemaInner(rootRef, rootRef, pointer, true);
             } else {
                 return Either3.makeThird(new PointedRef(reference, pointer));
             }
@@ -45,7 +45,7 @@ public class Pather {
                     }
                 } else if (key.equals("items")) {
                     if (schema.hasItems()) {
-                        return pathSchemaInner(new SchemaRef(schema.getItems(), schemaRef.getReference().cons(Part.asKey("items"))), rootRef, pointer.getTail());
+                        return pathSchemaInner(new SchemaRef(schema.getItems(), schemaRef.getReference().cons(Part.asKey("items"))), rootRef, pointer.getTail(), false);
                     }
                 } else if (key.equals("properties") && !pointer.getTail().isEmpty()) {
                     if (schema.hasProperties()) {
@@ -61,7 +61,7 @@ public class Pather {
         assert !pointer.isEmpty();
         final Part part = pointer.getHead();
         if (!part.hasKey() || !schemaMap.containsKey(part.getKey())) return Either3.makeSecond("Bad path (need key): "+schemaRef.getReference().toReferenceString()+";"+pointer.reversed().toPointerString());
-        return pathSchemaInner(new SchemaRef(schemaMap.get(part.getKey()), schemaRef.getReference().cons(Part.asKey(contextName)).cons(part)), rootRef, pointer.getTail());
+        return pathSchemaInner(new SchemaRef(schemaMap.get(part.getKey()), schemaRef.getReference().cons(Part.asKey(contextName)).cons(part)), rootRef, pointer.getTail(), false);
     }
 
     public static Either3<SchemaRef, String, PointedRef> pathDomain(SchemaRef schemaRef, Pointer pointer) {
@@ -79,7 +79,7 @@ public class Pather {
                 reference = new Reference(schemaRef.getReference().getUrl(), reference.getPointer());
             }
             if (reference.getUrl().equals(schemaRef.getReference().getUrl())) {
-                Either3<SchemaRef, String, PointedRef> x = pathSchemaInner(schemaRef, rootRef, reference.getPointer().reversed());
+                Either3<SchemaRef, String, PointedRef> x = pathSchemaInner(schemaRef, rootRef, reference.getPointer().reversed(), false);
                 if (x.isFirst()) return pathDomainInner(x.getFirst(), rootRef, pointer);
                 else return x;
 

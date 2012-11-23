@@ -26,7 +26,7 @@ public class SelfResolver implements RefResolver {
             otherReference = new Reference(selfRef.getUrl(), otherReference.getPointer());
         }
         if (selfRef.getUrl().equals(otherReference.getUrl())) {
-            return Pather.pathDomain(new SchemaRef(self, otherReference), pointedRef.getPointer());
+            return Pather.pathDomain(new SchemaRef(self, selfRef), pointedRef.getPointer());
         } else {
             return Either3.makeThird(pointedRef);
         }

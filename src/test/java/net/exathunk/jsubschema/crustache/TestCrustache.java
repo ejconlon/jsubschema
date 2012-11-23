@@ -280,6 +280,9 @@ public class TestCrustache {
 
         final List<String> empty = new ArrayList<String>();
 
+        // with ref!
+        assertEquals(empty, satisfyErrors(makeSchema("{ \"declarations\" : {\"strDecl\" : { \"type\": \"string\" }}, \"$ref\":\"#/declarations/strDecl\" }"), yawnTagTree));
+
         // NORMAL node accepts scalar types
         assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"string\" }"), yawnTagTree));
         assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"boolean\" }"), yawnTagTree));
@@ -287,9 +290,6 @@ public class TestCrustache {
         assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"number\" }"), yawnTagTree));
         assertEquals(Util.asList("yawn: expected schema with scalar type, found: object"), satisfyErrors(makeSchema("{ \"type\": \"object\" }"), yawnTagTree));
         assertEquals(Util.asList("yawn: expected schema with scalar type, found: array"), satisfyErrors(makeSchema("{ \"type\": \"array\" }"), yawnTagTree));
-
-        // with ref!
-        //assertEquals(empty, satisfyErrors(makeSchema("{ \"declarations\" : {\"strDecl\" : { \"type\": \"string\" }}, \"$ref\":\"#/declarations/strDecl\" }"), yawnTagTree));
 
         // ESCAPE node accepts scalar types
         assertEquals(empty, satisfyErrors(makeSchema("{ \"type\": \"string\" }"), moreTagTree));
