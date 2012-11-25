@@ -15,13 +15,13 @@ import java.util.TreeMap;
  * charolastra 11/16/12 6:34 PM
  */
 public class Schematizer {
-    public SchemaLike schematize(String id, JsonNode node, VContext context) {
+    public static SchemaLike schematize(String id, JsonNode node, VContext context) {
         SchemaLike schema = schematizeInner(new Reference(), node, context);
         schema.setId(id);
         return schema;
     }
 
-    private SchemaLike schematizeInner(Reference reference, JsonNode node, VContext context) {
+    private static SchemaLike schematizeInner(Reference reference, JsonNode node, VContext context) {
         SchemaLike schema = new Schema();
         if (node.isObject()) {
             schema.setType("object");

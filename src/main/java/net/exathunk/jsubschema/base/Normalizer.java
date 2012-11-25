@@ -5,38 +5,26 @@ import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.pointers.Part;
 import net.exathunk.jsubschema.pointers.Pointer;
 import net.exathunk.jsubschema.pointers.Reference;
-import net.exathunk.jsubschema.validation.VContext;
 
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.Callable;
 
 /**
  * charolastra 11/19/12 10:25 PM
  */
-public class Normalizer implements Callable<SchemaLike> {
-    private final SchemaLike root;
-    private final VContext context;
-    private int counter;
+public class Normalizer {
 
-    public Normalizer(SchemaLike root, VContext context) {
-        this.root = root;
-        this.context = context;
-        this.counter = 0;
+    public static SchemaLike normalize(final SchemaLike schema) {
+        return normalizeInner(schema, schema, new Pointer(), 0);
     }
 
-    @Override
-    public SchemaLike call() {
-        return subCall(root, new Pointer());
-    }
-
-    private SchemaLike subCall(final SchemaLike schema, final Pointer pointer) {
+    private static SchemaLike normalizeInner(final SchemaLike root, final SchemaLike schema, final Pointer pointer, final int depth) {
         if (schema.hasItems()) {
             final SchemaLike subSchema = schema.getItems();
             final Pointer subPointer = pointer.cons(Part.asKey("items"));
             if (subSchema.hasItems() || subSchema.hasProperties()) {
-                SchemaLike newSubSchema = subCall(subSchema, subPointer);
-                newSubSchema = declare(newSubSchema, subPointer);
+                SchemaLike newSubSchema = normalizeInner(root, subSchema, subPointer, depth+1);
+                if (depth > 0) newSubSchema = declare(root, newSubSchema, subPointer);
                 subSchema.setItems(newSubSchema);
             }
         } else if (schema.hasProperties()) {
@@ -45,8 +33,8 @@ public class Normalizer implements Callable<SchemaLike> {
                 final SchemaLike subSchema = entry.getValue();
                 final Pointer subPointer = pointer.cons(Part.asKey("properties")).cons(Part.asKey(entry.getKey()));
                 if (subSchema.hasItems() || subSchema.hasProperties()) {
-                    SchemaLike newSubSchema = subCall(subSchema, subPointer);
-                    newSubSchema = declare(newSubSchema, subPointer);
+                    SchemaLike newSubSchema = normalizeInner(root, subSchema, subPointer, depth+1);
+                    if (depth > 0) newSubSchema = declare(root, newSubSchema, subPointer);
                     newProperties.put(entry.getKey(), newSubSchema);
                 } else {
                     newProperties.put(entry.getKey(), entry.getValue());
@@ -57,7 +45,7 @@ public class Normalizer implements Callable<SchemaLike> {
         return schema;
     }
 
-    private SchemaLike declare(SchemaLike schema, Pointer pointer) {
+    private static SchemaLike declare(SchemaLike root, SchemaLike schema, Pointer pointer) {
         final Part keyPart = Part.fromPointerString(pointer.toPointerString());
         final Reference ref = new Reference("", new Pointer().cons(Part.asKey("declarations")).cons(keyPart));
         if (!root.hasDeclarations()) {

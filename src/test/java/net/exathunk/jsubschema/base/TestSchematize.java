@@ -1,6 +1,7 @@
 package net.exathunk.jsubschema.base;
 
 import net.exathunk.jsubschema.Util;
+import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.validation.DefaultValidator;
@@ -41,10 +42,9 @@ public class TestSchematize {
         JsonNode instanceNode = Util.parse(instanceStr);
         JsonNode goldSchemaNode = Util.parse(schemaStr);
 
-        Schematizer schematizer = new Schematizer();
         VContext context = new VContext();
 
-        SchemaLike schema = schematizer.schematize("http://example.com/foo", instanceNode, context);
+        SchemaLike schema = Schematizer.schematize("http://example.com/foo", instanceNode, context);
 
         assertEquals(new ArrayList<VError>(), context.errors);
 
@@ -64,16 +64,15 @@ public class TestSchematize {
         schemaStr += "\"properties\": {\"c\": {\"type\":\"integer\"} ";
         schemaStr += "} } } } } }";
 
-        String normalizedStr = "{\"type\":\"object\",\"properties\":{\"a\":{\"$ref\":\"#/declarations/~1properties~1a\"}},\"declarations\":{\"/properties/a\":{\"type\":\"object\",\"properties\":{\"b\":{\"$ref\":\"#/declarations/~1properties~1a~1properties~1b\"}}},\"/properties/a/properties/b\":{\"type\":\"object\",\"properties\":{\"c\":{\"type\":\"integer\"}}}},\"id\":\"http://example.com/foo\"}";
+        String normalizedStr = Loader.loadString("/test/schematized_abc");
 
         JsonNode instanceNode = Util.parse(instanceStr);
         JsonNode goldSchemaNode = Util.parse(schemaStr);
         JsonNode goldNormalizedNode = Util.parse(normalizedStr);
 
-        Schematizer schematizer = new Schematizer();
         VContext context = new VContext();
 
-        SchemaLike schema = schematizer.schematize("http://example.com/foo", instanceNode, context);
+        SchemaLike schema = Schematizer.schematize("http://example.com/foo", instanceNode, context);
 
         assertEquals(new ArrayList<VError>(), context.errors);
 
@@ -83,10 +82,7 @@ public class TestSchematize {
 
         assertEquals(goldSchemaNode, testSchemaNode);
 
-        Normalizer n = new Normalizer(schema, context);
-        SchemaLike normalized = n.call();
-
-        assertEquals(new ArrayList<VError>(), context.errors);
+        SchemaLike normalized = Normalizer.normalize(schema);
 
         JsonNode testNormalizedNode = Util.quickUnbind(normalized);
 
