@@ -185,14 +185,36 @@ public class TagTyper {
             PointedRef pointedRef = new PointedRef(eitherRef.getFirst());
             Either<SchemaRef, String> eitherSchema = refResolver.fullyResolveRef(pointedRef);
             if (eitherSchema.isSecond()) {
-                // Fuuuu sometimes these can have refs to partials and stuff TODO
+                // This is really convoluted.  We want to cheat and let the schema satisfy the tag
+                // even if we can't resolve the ref under certain circumstances.  Those include
+                // if the tag is a partial, or if it is a section start with a single partial child.
+                // (Multiple partial children would work, but that's TODO
+                if (tagTree.getParent().isJust()) {
+                    final String checkLabel;
+                    final Tag.Type parentType = tagTree.getParent().getJust().getType();
+                    if (Tag.Type.PARTIAL.equals(parentType)) {
+                        checkLabel = tagTree.getParent().getJust().getLabel();
+                    } else if (Tag.Type.SECTION_START.equals(parentType) || Tag.Type.INVERTED_START.equals(parentType)) {
+                        if (tagTree.getChildren().isEmpty()) {
+                            checkLabel = tagTree.getParent().getJust().getLabel();
+                        } else if (tagTree.getChildren().size() == 1 && tagTree.getChildren().get(0).getParent().isJust() &&
+                            Tag.Type.PARTIAL.equals(tagTree.getChildren().get(0).getParent().getJust().getType())) {
+                            checkLabel = tagTree.getChildren().get(0).getParent().getJust().getLabel();
+                        } else {
+                            checkLabel = null;
+                        }
+                    } else {
+                        checkLabel = null;
+                    }
 
-                if (tagTree.getParent().isJust() && Tag.Type.PARTIAL.equals(tagTree.getParent().getJust().getType())) {
-                    String url = nameResolver.resolveName(tagTree.getParent().getJust().getLabel());
-                    if (satisfies(url, schema)) {
-                        return;
+                    if (checkLabel != null) {
+                        String url = nameResolver.resolveName(checkLabel);
+                        if (satisfies(url, schema)) {
+                            return;
+                        }
                     }
                 }
+
                 errors.add("Invalid reference: "+eitherSchema.getSecond());
                 return;
             } else if (eitherRef.getFirst().getPointer().isEmpty()) {

@@ -339,12 +339,12 @@ public class TestCrustache {
         assertEquals(Util.asList("subSingle: expected schema with scalar type, found: array"), satisfyErrors(makeSchema("{ \"type\": \"array\", \"items\" : {\"type\":\"object\", \"properties\" : { \"subSingle\" : {\"type\" : \"array\"} } } }"), singleTagTree));
 
         // partials
-        //assertEquals(empty, satisfyErrors(makeSchema("{\"$ref\":\"http://example.com/whee/next2\"}"), secret2TagTree));
+        assertEquals(empty, satisfyErrors(makeSchema("{\"$ref\":\"http://example.com/whee/next2\"}"), secret2TagTree));
         assertEquals(empty, satisfyErrors(makeSchema("{\"type\":\"object\", \"extensions\":[\"http://example.com/whee/next2\"]}"), secret2TagTree));
         assertEquals(empty, satisfyErrors(makeSchema("{\"id\":\"http://example.com/whee/next2\", \"type\":\"object\"}}"), secret2TagTree));
 
-        //NameResolver resolver = new NameResolverImpl("http://example.com/whee");
-        //SchemaLike schema = TagTyper.makeTreeSchema("woo", tagTree, resolver);
-        //assertEquals(empty, TagTyper.satisfyErrors(schema, tagTree));
+        NameResolver resolver = new NameResolverImpl("http://example.com/whee");
+        SchemaLike schema = TagTyper.makeTreeSchema("woo", tagTree, resolver);
+        assertEquals(empty, satisfyErrors(schema, tagTree));
     }
 }
