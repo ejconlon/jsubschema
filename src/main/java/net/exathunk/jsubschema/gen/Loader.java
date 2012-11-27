@@ -1,6 +1,9 @@
 package net.exathunk.jsubschema.gen;
 
 import net.exathunk.jsubschema.Util;
+import net.exathunk.jsubschema.base.TypeException;
+import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
+import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import org.codehaus.jackson.JsonNode;
 
 import java.io.*;
@@ -45,6 +48,10 @@ public class Loader {
 
     public static JsonNode loadSchemaNode(String name) throws IOException {
         return loadNode("/schemas/"+name);
+    }
+
+    public static SchemaLike loadSchema(String name) throws IOException, TypeException {
+        return Util.quickBind(loadSchemaNode(name), new SchemaFactory());
     }
 
     public static Set<String> listSchemas() throws IOException {
