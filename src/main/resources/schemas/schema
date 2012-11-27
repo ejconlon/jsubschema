@@ -1,7 +1,7 @@
 {
   "id" : "http://exathunk.net/schemas/schema",
 
-  //"$schema" : "http://exathunk.net/schemas/schema",
+  "$schema" : "http://exathunk.net/schemas/schema",
 
   "type" : "object",
 
@@ -25,7 +25,7 @@
     "properties" : ["items"],
     "items" : ["properties"],
     "$ref" : ["id", "description", "format", "properties", "declarations", "items",
-              "type", "required", "allows", "forbidsMap", "dependencies"]
+              "type", "required", "forbids", "dependencies"]
   },
 
   "properties" : {

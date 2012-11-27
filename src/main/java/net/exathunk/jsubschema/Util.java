@@ -1,9 +1,8 @@
 package net.exathunk.jsubschema;
 
-import net.exathunk.jsubschema.base.SchemaNode;
-import net.exathunk.jsubschema.base.JacksonBinder;
-import net.exathunk.jsubschema.base.TypeException;
+import net.exathunk.jsubschema.base.*;
 import net.exathunk.jsubschema.gendeps.DomainFactory;
+import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.validation.VContext;
 import net.exathunk.jsubschema.validation.VError;
 import net.exathunk.jsubschema.validation.Validator;
@@ -157,6 +156,12 @@ public class Util {
         VContext context = new VContext();
         runValidator(validator, rootNode, context);
         return context;
+    }
+
+    public static VContext runValidator(Validator validator, Session session, SchemaLike schema, JsonNode node) {
+        FullRefResolver fullRefResolver = new MetaResolver(Util.asList(new SelfResolver(schema), new SessionResolver(session)));
+        SchemaNode rootNode = new SchemaNode(schema, new PointedNode(node), fullRefResolver);
+        return runValidator(validator, rootNode);
     }
 
     public static boolean matchesType(JsonNode node, String schemaType) {
