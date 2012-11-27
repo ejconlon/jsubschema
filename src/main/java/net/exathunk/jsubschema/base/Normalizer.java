@@ -15,16 +15,32 @@ import java.util.TreeMap;
 public class Normalizer {
 
     public static SchemaLike normalize(final SchemaLike schema) {
-        return normalizeInner(schema, schema, new Pointer(), 0);
+        return normalizeInner(schema, schema, new Pointer());
     }
 
-    private static SchemaLike normalizeInner(final SchemaLike root, final SchemaLike schema, final Pointer pointer, final int depth) {
+    // UGLY
+    private static boolean shouldDeclare(SchemaLike subSchema) {
+        if (subSchema.hasItems()) {
+            final SchemaLike subSubSchema = subSchema.getItems();
+            if (subSubSchema.hasItems()) {
+                return !subSubSchema.getItems().hasItems() || subSubSchema.getItems().hasProperties();
+            } else if (subSubSchema.hasProperties()) {
+                return true;
+            }
+            return false;
+        } else if (subSchema.hasProperties()) {
+            return true;
+        }
+        return false;
+    }
+
+    private static SchemaLike normalizeInner(final SchemaLike root, final SchemaLike schema, final Pointer pointer) {
         if (schema.hasItems()) {
             final SchemaLike subSchema = schema.getItems();
             final Pointer subPointer = pointer.cons(Part.asKey("items"));
-            if (subSchema.hasItems() || subSchema.hasProperties()) {
-                SchemaLike newSubSchema = normalizeInner(root, subSchema, subPointer, depth+1);
-                if (depth > 0) newSubSchema = declare(root, newSubSchema, subPointer);
+            if (shouldDeclare(subSchema)) {
+                SchemaLike newSubSchema = normalizeInner(root, subSchema, subPointer);
+                newSubSchema = declare(root, newSubSchema, subPointer);
                 subSchema.setItems(newSubSchema);
             }
         } else if (schema.hasProperties()) {
@@ -32,9 +48,9 @@ public class Normalizer {
             for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
                 final SchemaLike subSchema = entry.getValue();
                 final Pointer subPointer = pointer.cons(Part.asKey("properties")).cons(Part.asKey(entry.getKey()));
-                if (subSchema.hasItems() || subSchema.hasProperties()) {
-                    SchemaLike newSubSchema = normalizeInner(root, subSchema, subPointer, depth+1);
-                    if (depth > 0) newSubSchema = declare(root, newSubSchema, subPointer);
+                if (shouldDeclare(subSchema)) {
+                    SchemaLike newSubSchema = normalizeInner(root, subSchema, subPointer);
+                    newSubSchema = declare(root, newSubSchema, subPointer);
                     newProperties.put(entry.getKey(), newSubSchema);
                 } else {
                     newProperties.put(entry.getKey(), entry.getValue());

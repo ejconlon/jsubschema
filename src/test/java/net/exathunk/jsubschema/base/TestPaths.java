@@ -345,14 +345,14 @@ public class TestPaths {
         List<SchemaNode> flattened = flatten(schema, node, fullRefResolver);
 
         List<String> goldRefStrings = Arrays.asList(
-             "#", "#/dtstart", "#/dtend", "#/summary", "#/location",
-             "#/url", "#/duration", "#/rdate", "#/rrule", "#/category",
-             "#/description", "#/geo", "#/geo/latitude", "#/geo/longitude"
+             "#", "#/category", "#/description", "#/dtend", "#/dtstart", "#/duration",
+             "#/geo", "#/geo/latitude", "#/geo/longitude",
+             "#/location","#/rdate", "#/rrule", "#/summary",  "#/url"
         );
         List<String> goldTypes = Arrays.asList(
-             "object", "string", "string", "string", "string",
-             "string", "string", "string", "string", "string",
-             "string", "object", "number", "number"
+             "object", "string", "string", "string", "string", "string",
+             "object", "number", "number",
+             "string", "string", "string", "string", "string"
         );
 
         List<String> actualRefStrings = Util.map(schemaTupleRefStrings, flattened);

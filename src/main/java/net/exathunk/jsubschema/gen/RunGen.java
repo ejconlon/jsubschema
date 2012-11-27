@@ -1,9 +1,10 @@
 package net.exathunk.jsubschema.gen;
 
 import net.exathunk.jsubschema.Util;
+import net.exathunk.jsubschema.base.Normalizer;
 import net.exathunk.jsubschema.base.TypeException;
-import net.exathunk.jsubschema.genschema.schema.Schema;
 import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
+import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.pointers.Reference;
 import org.codehaus.jackson.JsonNode;
 
@@ -50,6 +51,7 @@ public class RunGen {
         final Map<String, ClassRep> genned = new TreeMap<String, ClassRep>();
 
         for (File schemaFile : schemasDir.listFiles()) {
+        //for (File schemaFile : new File[] {new File(schemasDir, "schema")}) {
             System.out.println("Generating "+schemaFile);
             final BufferedReader reader = new BufferedReader(new FileReader(schemaFile));
             final StringBuilder contents = new StringBuilder();
@@ -59,9 +61,14 @@ public class RunGen {
                 next = reader.readLine();
             }
             final JsonNode node = Util.parse(contents.toString());
-            final Schema schema = Util.quickBind(node, new SchemaFactory());
+            final SchemaLike schema = Util.quickBind(node, new SchemaFactory());
+            final SchemaLike normalized = Normalizer.normalize(schema);
 
-            SchemaRepper.makeAll(Reference.fromId(schema.getId()), schema, basePackage, genned);
+            final Reference reference = Reference.fromId(normalized.getId());
+            final String name = SchemaRepper.parseClassName(reference);
+            final String packageName = basePackage + "." + name.toLowerCase();
+
+            SchemaRepper.makeAll(reference, reference, normalized, normalized, packageName, packageName, genned);
         }
 
         for (Map.Entry<String, ClassRep> entry : genned.entrySet()) {

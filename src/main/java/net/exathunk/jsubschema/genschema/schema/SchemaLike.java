@@ -13,38 +13,21 @@ import org.codehaus.jackson.map.annotate.JsonDeserialize;
 @JsonDeserialize(as = Schema.class)
 public interface SchemaLike {
 
-    boolean hasType();
+    boolean has__dollar__ref();
 
-    @JsonProperty("type")
-    String getType();
+    @JsonProperty("$ref")
+    String get__dollar__ref();
 
-    @JsonProperty("type")
-    void setType(String type);
+    @JsonProperty("$ref")
+    void set__dollar__ref(String __dollar__ref);
 
-    boolean hasDescription();
+    boolean has__dollar__schema();
 
-    @JsonProperty("description")
-    String getDescription();
+    @JsonProperty("$schema")
+    String get__dollar__schema();
 
-    @JsonProperty("description")
-    void setDescription(String description);
-
-    boolean hasFormat();
-
-    @JsonProperty("format")
-    String getFormat();
-
-    @JsonProperty("format")
-    void setFormat(String format);
-
-    boolean hasProperties();
-
-    @JsonProperty("properties")
-    Map<String, SchemaLike> getProperties();
-
-    @JsonProperty("properties")
-    @JsonDeserialize(contentAs = Schema.class)
-    void setProperties(Map<String, SchemaLike> properties);
+    @JsonProperty("$schema")
+    void set__dollar__schema(String __dollar__schema);
 
     boolean hasDeclarations();
 
@@ -55,40 +38,6 @@ public interface SchemaLike {
     @JsonDeserialize(contentAs = Schema.class)
     void setDeclarations(Map<String, SchemaLike> declarations);
 
-    boolean hasId();
-
-    @JsonProperty("id")
-    String getId();
-
-    @JsonProperty("id")
-    void setId(String id);
-
-    boolean has__dollar__ref();
-
-    @JsonProperty("$ref")
-    String get__dollar__ref();
-
-    @JsonProperty("$ref")
-    void set__dollar__ref(String __dollar__ref);
-
-    boolean hasItems();
-
-    @JsonProperty("items")
-    SchemaLike getItems();
-
-    @JsonProperty("items")
-    @JsonDeserialize(as = Schema.class)
-    void setItems(SchemaLike items);
-
-    boolean hasRequired();
-
-    @JsonProperty("required")
-    KeyListLike getRequired();
-
-    @JsonProperty("required")
-    @JsonDeserialize(as = KeyList.class)
-    void setRequired(KeyListLike required);
-
     boolean hasDependencies();
 
     @JsonProperty("dependencies")
@@ -97,6 +46,22 @@ public interface SchemaLike {
     @JsonProperty("dependencies")
     @JsonDeserialize(contentAs = KeyList.class)
     void setDependencies(Map<String, KeyListLike> dependencies);
+
+    boolean hasDescription();
+
+    @JsonProperty("description")
+    String getDescription();
+
+    @JsonProperty("description")
+    void setDescription(String description);
+
+    boolean hasExtensions();
+
+    @JsonProperty("extensions")
+    List<String> getExtensions();
+
+    @JsonProperty("extensions")
+    void setExtensions(List<String> extensions);
 
     boolean hasForbids();
 
@@ -107,20 +72,55 @@ public interface SchemaLike {
     @JsonDeserialize(contentAs = KeyList.class)
     void setForbids(Map<String, KeyListLike> forbids);
 
-    boolean has__dollar__schema();
+    boolean hasFormat();
 
-    @JsonProperty("$schema")
-    String get__dollar__schema();
+    @JsonProperty("format")
+    String getFormat();
 
-    @JsonProperty("$schema")
-    void set__dollar__schema(String __dollar__schema);
+    @JsonProperty("format")
+    void setFormat(String format);
 
-    boolean hasExtensions();
+    boolean hasId();
 
-    @JsonProperty("extensions")
-    List<String> getExtensions();
+    @JsonProperty("id")
+    String getId();
 
-    @JsonProperty("extensions")
-    void setExtensions(List<String> extensions);
+    @JsonProperty("id")
+    void setId(String id);
+
+    boolean hasItems();
+
+    @JsonProperty("items")
+    SchemaLike getItems();
+
+    @JsonProperty("items")
+    @JsonDeserialize(as = Schema.class)
+    void setItems(SchemaLike items);
+
+    boolean hasProperties();
+
+    @JsonProperty("properties")
+    Map<String, SchemaLike> getProperties();
+
+    @JsonProperty("properties")
+    @JsonDeserialize(contentAs = Schema.class)
+    void setProperties(Map<String, SchemaLike> properties);
+
+    boolean hasRequired();
+
+    @JsonProperty("required")
+    KeyListLike getRequired();
+
+    @JsonProperty("required")
+    @JsonDeserialize(as = KeyList.class)
+    void setRequired(KeyListLike required);
+
+    boolean hasType();
+
+    @JsonProperty("type")
+    String getType();
+
+    @JsonProperty("type")
+    void setType(String type);
 
 }

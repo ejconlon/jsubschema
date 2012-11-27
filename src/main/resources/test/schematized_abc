@@ -2,15 +2,18 @@
   "type":"object",
   "properties":{
     "a":{
+      "$ref":"#/declarations/~1properties~1a"
+    }
+  }, 
+  "declarations":{
+    "/properties/a": {
       "type":"object",
       "properties":{
         "b":{
           "$ref":"#/declarations/~1properties~1a~1properties~1b"
         }
       }
-    }
-  }, 
-  "declarations":{
+    },
     "/properties/a/properties/b":{
       "type":"object",
       "properties":{

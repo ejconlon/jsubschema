@@ -110,10 +110,12 @@ public class Util {
     }
 
     public static String lowerFirst(String s) {
+        if (s.isEmpty()) return "";
         return s.substring(0, 1).toLowerCase()+s.substring(1);
     }
 
     public static String upperFirst(String s) {
+        if (s.isEmpty()) return "";
         return s.substring(0, 1).toUpperCase()+s.substring(1);
     }
 

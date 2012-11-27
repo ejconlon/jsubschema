@@ -11,13 +11,21 @@ import org.codehaus.jackson.map.annotate.JsonDeserialize;
 @JsonDeserialize(as = Event.class)
 public interface EventLike {
 
-    boolean hasDtstart();
+    boolean hasCategory();
 
-    @JsonProperty("dtstart")
-    String getDtstart();
+    @JsonProperty("category")
+    String getCategory();
 
-    @JsonProperty("dtstart")
-    void setDtstart(String dtstart);
+    @JsonProperty("category")
+    void setCategory(String category);
+
+    boolean hasDescription();
+
+    @JsonProperty("description")
+    String getDescription();
+
+    @JsonProperty("description")
+    void setDescription(String description);
 
     boolean hasDtend();
 
@@ -27,29 +35,13 @@ public interface EventLike {
     @JsonProperty("dtend")
     void setDtend(String dtend);
 
-    boolean hasSummary();
+    boolean hasDtstart();
 
-    @JsonProperty("summary")
-    String getSummary();
+    @JsonProperty("dtstart")
+    String getDtstart();
 
-    @JsonProperty("summary")
-    void setSummary(String summary);
-
-    boolean hasLocation();
-
-    @JsonProperty("location")
-    String getLocation();
-
-    @JsonProperty("location")
-    void setLocation(String location);
-
-    boolean hasUrl();
-
-    @JsonProperty("url")
-    String getUrl();
-
-    @JsonProperty("url")
-    void setUrl(String url);
+    @JsonProperty("dtstart")
+    void setDtstart(String dtstart);
 
     boolean hasDuration();
 
@@ -58,6 +50,23 @@ public interface EventLike {
 
     @JsonProperty("duration")
     void setDuration(String duration);
+
+    boolean hasGeo();
+
+    @JsonProperty("geo")
+    GeoLike getGeo();
+
+    @JsonProperty("geo")
+    @JsonDeserialize(as = Geo.class)
+    void setGeo(GeoLike geo);
+
+    boolean hasLocation();
+
+    @JsonProperty("location")
+    String getLocation();
+
+    @JsonProperty("location")
+    void setLocation(String location);
 
     boolean hasRdate();
 
@@ -75,29 +84,20 @@ public interface EventLike {
     @JsonProperty("rrule")
     void setRrule(String rrule);
 
-    boolean hasCategory();
+    boolean hasSummary();
 
-    @JsonProperty("category")
-    String getCategory();
+    @JsonProperty("summary")
+    String getSummary();
 
-    @JsonProperty("category")
-    void setCategory(String category);
+    @JsonProperty("summary")
+    void setSummary(String summary);
 
-    boolean hasDescription();
+    boolean hasUrl();
 
-    @JsonProperty("description")
-    String getDescription();
+    @JsonProperty("url")
+    String getUrl();
 
-    @JsonProperty("description")
-    void setDescription(String description);
-
-    boolean hasGeo();
-
-    @JsonProperty("geo")
-    GeoLike getGeo();
-
-    @JsonProperty("geo")
-    @JsonDeserialize(as = Geo.class)
-    void setGeo(GeoLike geo);
+    @JsonProperty("url")
+    void setUrl(String url);
 
 }

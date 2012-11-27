@@ -68,11 +68,11 @@ public class TestNodes {
         final Session session = Session.loadDefaultSession();
         final SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
-        final ClassRep classRep = SchemaRepper.makeClass(Reference.fromId(schema.getId()), schema, "net.exathunk.jsubschema.genschema");
+        final ClassRep classRep = SchemaRepper.makeClass(Reference.fromId(schema.getId()), Reference.fromId(schema.getId()), schema, "net.exathunk.jsubschema.genschema.schema", "net.exathunk.jsubschema.genschema.schema");
         final String classString = Assembler.writeClass(classRep);
         assertNotNull(classString);
         //System.out.println(classString);
-        final ClassRep factoryRep = SchemaRepper.makeFactory(Reference.fromId(schema.getId()), schema, "net.exathunk.jsubschema.genschema");
+        final ClassRep factoryRep = SchemaRepper.makeFactory(Reference.fromId(schema.getId()), Reference.fromId(schema.getId()), schema, "net.exathunk.jsubschema.genschema.schema", "net.exathunk.jsubschema.genschema.schema");
         final String factoryString = Assembler.writeClass(factoryRep);
         //System.out.println(factoryString);
         assertNotNull(factoryString);

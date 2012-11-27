@@ -1,14 +1,17 @@
 {
-    "id": "http://exathunk.net/schema/geo",
+    "id": "http://exathunk.net/schema/card",
     "description": "A representation of a person, company, organization, or place",
     "type": "object",
+
+    "required" : ["familyName", "givenName"],
+
     "properties": {
         "fn": {
             "description": "Formatted Name",
             "type": "string"
         },
-        "familyName": { "type": "string", "required": true },
-        "givenName": { "type": "string", "required": true },
+        "familyName": { "type": "string"},
+        "givenName": { "type": "string"},
         "additionalName": { "type": "array", "items": { "type": "string" } },
         "honorificPrefix": { "type": "array", "items": { "type": "string" } },
         "honorificSuffix": { "type": "array", "items": { "type": "string" } },
@@ -28,8 +31,8 @@
                 "value": { "type": "string", "format": "phone" }
             }
         },
-        "adr": { "type": "object", "$ref": "http://exathunk.net/schemas/address" },
-        "geo": { "type": "object", "$ref": "http://exathunk.net/schemas/geo" },
+        "adr": { "$ref": "http://exathunk.net/schemas/address" },
+        "geo": { "$ref": "http://exathunk.net/schemas/geo" },
         "tz": { "type": "string" },
         "photo": { "type": "string" },
         "logo": { "type": "string" },

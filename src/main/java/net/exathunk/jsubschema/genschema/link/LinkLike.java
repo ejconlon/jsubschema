@@ -9,6 +9,14 @@ import org.codehaus.jackson.map.annotate.JsonDeserialize;
 @JsonDeserialize(as = Link.class)
 public interface LinkLike {
 
+    boolean hasEnctype();
+
+    @JsonProperty("enctype")
+    String getEnctype();
+
+    @JsonProperty("enctype")
+    void setEnctype(String enctype);
+
     boolean hasHref();
 
     @JsonProperty("href")
@@ -16,14 +24,6 @@ public interface LinkLike {
 
     @JsonProperty("href")
     void setHref(String href);
-
-    boolean hasRel();
-
-    @JsonProperty("rel")
-    String getRel();
-
-    @JsonProperty("rel")
-    void setRel(String rel);
 
     boolean hasMethod();
 
@@ -33,12 +33,12 @@ public interface LinkLike {
     @JsonProperty("method")
     void setMethod(String method);
 
-    boolean hasEnctype();
+    boolean hasRel();
 
-    @JsonProperty("enctype")
-    String getEnctype();
+    @JsonProperty("rel")
+    String getRel();
 
-    @JsonProperty("enctype")
-    void setEnctype(String enctype);
+    @JsonProperty("rel")
+    void setRel(String rel);
 
 }
