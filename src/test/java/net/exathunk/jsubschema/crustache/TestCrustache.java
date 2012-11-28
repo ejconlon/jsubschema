@@ -1,10 +1,7 @@
 package net.exathunk.jsubschema.crustache;
 
 import net.exathunk.jsubschema.Util;
-import net.exathunk.jsubschema.base.FullRefResolver;
-import net.exathunk.jsubschema.base.MetaResolver;
-import net.exathunk.jsubschema.base.SelfResolver;
-import net.exathunk.jsubschema.base.TypeException;
+import net.exathunk.jsubschema.base.*;
 import net.exathunk.jsubschema.functional.Either;
 import net.exathunk.jsubschema.functional.Either3;
 import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
@@ -18,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * charolastra 11/19/12 11:08 PM
@@ -346,5 +344,23 @@ public class TestCrustache {
         NameResolver resolver = new NameResolverImpl("http://example.com/whee");
         SchemaLike schema = TagTyper.makeTreeSchema("woo", tagTree, resolver);
         assertEquals(empty, satisfyErrors(schema, tagTree));
+    }
+
+    @Test
+    public void testGithubProfile() throws IOException, TypeException {
+        final String template = "    <h1>Github Profile: {{email}}</h1>\n" +
+                "    <p> Projects: </p>\n" +
+                "    <ul>\n" +
+                "    {{#projects}}\n" +
+                "      <li><a href=\"{{url}}\">{{title}}</a></li>\n" +
+                "    {{/projects}}\n" +
+                "    </ul>";
+
+        Session session = Session.loadDefaultSession();
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/githubprofile");
+        assertNotNull(schema);
+
+        TagTree tagTree = Crustache.treed(Crustache.parsed(Crustache.inline(template))).tagTree();
+        assertEquals(new ArrayList<String>(), satisfyErrors(schema, tagTree));
     }
 }

@@ -52,7 +52,104 @@ This schema will validate JSON documents like this:
 
     { "email": "ejconlon@gmail.com", "projects": [{"title": "jsubschema", "url": "https://github.com/ejconlon/jsubschema"}] }
 
-But will object if the types are wrong or required attributes are missing, etc.
+But will object if the types are wrong or required attributes are missing, etc. (And provide maybe-helpful error messages!)
 
+In order to generate usable Java code from this schema, we have to normalize.  For this reason I've added a "declarations" property to the
+meta schema definition, and use JSON-Schema-style "$ref" links to internally reference declared types.  The above schema is normalized like this:
 
+     {
+       "id": "http://exathunk.net/schemas/githubprofile",
+       "type": "object",
+       "description": "A representation of a Github profile",
 
+       "declarations": {
+         "/properties/projects/items": {
+           "type": "object",
+           "description": "A project",
+           "required": ["title", "url"],
+           "properties": {
+             "title": {
+               "type": "string"
+             },
+             "url": {
+               "type": "string",
+               "format": "uri"
+             },
+             "numCommits": {
+               "type": "integer"
+             },
+             "lastCommit": {
+               "type": "string",
+               "format": "date"
+             }
+           }
+         },
+         "/properties/projects": {
+           "type": "array",
+           "items": {
+             "$ref": "#/declarations/~1properties~1projects~1items"
+           }
+         }
+       },
+
+       "required": ["email"],
+       "properties": {
+         "email": {
+           "type": "string",
+           "format": "email"
+         },
+         "projects": {
+           "$ref": "#/declarations/~1properties~1projects"
+         }
+       }
+     }
+
+(The "~1" bits are the JSON-Pointer escape sequences for "/".)  Generating code is easy from this point:
+
+    @JsonDeserialize(as = Githubprofile.class)
+    public interface GithubprofileLike {
+
+        boolean hasEmail();
+
+        @JsonProperty("email")
+        String getEmail();
+
+        @JsonProperty("email")
+        void setEmail(String email);
+
+        boolean hasProjects();
+
+        @JsonProperty("projects")
+        PropertiesProjectsLike getProjects();
+
+        @JsonProperty("projects")
+        @JsonDeserialize(as = PropertiesProjects.class)
+        void setProjects(PropertiesProjectsLike projects);
+
+    }
+
+(With appropriate definitions for PropertiesProjects, etc.)  The annotations are from the Jackson library and are placed on
+interfaces so the data can be backed by any source - a database, for example.  The generated concrete classes
+are simple beans with useful toString(), equals(), and hashCode() defined, and are accompanied by factory classes for metaprogramming.
+
+So how about some cool applications?  Have you ever been stuck in template hell, tweaking your models and controllers endlessly to
+satisfy changed or ill-exercised view templates?  Why not generate a schema from the template to start, or guard against regressions
+by checking that a schema satisfies a template?  Take this Mustache partial template:
+
+    <h1>Github Profile: {{email}}</h1>
+    <p> Projects: </p>
+    <ul>
+    {{#projects}}
+      <li><a href="{{url}}">{{title}}</a></li>
+    {{/projects}}
+    </ul>
+
+It is easy to see that this can be successfully filled by our "githubprofile" JSON document, and the "crustache" module in JSubSchema agrees.
+
+Other applications?  Data integrity proxies, fuzzers + test case generators, multi-language code generation, and so on.
+
+Now, let's be serious.  There are some truly puzzling corners in this code base - hobby-hacking is dirty work :)  Please talk to me if you
+are interested in exploring more!
+
+Eric Conlon
+ejconlon@gmail.com
