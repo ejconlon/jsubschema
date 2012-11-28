@@ -13,6 +13,14 @@ import org.codehaus.jackson.map.annotate.JsonDeserialize;
 @JsonDeserialize(as = Schema.class)
 public interface SchemaLike {
 
+    boolean has__dollar__instance();
+
+    @JsonProperty("$instance")
+    String get__dollar__instance();
+
+    @JsonProperty("$instance")
+    void set__dollar__instance(String __dollar__instance);
+
     boolean has__dollar__ref();
 
     @JsonProperty("$ref")
@@ -114,6 +122,14 @@ public interface SchemaLike {
     @JsonProperty("required")
     @JsonDeserialize(as = KeyList.class)
     void setRequired(KeyListLike required);
+
+    boolean hasStringEnum();
+
+    @JsonProperty("stringEnum")
+    List<String> getStringEnum();
+
+    @JsonProperty("stringEnum")
+    void setStringEnum(List<String> stringEnum);
 
     boolean hasType();
 

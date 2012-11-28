@@ -10,6 +10,8 @@ import net.exathunk.jsubschema.genschema.schema.declarations.keylist.KeyListLike
 
 public class Schema implements Cloneable, Serializable, SchemaLike {
 
+    private String __dollar__instance;
+
     private String __dollar__ref;
 
     private String __dollar__schema;
@@ -34,7 +36,24 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
 
     private KeyListLike required;
 
+    private List<String> stringEnum;
+
     private String type;
+
+    @Override
+    public boolean has__dollar__instance() {
+        return null != __dollar__instance;
+    }
+
+    @Override
+    public String get__dollar__instance() {
+        return __dollar__instance;
+    }
+
+    @Override
+    public void set__dollar__instance(String __dollar__instance) {
+        this.__dollar__instance = __dollar__instance;
+    }
 
     @Override
     public boolean has__dollar__ref() {
@@ -217,6 +236,21 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     }
 
     @Override
+    public boolean hasStringEnum() {
+        return null != stringEnum;
+    }
+
+    @Override
+    public List<String> getStringEnum() {
+        return stringEnum;
+    }
+
+    @Override
+    public void setStringEnum(List<String> stringEnum) {
+        this.stringEnum = stringEnum;
+    }
+
+    @Override
     public boolean hasType() {
         return null != type;
     }
@@ -234,6 +268,7 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Schema{ ");
+        if (__dollar__instance != null) sb.append("__dollar__instance='").append(__dollar__instance).append("', ");
         if (__dollar__ref != null) sb.append("__dollar__ref='").append(__dollar__ref).append("', ");
         if (__dollar__schema != null) sb.append("__dollar__schema='").append(__dollar__schema).append("', ");
         if (declarations != null) sb.append("declarations='").append(declarations).append("', ");
@@ -246,6 +281,7 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         if (items != null) sb.append("items='").append(items).append("', ");
         if (properties != null) sb.append("properties='").append(properties).append("', ");
         if (required != null) sb.append("required='").append(required).append("', ");
+        if (stringEnum != null) sb.append("stringEnum='").append(stringEnum).append("', ");
         if (type != null) sb.append("type='").append(type).append("', ");
         return sb.append("}").toString();
     }
@@ -255,6 +291,8 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         if (this == o) return true;
         if (o instanceof SchemaLike) {
             SchemaLike other = (SchemaLike) o;
+            if (__dollar__instance == null) { if (other.has__dollar__instance()) { return false; } }
+            else if (!__dollar__instance.equals(other.get__dollar__instance())) { return false; }
             if (__dollar__ref == null) { if (other.has__dollar__ref()) { return false; } }
             else if (!__dollar__ref.equals(other.get__dollar__ref())) { return false; }
             if (__dollar__schema == null) { if (other.has__dollar__schema()) { return false; } }
@@ -279,6 +317,8 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!properties.equals(other.getProperties())) { return false; }
             if (required == null) { if (other.hasRequired()) { return false; } }
             else if (!required.equals(other.getRequired())) { return false; }
+            if (stringEnum == null) { if (other.hasStringEnum()) { return false; } }
+            else if (!stringEnum.equals(other.getStringEnum())) { return false; }
             if (type == null) { if (other.hasType()) { return false; } }
             else if (!type.equals(other.getType())) { return false; }
             return true;
@@ -290,6 +330,7 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
     @Override
     public int hashCode() {
         int result = 0;
+        result = 31 * result + (__dollar__instance == null ? 0 : __dollar__instance.hashCode());
         result = 31 * result + (__dollar__ref == null ? 0 : __dollar__ref.hashCode());
         result = 31 * result + (__dollar__schema == null ? 0 : __dollar__schema.hashCode());
         result = 31 * result + (declarations == null ? 0 : declarations.hashCode());
@@ -302,12 +343,15 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
         result = 31 * result + (items == null ? 0 : items.hashCode());
         result = 31 * result + (properties == null ? 0 : properties.hashCode());
         result = 31 * result + (required == null ? 0 : required.hashCode());
+        result = 31 * result + (stringEnum == null ? 0 : stringEnum.hashCode());
         result = 31 * result + (type == null ? 0 : type.hashCode());
         return result;
     }
 
     public Set<String> diff(SchemaLike other) {
             Set<String> s = new TreeSet<String>();
+            if (__dollar__instance == null) { if (other == null || other.has__dollar__instance()) { s.add("__dollar__instance"); } }
+            else if (!__dollar__instance.equals(other.get__dollar__instance())) { s.add("__dollar__instance"); }
             if (__dollar__ref == null) { if (other == null || other.has__dollar__ref()) { s.add("__dollar__ref"); } }
             else if (!__dollar__ref.equals(other.get__dollar__ref())) { s.add("__dollar__ref"); }
             if (__dollar__schema == null) { if (other == null || other.has__dollar__schema()) { s.add("__dollar__schema"); } }
@@ -332,6 +376,8 @@ public class Schema implements Cloneable, Serializable, SchemaLike {
             else if (!properties.equals(other.getProperties())) { s.add("properties"); }
             if (required == null) { if (other == null || other.hasRequired()) { s.add("required"); } }
             else if (!required.equals(other.getRequired())) { s.add("required"); }
+            if (stringEnum == null) { if (other == null || other.hasStringEnum()) { s.add("stringEnum"); } }
+            else if (!stringEnum.equals(other.getStringEnum())) { s.add("stringEnum"); }
             if (type == null) { if (other == null || other.hasType()) { s.add("type"); } }
             else if (!type.equals(other.getType())) { s.add("type"); }
             return s;
