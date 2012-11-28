@@ -21,8 +21,7 @@ public class StringEnumTypeValidator implements Validator {
         if (shouldIgnore(node)) return;
         final JsonNode n = node.getPointedNode().getNode();
         if (n.has("stringEnum")) {
-            if (!n.has("type") || !"array".equals(n.get("type").asText()) || !n.has("items") ||
-                !n.get("items").has("type") || !"string".equals(n.get("items").get("type").asText())) {
+            if (!n.has("type") || !"string".equals(n.get("type").asText())) {
                 context.errors.add(new VError(node, "stringEnum must have string type, found: "+n));
             }
         }

@@ -212,16 +212,12 @@ public class TestValidation {
         List<String> types = Util.asList("object", "array", "string", "boolean", "integer", "number");
 
         for (String type : types) {
-            for (String itemType : types) {
-                boolean isArray = "array".equals(type);
-                String itemsStr = (isArray ? "\"items\":{ \"type\":\""+itemType+"\"}, " : "");
-                int expectedNum = (isArray && itemType.equals("string")) ? 0 : 1;
-                String str = "{ \"stringEnum\":[\"a\",\"b\",\"c\"], "+itemsStr+" \"type\":\""+type+"\" }";
-                JsonNode node = Util.parse(str);
-                VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
-                assertEquals(str, expectedNum, context.errors.size());
-                if (!isArray) break;
-            }
+            boolean isString = "string".equals(type);
+            int expectedNum = (isString) ? 0 : 1;
+            String str = "{ \"stringEnum\":[\"a\",\"b\",\"c\"], \"type\":\""+type+"\" }";
+            JsonNode node = Util.parse(str);
+            VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
+            assertEquals(str, expectedNum, context.errors.size());
         }
     }
 
@@ -236,10 +232,8 @@ public class TestValidation {
         List<String> types = Util.asList("object", "array", "string", "boolean", "integer", "number", "foo", "bar", "baz");
 
         for (String type : types) {
-                boolean isContainer = "array".equals(type);
-                String itemsStr = (isContainer ? "\"items\":{ \"type\":\"string\"}, " : "");
                 int expectedNum = (schema.getProperties().get("type").getStringEnum().contains(type) ? 0 : 1);
-                String str = "{ "+itemsStr+" \"type\":\""+type+"\" }";
+                String str = "{ \"type\":\""+type+"\" }";
                 JsonNode node = Util.parse(str);
                 VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
                 assertEquals(str, expectedNum, context.errors.size());
