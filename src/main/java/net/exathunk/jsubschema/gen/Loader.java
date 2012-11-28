@@ -17,6 +17,7 @@ public class Loader {
 
     public static String loadString(String path) throws IOException {
         InputStream is = Loader.class.getResourceAsStream(path);
+        if (is == null) throw new IOException("Invalid path: "+path);
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
         String line = reader.readLine();
