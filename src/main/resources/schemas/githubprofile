@@ -1,0 +1,36 @@
+    {
+      "id": "http://exathunk.net/schemas/githubprofile",
+      "type": "object",
+      "description": "A representation of a Github profile",
+      "required": ["email"],
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "A project",
+            "required": ["title", "url"],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "numCommits": {
+                "type": "integer"
+              },
+              "lastCommit": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          }
+        }
+      }
+    }

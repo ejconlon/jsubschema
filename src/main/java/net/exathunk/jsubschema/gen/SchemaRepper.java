@@ -28,7 +28,7 @@ public class SchemaRepper {
         if (schema.getType().equals("object")) {
             if (schema.hasProperties()) {
                 for (Map.Entry<String, SchemaLike> entry : schema.getProperties().entrySet()) {
-                    final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.name, rootPackage, addlImports);
+                    final FieldRep field = makeField(entry.getKey(), entry.getValue(), c.name, rootPackage, classPackage, addlImports);
                     c.imports.addAll(field.imports);
                     c.fields.add(field);
                     c.methods.add(new GenUtil.HasAccessorGen().genAccessor(field));
@@ -44,7 +44,7 @@ public class SchemaRepper {
             } else if (schema.hasItems()) {
                 c.imports.add("java.util.Map");
                 c.imports.add("java.util.TreeMap");
-                final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), c.name, rootPackage, addlImports);
+                final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), c.name, rootPackage, classPackage, addlImports);
                 c.imports.addAll(virtualField.imports);
                 c.extended.add("TreeMap<String, "+virtualField.className+">");
                 c.virtual = virtualField;
@@ -54,7 +54,7 @@ public class SchemaRepper {
         } else if (schema.getType().equals("array")) {
             c.imports.add("java.util.List");
             c.imports.add("java.util.ArrayList");
-            final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), c.name, rootPackage, addlImports);
+            final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), c.name, rootPackage, classPackage, addlImports);
             c.imports.addAll(virtualField.imports);
             c.extended.add("ArrayList<"+virtualField.className+">");
             c.virtual = virtualField;
@@ -88,7 +88,7 @@ public class SchemaRepper {
                 // pass
             } else if (schema.hasItems()) {
                 interfaceRep.imports.add("java.util.Map");
-                final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), classRep.name, classPackage, addlImports);
+                final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), classRep.name, rootPackage, classPackage, addlImports);
                 interfaceRep.imports.addAll(virtualField.imports);
                 interfaceRep.extended.add("Map<String, "+virtualField.className+">");
             } else {
@@ -96,7 +96,7 @@ public class SchemaRepper {
             }
         } else if (schema.getType().equals("array")) {
             interfaceRep.imports.add("java.util.List");
-            final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), classRep.name, classPackage, addlImports);
+            final FieldRep virtualField = makeField("VIRTUAL", schema.getItems(), classRep.name, rootPackage, classPackage, addlImports);
             interfaceRep.imports.addAll(virtualField.imports);
             interfaceRep.extended.add("List<"+virtualField.className+">");
         } else {
@@ -168,7 +168,7 @@ public class SchemaRepper {
         public String declaredName;
     }
 
-    private static TContext typeOf(SchemaLike schema, String rootClassName, String classPackage, Set<String> addlImports) {
+    private static TContext typeOf(SchemaLike schema, String rootClassName, String rootPackage, String classPackage, Set<String> addlImports) {
         Set<String> addlParts = new TreeSet<String>();
         for (String x : addlImports) {
             String[] parts = x.split("\\.");
@@ -184,8 +184,8 @@ public class SchemaRepper {
                     final String rawClassName = parseClassName(Reference.fromReferenceString(dr).getFirst());
                     tContext.className = rawClassName+"Like";
                     tContext.declaredName = dr.substring("#/declarations/".length(), dr.length());
-                    tContext.imports.add(classPackage+".declarations."+rawClassName.toLowerCase()+"."+tContext.className);
-                    tContext.imports.add(classPackage+".declarations."+rawClassName.toLowerCase()+"."+rawClassName);
+                    tContext.imports.add(rootPackage+".declarations."+rawClassName.toLowerCase()+"."+tContext.className);
+                    tContext.imports.add(rootPackage+".declarations."+rawClassName.toLowerCase()+"."+rawClassName);
                 } else {
                     throw new IllegalArgumentException("Cannot type (reffed): "+schema);
                 }
@@ -203,13 +203,13 @@ public class SchemaRepper {
                 }
             }
         } else if (schema.getType().equals("object")) {
-            final TContext subContext = typeOf(schema.getItems(), rootClassName, classPackage, addlImports);
+            final TContext subContext = typeOf(schema.getItems(), rootClassName, rootPackage, classPackage, addlImports);
             tContext.className  = "Map<String, "+subContext.className+">";
             tContext.declaredName = subContext.declaredName;
             tContext.imports.addAll(subContext.imports);
             tContext.imports.add("java.util.Map");
         } else if (schema.getType().equals("array")) {
-            final TContext subContext = typeOf(schema.getItems(), rootClassName, classPackage, addlImports);
+            final TContext subContext = typeOf(schema.getItems(), rootClassName, rootPackage, classPackage, addlImports);
             tContext.className  = "List<"+subContext.className+">";
             tContext.declaredName = subContext.declaredName;
             tContext.imports.addAll(subContext.imports);
@@ -237,39 +237,39 @@ public class SchemaRepper {
         }
     }
 
-    private static FieldRep makeField(String key, SchemaLike schema, String rootClassName, String rootPackage, Set<String> addlImports) {
+    private static FieldRep makeField(String key, SchemaLike schema, String rootClassName, String rootPackage, String classPackage, Set<String> addlImports) {
         final FieldRep f = new FieldRep();
         f.visibility = Visibility.PRIVATE;
         f.name = Util.convert(key);
-        TContext tContext = typeOf(schema, rootClassName, rootPackage, addlImports);
+        TContext tContext = typeOf(schema, rootClassName, rootPackage, classPackage, addlImports);
         f.className = tContext.className;
         f.declaredName = tContext.declaredName;
         f.imports.addAll(tContext.imports);
         return f;
     }
 
-    public static void makeAll(Reference rootReference, Reference reference, SchemaLike rootSchema, SchemaLike schema, String rootClassPackage, String classPackage, Map<String, ClassRep> genned, Set<String> addlImports) {
-        final ClassRep classRep = SchemaRepper.makeClass(rootReference, reference, schema, rootClassPackage, classPackage, addlImports);
+    public static void makeAll(Reference rootReference, Reference reference, SchemaLike rootSchema, SchemaLike schema, String rootPackage, String classPackage, Map<String, ClassRep> genned, Set<String> addlImports) {
+        final ClassRep classRep = SchemaRepper.makeClass(rootReference, reference, schema, rootPackage, classPackage, addlImports);
         putGenned(classRep, genned);
-        putGenned(SchemaRepper.makeInterface(rootReference, reference, schema, rootClassPackage, classPackage, addlImports), genned);
-        putGenned(SchemaRepper.makeFactory(rootReference, reference, schema, rootClassPackage, classPackage, addlImports), genned);
+        putGenned(SchemaRepper.makeInterface(rootReference, reference, schema, rootPackage, classPackage, addlImports), genned);
+        putGenned(SchemaRepper.makeFactory(rootReference, reference, schema, rootPackage, classPackage, addlImports), genned);
 
         for (final FieldRep field : classRep.fields) {
-            genIt(rootReference, rootSchema, field, rootClassPackage, genned, addlImports);
+            genIt(rootReference, rootSchema, field, rootPackage, genned, addlImports);
         }
         if (classRep.virtual != null) {
-            genIt(rootReference, rootSchema, classRep.virtual, rootClassPackage, genned, addlImports);
+            genIt(rootReference, rootSchema, classRep.virtual, rootPackage, genned, addlImports);
         }
     }
 
-    public static void genIt(Reference rootReference, SchemaLike rootSchema, FieldRep field, String rootClassPackage, Map<String, ClassRep> genned, Set<String> addlImports) {
+    public static void genIt(Reference rootReference, SchemaLike rootSchema, FieldRep field, String rootPackage, Map<String, ClassRep> genned, Set<String> addlImports) {
         if (field.declaredName != null) {
             final Part part = Part.fromPointerString(field.declaredName);
             final Reference ref = rootReference.cons(Part.asKey("declarations")).cons(part);
             final SchemaLike subSchema = rootSchema.getDeclarations().get(part.getKey());
             final String name = SchemaRepper.parseClassName(ref);
-            final String packageName = rootClassPackage + ".declarations." + name.toLowerCase();
-            makeAll(rootReference, ref, rootSchema, subSchema, rootClassPackage, packageName, genned, addlImports);
+            final String packageName = rootPackage + ".declarations." + name.toLowerCase();
+            makeAll(rootReference, ref, rootSchema, subSchema, rootPackage, packageName, genned, addlImports);
         }
     }
 

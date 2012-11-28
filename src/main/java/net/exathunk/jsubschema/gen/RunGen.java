@@ -59,7 +59,7 @@ public class RunGen {
         final Map<String, ClassRep> genned = new TreeMap<String, ClassRep>();
 
         for (File schemaFile : schemasDir.listFiles()) {
-        //for (File schemaFile : new File[] {new File(schemasDir, "schema")}) {
+        //for (File schemaFile : new File[] {new File(schemasDir, "githubprofile")}) {
             System.out.println("Generating "+schemaFile);
             final BufferedReader reader = new BufferedReader(new FileReader(schemaFile));
             final StringBuilder contents = new StringBuilder();
