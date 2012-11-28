@@ -11,7 +11,7 @@ public class SchemaValidator extends MetaValidator {
                 new PropAttrsValidator(),
                 new ExtensionsValidator(),
                 new RefValidator(),
-                new StringEnumTypeValidator(),
+                new StringTypeValidator(),
                 new InstanceValidator()
         ));
     }

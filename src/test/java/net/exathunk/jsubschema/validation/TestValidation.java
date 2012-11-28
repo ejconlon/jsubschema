@@ -207,7 +207,7 @@ public class TestValidation {
         SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
         assertNotNull(schema);
         FullRefResolver fullRefResolver = new MetaResolver(new SessionResolver(session), new SelfResolver(schema));
-        Validator validator = new StringEnumTypeValidator();
+        Validator validator = new StringTypeValidator();
 
         List<String> types = Util.asList("object", "array", "string", "boolean", "integer", "number");
 
