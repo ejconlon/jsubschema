@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -176,5 +177,78 @@ public class TestValidation {
             VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
             assertEquals(0, context.errors.size());
         }
+    }
+
+    @Test
+    public void testRefs() throws IOException, TypeException {
+        Session session = Session.loadDefaultSession();
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        assertNotNull(schema);
+        FullRefResolver fullRefResolver = new MetaResolver(new SessionResolver(session), new SelfResolver(schema));
+        Validator validator = new RefValidator();
+
+        List<String> keys = Util.asList("$ref", "$schema", "$instance");
+        List<String> values = Util.asList("http://exathunk.net/schemas/schema", "http://whatever.com/not/here");
+
+        for (final String key : keys) {
+            for (int i = 0; i < values.size(); ++i) {
+                final String value = values.get(i);
+                JsonNode node = Util.parse("{ \""+key+"\": \""+value+"\" }");
+                VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
+                assertEquals(i, context.errors.size());
+            }
+        }
+
+    }
+
+    @Test
+    public void testStringEnumType() throws IOException, TypeException {
+        Session session = Session.loadDefaultSession();
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        assertNotNull(schema);
+        FullRefResolver fullRefResolver = new MetaResolver(new SessionResolver(session), new SelfResolver(schema));
+        Validator validator = new StringEnumTypeValidator();
+
+        List<String> types = Util.asList("object", "array", "string", "boolean", "integer", "number");
+
+        for (String type : types) {
+            for (String itemType : types) {
+                boolean isArray = "array".equals(type);
+                String itemsStr = (isArray ? "\"items\":{ \"type\":\""+itemType+"\"}, " : "");
+                int expectedNum = (isArray && itemType.equals("string")) ? 0 : 1;
+                String str = "{ \"stringEnum\":[\"a\",\"b\",\"c\"], "+itemsStr+" \"type\":\""+type+"\" }";
+                JsonNode node = Util.parse(str);
+                VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
+                assertEquals(str, expectedNum, context.errors.size());
+                if (!isArray) break;
+            }
+        }
+    }
+
+    @Test
+    public void testStringEnumValue() throws IOException, TypeException {
+        Session session = Session.loadDefaultSession();
+        SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
+        assertNotNull(schema);
+        FullRefResolver fullRefResolver = new MetaResolver(new SessionResolver(session), new SelfResolver(schema));
+        Validator validator = new StringEnumValueValidator();
+
+        List<String> types = Util.asList("object", "array", "string", "boolean", "integer", "number", "foo", "bar", "baz");
+
+        for (String type : types) {
+                boolean isContainer = "array".equals(type);
+                String itemsStr = (isContainer ? "\"items\":{ \"type\":\"string\"}, " : "");
+                int expectedNum = (schema.getProperties().get("type").getStringEnum().contains(type) ? 0 : 1);
+                String str = "{ "+itemsStr+" \"type\":\""+type+"\" }";
+                JsonNode node = Util.parse(str);
+                VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
+                assertEquals(str, expectedNum, context.errors.size());
+        }
+    }
+
+    @Test
+    public void testValidateSession() throws IOException, TypeException {
+        Session session = Session.loadDefaultSession();
+        assertEquals(new ArrayList<VError>(), session.validate().errors);
     }
 }

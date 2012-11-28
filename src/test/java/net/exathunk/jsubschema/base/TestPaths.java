@@ -7,7 +7,7 @@ import net.exathunk.jsubschema.genschema.event.Event;
 import net.exathunk.jsubschema.genschema.geo.Geo;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
 import net.exathunk.jsubschema.pointers.*;
-import net.exathunk.jsubschema.validation.DefaultValidator;
+import net.exathunk.jsubschema.validation.InstanceValidator;
 import net.exathunk.jsubschema.validation.VContext;
 import net.exathunk.jsubschema.validation.VError;
 import net.exathunk.jsubschema.validation.Validator;
@@ -127,7 +127,7 @@ public class TestPaths {
         assertEquals(goldTypes, actualTypes);
 
         FullRefResolver fullRefResolver = new MetaResolver(new SelfResolver(schema));
-        Validator validator = new DefaultValidator();
+        Validator validator = new InstanceValidator();
         VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
         assertEquals(new ArrayList<VError>(), context.errors);
     }
@@ -175,7 +175,7 @@ public class TestPaths {
         assertEquals(goldSchemaRefs, actualSchemaRefs);
 
         FullRefResolver fullRefResolver = new MetaResolver(new SelfResolver(schema));
-        Validator validator = new DefaultValidator();
+        Validator validator = new InstanceValidator();
         VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
         assertEquals(new ArrayList<VError>(), context.errors);
     }
@@ -244,7 +244,7 @@ public class TestPaths {
         assertEquals(goldSchemaRefs, actualSchemaRefs);
 
         FullRefResolver fullRefResolver = new MetaResolver(new SelfResolver(schema));
-        Validator validator = new DefaultValidator();
+        Validator validator = new InstanceValidator();
         VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
         assertEquals(new ArrayList<VError>(), context.errors);
     }
@@ -363,7 +363,7 @@ public class TestPaths {
 
         assertEquals(goldTypes, actualTypes);
 
-        Validator validator = new DefaultValidator();
+        Validator validator = new InstanceValidator();
         VContext context = Util.runValidator(validator, new SchemaNode(schema, new PointedNode(node), fullRefResolver));
         assertEquals(new ArrayList<VError>(), context.errors);
     }

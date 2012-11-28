@@ -24,7 +24,7 @@
     "id" : ["$ref"],
     "properties" : ["items"],
     "items" : ["properties"],
-    "$ref" : ["id", "description", "format", "properties", "declarations", "items",
+    "$ref" : ["id", "format", "properties", "declarations", "items",
               "type", "required", "forbids", "dependencies", "$instance", "stringEnum"]
   },
 

@@ -4,7 +4,7 @@ import net.exathunk.jsubschema.Util;
 import net.exathunk.jsubschema.gen.Loader;
 import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
-import net.exathunk.jsubschema.validation.DefaultValidator;
+import net.exathunk.jsubschema.validation.SchemaValidator;
 import net.exathunk.jsubschema.validation.VContext;
 import net.exathunk.jsubschema.validation.VError;
 import net.exathunk.jsubschema.validation.Validator;
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 public class TestSchematize {
 
     private static List<VError> validate(SchemaLike schema, JsonNode node) {
-        Validator validator = new DefaultValidator();
+        Validator validator = new SchemaValidator();
         FullRefResolver fullRefResolver = new MetaResolver(new SelfResolver(schema));
         VContext context = Util.runValidator(validator, new SchemaNode(new SchemaRef(schema), new PointedNode(node), fullRefResolver));
         return context.errors;

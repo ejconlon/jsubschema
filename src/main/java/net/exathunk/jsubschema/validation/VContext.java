@@ -8,4 +8,10 @@ import java.util.List;
  */
 public class VContext {
     public List<VError> errors = new ArrayList<VError>();
+
+    public void subsume(String prefix, VContext other) {
+        for (VError error : other.errors) {
+            errors.add(new VError(prefix+error.path, error.message));
+        }
+    }
 }

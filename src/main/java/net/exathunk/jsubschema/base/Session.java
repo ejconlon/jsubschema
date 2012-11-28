@@ -6,6 +6,10 @@ import net.exathunk.jsubschema.gendeps.DomainFactory;
 import net.exathunk.jsubschema.genschema.schema.Schema;
 import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
 import net.exathunk.jsubschema.genschema.schema.SchemaLike;
+import net.exathunk.jsubschema.validation.SchemaValidator;
+import net.exathunk.jsubschema.validation.VContext;
+import net.exathunk.jsubschema.validation.VError;
+import net.exathunk.jsubschema.validation.Validator;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -31,6 +35,21 @@ public class Session {
             session.addSchema(schema);
         }
         return session;
+    }
+
+    public VContext validate()  {
+        VContext context = new VContext();
+        Validator validator = new SchemaValidator();
+        for (SchemaLike schema : schemas.values()) {
+            try {
+                JsonNode node = Util.quickUnbind(schema);
+                VContext subContext =  Util.runValidator(validator, this, schemas.get("http://exathunk.net/schemas/schema"), node);
+                context.subsume(schema.getId()+" => ", subContext);
+            } catch (TypeException e) {
+                context.errors.add(new VError("ROOT", "Could not unbind schema "+schema.getId()));
+            }
+        }
+        return context;
     }
 
     public void addSchema(SchemaLike schema) {
