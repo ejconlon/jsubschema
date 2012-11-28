@@ -1,14 +1,9 @@
 package net.exathunk.jsubschema.base;
 
 import net.exathunk.jsubschema.Util;
-import net.exathunk.jsubschema.gen.Assembler;
-import net.exathunk.jsubschema.gen.ClassRep;
 import net.exathunk.jsubschema.gen.Loader;
-import net.exathunk.jsubschema.gen.SchemaRepper;
 import net.exathunk.jsubschema.genschema.schema.Schema;
 import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
-import net.exathunk.jsubschema.genschema.schema.SchemaLike;
-import net.exathunk.jsubschema.pointers.Reference;
 import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
@@ -16,7 +11,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * charolastra 11/13/12 7:18 PM
@@ -62,20 +56,5 @@ public class TestNodes {
         System.out.println(session);
     }*/
 
-    // TODO better assertions :-/
-    @Test
-    public void testGenSchema() throws IOException, TypeException {
-        final Session session = Session.loadDefaultSession();
-        final SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/schema");
-        assertNotNull(schema);
-        final ClassRep classRep = SchemaRepper.makeClass(Reference.fromId(schema.getId()), Reference.fromId(schema.getId()), schema, "net.exathunk.jsubschema.genschema.schema", "net.exathunk.jsubschema.genschema.schema");
-        final String classString = Assembler.writeClass(classRep);
-        assertNotNull(classString);
-        //System.out.println(classString);
-        final ClassRep factoryRep = SchemaRepper.makeFactory(Reference.fromId(schema.getId()), Reference.fromId(schema.getId()), schema, "net.exathunk.jsubschema.genschema.schema", "net.exathunk.jsubschema.genschema.schema");
-        final String factoryString = Assembler.writeClass(factoryRep);
-        //System.out.println(factoryString);
-        assertNotNull(factoryString);
-    }
 
 }

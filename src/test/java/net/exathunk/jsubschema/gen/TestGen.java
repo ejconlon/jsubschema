@@ -1,21 +1,42 @@
 package net.exathunk.jsubschema.gen;
 
 import net.exathunk.jsubschema.Util;
+import net.exathunk.jsubschema.base.Session;
 import net.exathunk.jsubschema.base.TypeException;
 import net.exathunk.jsubschema.genschema.geo.Geo;
 import net.exathunk.jsubschema.genschema.schema.Schema;
 import net.exathunk.jsubschema.genschema.schema.SchemaFactory;
+import net.exathunk.jsubschema.genschema.schema.SchemaLike;
+import net.exathunk.jsubschema.pointers.Reference;
 import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * charolastra 11/16/12 11:08 PM
  */
 public class TestGen {
+
+    // TODO better assertions :-/
+    @Test
+    public void testGenSchema() throws IOException, TypeException {
+        final Session session = Session.loadDefaultSession();
+        final SchemaLike schema = session.schemas.get("http://exathunk.net/schemas/event");
+        assertNotNull(schema);
+        final ClassRep classRep = SchemaRepper.makeClass(Reference.fromId(schema.getId()), Reference.fromId(schema.getId()), schema, "net.exathunk.jsubschema.genschema.event", "net.exathunk.jsubschema.genschema.event", Util.asSet("foo.bar.GeoLike"));
+        final String classString = Assembler.writeClass(classRep);
+        assertNotNull(classString);
+        //System.out.println(classString);
+        final ClassRep factoryRep = SchemaRepper.makeFactory(Reference.fromId(schema.getId()), Reference.fromId(schema.getId()), schema, "net.exathunk.jsubschema.genschema.event", "net.exathunk.jsubschema.genschema.event", Util.asSet("foo.bar.GeoLike"));
+        final String factoryString = Assembler.writeClass(factoryRep);
+        //System.out.println(factoryString);
+        assertNotNull(factoryString);
+    }
+
     @Test
     public void testEquals() {
         final Geo a = new Geo();

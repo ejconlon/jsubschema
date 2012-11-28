@@ -10,7 +10,9 @@ import org.codehaus.jackson.JsonNode;
 
 import java.io.*;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * java RunGen src/main/resources/schemas target/generated-sources/gen-javabean/net/exathunk/jsubschema/genschema net.exathunk.jsubschema.genschema
@@ -24,18 +26,24 @@ import java.util.TreeMap;
  */
 public class RunGen {
 
-    final String schemaDir;
-    final String destDir;
-    final String basePackage;
+    private final String schemaDir;
+    private final String destDir;
+    private final String basePackage;
+    private final Set<String> addlImports;
 
-    public RunGen(String schemaDir, String destDir, String basePackage) {
+    public RunGen(String schemaDir, String destDir, String basePackage, Set<String> addlImports) {
         this.schemaDir = schemaDir;
         this.destDir = destDir;
         this.basePackage = basePackage;
+        this.addlImports = addlImports;
     }
 
     public static void main(String[] args) throws IOException, TypeException {
-        RunGen runGen = new RunGen(args[0], args[1], args[2]);
+        Set<String> addlImports = new TreeSet<String>();
+        for (int i = 3; i < args.length; ++i) {
+            addlImports.add(args[i]);
+        }
+        RunGen runGen = new RunGen(args[0], args[1], args[2], addlImports);
         runGen.innerExecute();
     }
 
@@ -68,7 +76,7 @@ public class RunGen {
             final String name = SchemaRepper.parseClassName(reference);
             final String packageName = basePackage + "." + name.toLowerCase();
 
-            SchemaRepper.makeAll(reference, reference, normalized, normalized, packageName, packageName, genned);
+            SchemaRepper.makeAll(reference, reference, normalized, normalized, packageName, packageName, genned, addlImports);
         }
 
         for (Map.Entry<String, ClassRep> entry : genned.entrySet()) {

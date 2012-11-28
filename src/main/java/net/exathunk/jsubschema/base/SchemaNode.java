@@ -48,6 +48,10 @@ public class SchemaNode implements Iterable<SchemaNode> {
         return pointedNode;
     }
 
+    public FullRefResolver getFullRefResolver() {
+        return fullRefResolver;
+    }
+
     public String toPathString() {
         if (eitherSchema.isFirst()) {
             return eitherSchema.getFirst().getReference().toReferenceString()+";"+pointedNode.getPointer().toPointerString();
