@@ -145,11 +145,46 @@ by checking that a schema satisfies a template?  Take this Mustache partial temp
     </ul>
 
 It is easy to see that this can be successfully filled by our "githubprofile" JSON document, and the "crustache" module in JSubSchema agrees.
+As you would expect, the minimal schema it generates is much like the hand-written one:
+
+    {
+      "id": "http://exathunk.net/schemas/githubprofile",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "projects": {
+          "items": {
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "url",
+              "title"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "email"
+      ],
+      "type": "object"
+    }
 
 Other applications?  Data integrity proxies, fuzzers + test case generators, multi-language code generation, and so on.
 
-Now, let's be serious.  There are some truly puzzling corners in this code base - hobby-hacking is dirty work :)  Please talk to me if you
-are interested in exploring more!
+Now, let's be serious.  There are some truly puzzling corners in this code base - hobby-hacking is dirty work :)
+I was figuring out a lot of things on the fly.
+However, there are a tests that cover the core aspects, and in general things are pretty modular and functional, so there is a good foundation.
+Please talk to me if you are interested in exploring more!
 
 Eric Conlon
+
 ejconlon@gmail.com

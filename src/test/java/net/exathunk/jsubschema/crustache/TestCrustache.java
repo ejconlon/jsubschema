@@ -362,5 +362,12 @@ public class TestCrustache {
 
         TagTree tagTree = Crustache.treed(Crustache.parsed(Crustache.inline(template))).tagTree();
         assertEquals(new ArrayList<String>(), satisfyErrors(schema, tagTree));
+
+        NameResolver resolver = new NameResolverImpl("http://exathunk.net/schemas");
+        SchemaLike genSchema = TagTyper.makeTreeSchema("githubprofile", tagTree, resolver);
+        assertEquals(new ArrayList<String>(), satisfyErrors(genSchema, tagTree));
+
+        //JsonNode node = Util.quickUnbind(genSchema);
+        //System.out.println(node);
     }
 }
